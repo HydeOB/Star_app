@@ -91,6 +91,7 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
       <button data-s="0" title="Pause">II</button>
       <button data-s="0.5">½×</button>
       <button data-s="1" aria-pressed="true">1×</button>
+      <button data-s="1.5">1,5×</button>
       <button data-s="2">2×</button>
       <button data-s="3">3×</button>
     </div>
@@ -128,13 +129,9 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
         </div>
       </div>
       <div><h2>Munitions · envoi automatique</h2>
-        <div class="setrow"><span>Un envoi toutes les</span>
-          <div class="chip seg" id="every" role="group" aria-label="Intervalle entre deux envois">
-            <button data-e="1">1 s</button><button data-e="3" aria-pressed="true">3 s</button><button data-e="5">5 s</button><button data-e="10">10 s</button>
-          </div></div>
-        <div class="setrow"><span>Vaisseaux par envoi</span>
+        <div class="setrow"><span>Après le premier envoi, envoyer par paquets de</span>
           <div class="chip seg" id="qty" role="group" aria-label="Vaisseaux par envoi">
-            <button data-q="3">3</button><button data-q="5" aria-pressed="true">5</button><button data-q="10">10</button><button data-q="0">Tout</button>
+            <button data-q="3">3</button><button data-q="5" aria-pressed="true">5</button><button data-q="10">10</button>
           </div></div>
       </div>
       <div class="btns"><button class="go" id="start">Lancer la partie</button><button class="ghost" id="resume" hidden>Reprendre</button></div>
@@ -142,7 +139,7 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
         <ul class="rules">
           <li>Chaque planète à toi <b>produit des vaisseaux</b> en continu. Les grosses produisent plus.</li>
           <li><b>Touche</b> ton étoile puis une cible : elle envoie ses vaisseaux une fois (25, 50 ou 100 %).</li>
-          <li><b>Reste appuyé et glisse</b> vers une étoile : envoi automatique selon tes réglages Munitions. Glisse à nouveau vers la même cible pour l'arrêter.</li>
+          <li><b>Reste appuyé et glisse</b> vers une étoile : elle envoie d'abord tous ses vaisseaux, puis un paquet (3, 5 ou 10, réglable dans Munitions) dès qu'elle l'a produit. Glisse à nouveau vers la même cible pour l'arrêter.</li>
           <li>Une attaque réussit si tu envoies <b>plus de vaisseaux que la défense</b>. Les boucliers multiplient la défense.</li>
                     <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux).</li>
           <li>Tu gagnes quand l'adversaire n'a plus aucun système ni flotte.</li>
@@ -185,9 +182,10 @@ const DIFF={
   difficile:{think:.85,aggr:.95,margin:4,upg:.5,bonus:1.15,safety:.5}
 };
 
-let G=null, mapKey="vega", diffKey="normal", speed=1, ratio=1, autoEvery=3, autoQty=5;
-try{const st=JSON.parse(localStorage.getItem("constella-munitions")||"null");if(st){autoEvery=st.e;autoQty=st.q;}}catch(e){}
-const saveMun=()=>{try{localStorage.setItem("constella-munitions",JSON.stringify({e:autoEvery,q:autoQty}));}catch(e){}};
+let G=null, mapKey="vega", diffKey="normal", speed=1, ratio=1, autoQty=5;
+const PACE=1/1.5; // rythme de base : 1× est 1,5 fois plus lent que la v1
+try{const st=JSON.parse(localStorage.getItem("constella-munitions")||"null");if(st&&[3,5,10].includes(st.q))autoQty=st.q;}catch(e){}
+const saveMun=()=>{try{localStorage.setItem("constella-munitions",JSON.stringify({q:autoQty}));}catch(e){}};
 
 function build(key){
   const M=MAPS[key], N=M.half.length, nodes=[];
@@ -254,7 +252,7 @@ function step(dt){
   for(const n of G.nodes){
     if(n.owner&&n.ships<cap(n))n.ships=Math.min(cap(n),n.ships+rate(n)*dt);
     n.pulse=Math.max(0,n.pulse-dt*2);
-    if(n.rally!==null&&n.owner){n.rallyT+=dt;if(n.rallyT>=autoEvery&&n.ships>=1){n.rallyT=0;send(n,G.nodes[n.rally],autoQty||n.ships);}}
+    if(n.rally!==null&&n.owner&&n.ships>=autoQty)send(n,G.nodes[n.rally],autoQty);
   }
   // flottes
   const alive=[];
@@ -389,7 +387,7 @@ function draw(){
     ctx.strokeStyle=C.gold;ctx.lineWidth=2.5;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(n.sx,n.sy);
     if(over!==null&&over!==drag.from){const p=path(drag.from,over,1)||[];p.slice(1).forEach(i=>ctx.lineTo(nodes[i].sx,nodes[i].sy));}else ctx.lineTo(drag.x,drag.y);
     ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=C.gold;ctx.font=font(13,700);ctx.fillText((n.rally===over&&over!==null)?"arrêter l'envoi auto":`auto · ${autoQty||"tout"} / ${autoEvery} s`,drag.x,drag.y-24);}
+    ctx.fillStyle=C.gold;ctx.font=font(13,700);ctx.fillText((n.rally===over&&over!==null)?"arrêter l'envoi auto":`auto · tout, puis par ${autoQty}`,drag.x,drag.y-24);}
 }
 
 // Saisie
@@ -399,12 +397,13 @@ cv.addEventListener("pointerdown",e=>{if(!G||G.over)return;cv.setPointerCapture(
 cv.addEventListener("pointermove",e=>{if(!drag)return;drag.x=e.offsetX;drag.y=e.offsetY;if(Math.hypot(drag.x-drag.x0,drag.y-drag.y0)>12)drag.moved=true;});
 cv.addEventListener("pointercancel",()=>drag=null);
 cv.addEventListener("pointerup",e=>{if(!drag)return;const d=drag;drag=null;const up=hit(e.offsetX,e.offsetY);
-  if(d.moved){if(d.from!==null&&up!==null&&up!==d.from){const n=G.nodes[d.from];if(n.rally===up)n.rally=null;else{n.rally=up;n.rallyT=autoEvery;fx(G.nodes[up],C.gold);}}refreshPanel();return;}
+  if(d.moved){if(d.from!==null&&up!==null&&up!==d.from){const n=G.nodes[d.from];if(n.rally===up)n.rally=null;else startAuto(n,up);}refreshPanel();return;}
   tap(up);});
+function startAuto(n,to){n.rally=to;send(n,G.nodes[to],n.ships);fx(G.nodes[to],C.gold);}
 function tap(id){
   const sel=G.sel!==null?G.nodes[G.sel]:null;
   if(id===null){G.sel=null;G.relayMode=false;}
-  else if(G.relayMode&&sel){if(id!==sel.id){sel.rally=id;sel.rallyT=1;}G.relayMode=false;}
+  else if(G.relayMode&&sel){if(id!==sel.id)startAuto(sel,id);G.relayMode=false;}
   else{const n=G.nodes[id];
     if(sel&&sel.owner===1&&id!==sel.id){send(sel,n,sel.ships*ratio);G.sel=null;}
     else if(n.owner===1){G.sel=(G.sel===id)?null:id;}
@@ -425,7 +424,7 @@ function refreshPanel(){
   $("upDef").querySelector("small").textContent=n.def>=3?"niveau max":`niv. ${n.def}→${n.def+1} · ${dc} vx`;
   $("upDef").disabled=n.def>=3||n.ships<dc;
   $("relay").setAttribute("aria-pressed",String(n.rally!==null||G.relayMode));
-  $("relay").querySelector("small").textContent=G.relayMode?"touche la cible":n.rally!==null?"vers "+G.nodes[n.rally].name+" · arrêter":`${autoQty||"tout"} / ${autoEvery} s · choisir cible`;
+  $("relay").querySelector("small").textContent=G.relayMode?"touche la cible":n.rally!==null?"vers "+G.nodes[n.rally].name+" · arrêter":`par ${autoQty} · choisir cible`;
 }
 $("upProd").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"prod");refreshPanel();};
 $("upDef").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"def");refreshPanel();};
@@ -434,10 +433,9 @@ function segGroup(id,attr,fn){const el=$(id);el.querySelectorAll("button").forEa
 segGroup("speed","s",v=>speed=+v);
 segGroup("ratio","r",v=>ratio=+v);
 segGroup("diff","d",v=>diffKey=v);
-segGroup("every","e",v=>{autoEvery=+v;saveMun();});
 segGroup("qty","q",v=>{autoQty=+v;saveMun();});
 const mark=(id,attr,val)=>$(id).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset[attr]===val)));
-mark("every","e",autoEvery);mark("qty","q",autoQty);
+mark("qty","q",autoQty);
 function scoreHud(){
   if(!G)return;let a=0,b=0,z=0;
   G.nodes.forEach(n=>{if(n.owner===1)a+=n.ships;else if(n.owner===2)b+=n.ships;else z+=n.ships*.3;});
@@ -473,7 +471,7 @@ let last=performance.now(),hudT=0;
 function loop(now){
   let dt=Math.min(.1,(now-last)/1000);last=now;
   if(G&&!G.over){
-    let sim=G.demo?dt:(menuOpen?0:dt*speed);
+    let sim=G.demo?dt:(menuOpen?0:dt*speed*PACE);
     if(G.demo){G.demoT=(G.demoT||0)+dt;if(G.demoT>1.2){G.demoT=0;ai(1);}}
     while(sim>0){const s=Math.min(.05,sim);step(s);sim-=s;}
     if(G.demo&&G.over){demo();}
