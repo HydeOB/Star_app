@@ -9,9 +9,9 @@ Ouvre `index.html` dans un navigateur (PC ou téléphone). Aucun serveur ni inst
 ## Règles
 
 - Chaque planète que tu possèdes produit des vaisseaux en continu. Les grosses planètes produisent plus.
-- Touche une de tes planètes puis une cible, ou glisse de l'une à l'autre : la flotte suit les liens.
+- **Envoi unique** : touche ton étoile puis une autre étoile, elle envoie ses vaisseaux une fois (25, 50 ou 100 %).
+- **Envoi automatique** : reste appuyé sur ton étoile et glisse vers une autre. Elle envoie des vaisseaux en continu selon les réglages Munitions du menu (toutes les 1, 3, 5 ou 10 s ; 3, 5, 10 vaisseaux ou tout). Glisse à nouveau vers la même cible pour arrêter.
 - Une attaque réussit si la flotte compte plus de vaisseaux que la défense (vaisseaux × bouclier).
-- **Relais** : une planète envoie automatiquement ses renforts vers un point de passage.
 - **Améliorations** : dépense des vaisseaux pour monter Production et Défense (3 niveaux chacune).
 - Vitesse du jeu : pause, ½×, 1×, 2×, 3×.
 - Victoire quand l'adversaire n'a plus aucun système ni flotte.
