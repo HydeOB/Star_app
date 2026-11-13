@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Mise en page : carte plein écran sur canvas, HUD flottant en haut (score, vitesse) et en bas (envoi, planète) */
+/* Mise en page : carte plein écran sur canvas, HUD flottant en haut (score, vitesse) et en bas (envoi, étoile) */
 :root{
   --void:#0a0c1b; --void2:#12153a; --ink:#ecebf7; --muted:#8f8db0; --panel:rgba(18,20,44,.88); --edge:#2a2e5a;
-  --me:#5ee6c9; --foe:#ff7a59; --neutral:#a29fc2; --gold:#f2c14e;
+  --me:#5ee6c9; --foe:#ff7a59; --foe2:#b18cff; --foe3:#ff5fa2; --neutral:#a29fc2; --gold:#f2c14e; --shield:#bfe6ff;
   --display:"Chakra Petch",ui-sans-serif,system-ui,sans-serif; --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
   color-scheme:dark;
 }
@@ -32,7 +32,6 @@ button:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 .score{display:flex;align-items:center;gap:8px;padding:6px 10px;font-family:var(--display);font-variant-numeric:tabular-nums;font-size:14px;flex:1;min-width:150px;max-width:360px}
 .bar{flex:1;height:8px;border-radius:4px;background:var(--edge);overflow:hidden;display:flex}
 .bar i{display:block;height:100%}
-#barMe{background:var(--me)} #barNeu{background:#3a3d68} #barFoe{background:var(--foe)}
 .me{color:var(--me)} .foe{color:var(--foe)}
 .seg{display:flex;padding:3px;gap:2px}
 .seg button{padding:6px 9px;border-radius:7px;font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);min-width:34px}
@@ -40,18 +39,21 @@ button:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 .row{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
 #ratio{align-items:center}
 #hint{flex:1 1 220px;padding:9px 12px;font-size:13px;color:var(--muted);min-width:0;display:flex;align-items:center}
-#panel{flex:1 1 340px;padding:8px 10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-width:0}
+#panel{flex:1 1 340px;padding:8px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
 #pName{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.04em}
 #pInfo{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .pTitle{display:flex;flex-direction:column;margin-right:auto;min-width:0}
-.act{border:1px solid var(--edge);border-radius:8px;padding:6px 10px;font-size:12px;display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;min-width:92px}
+.act{border:1px solid var(--edge);border-radius:8px;padding:6px 10px;font-size:12px;display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;min-width:88px}
 .act b{font-family:var(--display);font-size:13px}
 .act small{color:var(--muted);font-variant-numeric:tabular-nums}
 .act:disabled{opacity:.4;cursor:default}
 .act[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.act.fast{border-color:rgba(94,230,201,.45)} .act.shield{border-color:rgba(191,230,255,.45)}
 .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 4px 0 8px;display:flex;align-items:center}
+#toast{position:absolute;left:50%;top:76px;transform:translateX(-50%);max-width:min(520px,calc(100% - 32px));padding:10px 14px;text-align:center;font-size:14px;line-height:1.4;pointer-events:none;transition:opacity .4s}
+#toast b{font-family:var(--display);letter-spacing:.06em;display:block;font-size:15px;margin-bottom:2px}
 /* Écrans */
-.screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,9,22,.78);backdrop-filter:blur(4px);overflow:auto;
+.screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,9,22,.8);backdrop-filter:blur(4px);overflow:auto;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
 .card{width:100%;max-width:560px;display:flex;flex-direction:column;gap:18px;margin:auto}
 .logo{font-family:var(--display);font-weight:700;font-size:clamp(40px,11vw,68px);letter-spacing:.14em;line-height:1;margin:0}
@@ -64,6 +66,7 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
 .map small{color:var(--muted);font-size:12.5px}
 .map[aria-pressed="true"]{border-color:var(--me);box-shadow:0 0 0 1px var(--me) inset}
 .go{background:var(--me);color:#06201b;font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.08em;padding:14px;border-radius:12px}
+.go small{display:block;font-family:var(--body);font-weight:500;font-size:12.5px;letter-spacing:0;opacity:.8;margin-top:2px}
 .ghost{border:1px solid var(--edge);border-radius:12px;padding:12px;font-family:var(--display);font-weight:600}
 .rules{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.55;display:grid;gap:2px}
 .rules b{color:var(--ink);font-weight:600}
@@ -71,7 +74,27 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
 #endStats{color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
 .setrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:14px}
 .btns{display:flex;gap:10px;flex-wrap:wrap}.btns>*{flex:1}
-@media (max-width:560px){ .brand{display:none} .act{min-width:80px;padding:5px 8px} #pInfo{font-size:11.5px} }
+details.free{border:1px solid var(--edge);border-radius:12px;padding:10px 12px}
+details.free summary{cursor:pointer;font-family:var(--display);font-weight:600;letter-spacing:.06em}
+details.free[open] summary{margin-bottom:12px}
+details.free>div{display:flex;flex-direction:column;gap:14px}
+/* Mondes */
+.world{border:1px solid var(--edge);border-radius:14px;padding:14px;background:var(--void2);display:flex;flex-direction:column;gap:10px}
+.world.locked{opacity:.5}
+.wh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.wh b{font-family:var(--display);font-size:17px;letter-spacing:.03em}
+.wh .num{color:var(--muted);font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:2px}
+.foes{display:flex;gap:5px;align-items:center;font-size:12px;color:var(--muted)}
+.foes i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.world p{margin:0;color:var(--muted);font-size:13px}
+.lv{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.lv button{border:1px solid var(--edge);border-radius:10px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--void);min-width:0}
+.lv button b{font-family:var(--display);font-size:16px}
+.lv button small{font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lv button.done{border-color:rgba(94,230,201,.5)} .lv button.done small{color:var(--me)}
+.lv button.next{border-color:var(--me);box-shadow:0 0 0 1px var(--me) inset}
+.lv button:disabled{opacity:.45;cursor:default}
+@media (max-width:560px){ .brand{display:none} .act{min-width:76px;padding:5px 8px} #pInfo{font-size:11.5px} }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
 </style>
 </head>
@@ -81,10 +104,10 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
   <canvas id="cv" aria-label="Carte de la galaxie"></canvas>
 
   <div class="hud" id="top">
-    <div class="chip brand">CONSTELLA</div>
+    <div class="chip brand" id="brand">CONSTELLA</div>
     <div class="chip score" aria-live="polite">
       <span class="me" id="sMe">0</span>
-      <div class="bar"><i id="barMe"></i><i id="barNeu"></i><i id="barFoe"></i></div>
+      <div class="bar" id="bar"></div>
       <span class="foe" id="sFoe">0</span>
     </div>
     <div class="chip seg" id="speed" role="group" aria-label="Vitesse du jeu">
@@ -98,6 +121,8 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
     <button class="chip" id="menuBtn" style="padding:8px 12px;font-family:var(--display);font-weight:600">Menu</button>
   </div>
 
+  <div class="chip" id="toast" hidden></div>
+
   <div class="hud" id="bottom">
     <div class="row">
       <div class="chip seg" id="ratio" role="group" aria-label="Part de la flotte envoyée">
@@ -109,6 +134,8 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
       <div class="chip" id="hint">Touche une étoile puis une autre : envoi unique. Glisse de l'une à l'autre : envoi automatique.</div>
       <div class="chip" id="panel" hidden>
         <div class="pTitle"><span id="pName">—</span><span id="pInfo"></span></div>
+        <button class="act fast" id="mkFast"><b>Rapide</b><small>5 vx</small></button>
+        <button class="act shield" id="mkShield"><b>Bouclier</b><small>5 vx</small></button>
         <button class="act" id="upProd"><b>Production</b><small></small></button>
         <button class="act" id="upDef"><b>Défense</b><small></small></button>
         <button class="act" id="relay"><b>Envoi auto</b><small>choisir cible</small></button>
@@ -120,31 +147,44 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
     <div class="card">
       <h1 class="logo">CONST<span>E</span>LLA</h1>
       <p class="tag">Relie les étoiles, fais tourner tes chantiers, et reprends chaque système à l'adversaire.</p>
-      <div><h2>Carte</h2><div class="maps" id="maps"></div></div>
-      <div><h2>Adversaire</h2>
-        <div class="chip seg" id="diff" role="group" aria-label="Difficulté" style="display:inline-flex">
-          <button data-d="facile">Facile</button>
-          <button data-d="normal" aria-pressed="true">Normal</button>
-          <button data-d="difficile">Difficile</button>
+      <div class="btns"><button class="go" id="campaign">Campagne<small id="campNext"></small></button><button class="ghost" id="resume" hidden>Reprendre</button></div>
+      <details class="free"><summary>Partie libre</summary>
+        <div>
+          <div><h2>Carte</h2><div class="maps" id="maps"></div></div>
+          <div><h2>Adversaire</h2>
+            <div class="chip seg" id="diff" role="group" aria-label="Difficulté" style="display:inline-flex">
+              <button data-d="facile">Facile</button>
+              <button data-d="normal" aria-pressed="true">Normal</button>
+              <button data-d="difficile">Difficile</button>
+            </div>
+          </div>
+          <button class="ghost" id="start">Lancer la partie libre</button>
         </div>
-      </div>
+      </details>
       <div><h2>Munitions · envoi automatique</h2>
         <div class="setrow"><span>Après le premier envoi, envoyer par paquets de</span>
           <div class="chip seg" id="qty" role="group" aria-label="Vaisseaux par envoi">
             <button data-q="3">3</button><button data-q="5" aria-pressed="true">5</button><button data-q="10">10</button>
           </div></div>
       </div>
-      <div class="btns"><button class="go" id="start">Lancer la partie</button><button class="ghost" id="resume" hidden>Reprendre</button></div>
       <div><h2>Comment jouer</h2>
         <ul class="rules">
-          <li>Chaque planète à toi <b>produit des vaisseaux</b> en continu. Les grosses produisent plus.</li>
+          <li>Chaque étoile à toi <b>produit des vaisseaux</b> en continu. Les grosses produisent plus.</li>
           <li><b>Touche</b> ton étoile puis une cible : elle envoie ses vaisseaux une fois (25, 50 ou 100 %).</li>
-          <li><b>Reste appuyé et glisse</b> vers une étoile : elle envoie d'abord tous ses vaisseaux, puis un paquet (3, 5 ou 10, réglable dans Munitions) dès qu'elle l'a produit. Glisse à nouveau vers la même cible pour l'arrêter.</li>
-          <li>Une attaque réussit si tu envoies <b>plus de vaisseaux que la défense</b>. Les boucliers multiplient la défense.</li>
-                    <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux).</li>
-          <li>Tu gagnes quand l'adversaire n'a plus aucun système ni flotte.</li>
+          <li><b>Reste appuyé et glisse</b> vers une étoile : elle envoie d'abord tous ses vaisseaux, puis un paquet (3, 5 ou 10) dès qu'elle l'a produit. Glisse à nouveau vers la même cible pour arrêter.</li>
+          <li>Une attaque réussit si tu envoies <b>plus de vaisseaux que la défense</b>.</li>
+          <li>Dès 5 vaisseaux, transforme une étoile en <b>Rapide</b> (produit et envoie plus vite, sans défense) ou en <b>Bouclier</b> (produit un peu moins, mais une protection se recharge jusqu'à 10).</li>
+          <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux).</li>
+          <li>Tu gagnes quand plus aucun ennemi n'a de système ni de flotte.</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <div class="screen" id="worlds" hidden>
+    <div class="card">
+      <div class="wh"><h1 class="logo" style="font-size:clamp(30px,8vw,44px)">CAMPAGNE</h1><button class="ghost" id="wBack" style="flex:0 0 auto;padding:8px 14px">Retour</button></div>
+      <div id="wList" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
   </div>
 
@@ -160,12 +200,12 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
 <script>
 (()=>{
 "use strict";
-const C={me:"#5ee6c9",foe:"#ff7a59",neu:"#a29fc2",gold:"#f2c14e",edge:"#2a2e5a",ink:"#ecebf7",void:"#0a0c1b"};
-const OWN_COL=[C.neu,C.me,C.foe];
-const W0=1600,H0=900,FLEET_SPEED=95;
-const NAMES=["Aldra","Vesk","Tirun","Moba","Kael","Ysor","Pherin","Duna","Oriel","Saph","Neral","Quill","Hesk","Lumo","Brann","Ithe","Zorae","Calix","Tem","Varo","Nyx","Elar"];
+const C={me:"#5ee6c9",foe:"#ff7a59",foe2:"#b18cff",foe3:"#ff5fa2",neu:"#a29fc2",gold:"#f2c14e",shield:"#bfe6ff",edge:"#2a2e5a",ink:"#ecebf7",void:"#0a0c1b"};
+const OWN_COL=[C.neu,C.me,C.foe,C.foe2,C.foe3];
+const W0=1600,H0=900,FLEET_SPEED=95,SPECIAL_COST=5,SHIELD_MAX=10,SHIELD_REGEN=.5;
+const NAMES=["Aldra","Vesk","Tirun","Moba","Kael","Ysor","Pherin","Duna","Oriel","Saph","Neral","Quill","Hesk","Lumo","Brann","Ithe","Zorae","Calix","Tem","Varo","Nyx","Elar","Opa","Rhen","Sel","Ganth","Iru","Pell","Xan","Meru"];
 
-// Cartes : moitié + centre, complétées par symétrie centrale (équité)
+// Cartes de partie libre : moitié + centre, complétées par symétrie centrale
 const MAPS={
   vega:{name:"Anneau de Véga",desc:"13 systèmes, un cœur géant disputé au milieu.",
     half:[[150,450,3,1],[350,250,1],[350,650,1],[600,150,2],[600,450,1],[600,750,2]],
@@ -177,37 +217,131 @@ const MAPS={
     links:["0-1","0-2","1-3","1-4","2-4","3-5","5-6","3-C0","4-C0","4-6'"]}
 };
 const DIFF={
-  facile:{think:2.6,aggr:.7,margin:2,upg:.12,bonus:.85,safety:0},
-  normal:{think:1.5,aggr:.85,margin:3,upg:.3,bonus:1,safety:.3},
-  difficile:{think:.85,aggr:.95,margin:4,upg:.5,bonus:1.15,safety:.5}
+  facile:{think:2.6,aggr:.7,margin:2,upg:.12,bonus:.85,safety:0,special:0},
+  normal:{think:1.5,aggr:.85,margin:3,upg:.3,bonus:1,safety:.3,special:.15},
+  difficile:{think:.85,aggr:.95,margin:4,upg:.5,bonus:1.15,safety:.5,special:.3}
 };
 
-let G=null, mapKey="vega", diffKey="normal", speed=1, ratio=1, autoQty=5;
-const PACE=1/1.5; // rythme de base : 1× est 1,5 fois plus lent que la v1
-try{const st=JSON.parse(localStorage.getItem("constella-munitions")||"null");if(st&&[3,5,10].includes(st.q))autoQty=st.q;}catch(e){}
-const saveMun=()=>{try{localStorage.setItem("constella-munitions",JSON.stringify({q:autoQty}));}catch(e){}};
+// Campagne : 4 mondes, de plus en plus durs. k = nombre de joueurs (toi + ennemis), n = étoiles par secteur
+const WORLDS=[
+  {name:"Ceinture d'Aldra",desc:"Un seul adversaire, prudent. Le temps d'apprendre.",levels:[
+    {k:2,n:2,start:2,ai:"facile",tip:"2 étoiles contre 2. Touche ton étoile puis une neutre pour la capturer."},
+    {k:2,n:3,start:1,ai:"facile",tip:"Glisse d'une étoile à une autre pour créer un envoi automatique."},
+    {k:2,n:4,start:1,ai:"facile",center:1,tip:"Améliore la Production de ton étoile principale pour prendre de l'avance."},
+    {k:2,n:5,start:2,ai:"normal",tip:"Nouveau : dès 5 vaisseaux, transforme une étoile en Rapide ou en Bouclier."},
+    {k:2,n:5,start:1,ai:"normal",center:1}]},
+  {name:"Nébuleuse de Vesk",desc:"Un adversaire plus vif, des cartes plus grandes.",levels:[
+    {k:2,n:6,start:1,ai:"normal"},
+    {k:2,n:6,start:1,ai:"normal",center:1,neu:1.3,tip:"Les neutres sont mieux défendus ici."},
+    {k:2,n:7,start:1,ai:"normal",aiShips:32},
+    {k:2,n:7,start:1,ai:"difficile",center:1},
+    {k:2,n:8,start:1,ai:"difficile",center:1,aiShips:35}]},
+  {name:"Triangle de Kael",desc:"Deux ennemis en même temps. Ils se battent aussi entre eux.",levels:[
+    {k:3,n:3,start:1,ai:"facile",center:1,tip:"Deux ennemis : laisse-les s'affaiblir entre eux avant de frapper."},
+    {k:3,n:4,start:1,ai:"normal"},
+    {k:3,n:4,start:2,ai:"normal",center:1},
+    {k:3,n:5,start:1,ai:"difficile"},
+    {k:3,n:5,start:1,ai:"difficile",center:1,aiShips:30}]},
+  {name:"Couronne d'Ysor",desc:"Trois ennemis. Survivre d'abord, conquérir ensuite.",levels:[
+    {k:4,n:3,start:1,ai:"normal",center:1,tip:"Trois ennemis autour de toi. Un Bouclier sur ta frontière peut tout changer."},
+    {k:4,n:4,start:1,ai:"normal"},
+    {k:4,n:4,start:2,ai:"difficile",center:1},
+    {k:4,n:5,start:1,ai:"difficile",center:1,aiShips:30}]}
+];
+const FLAT=[];WORLDS.forEach((w,wi)=>w.levels.forEach((l,li)=>FLAT.push({wi,li})));
 
-function build(key){
-  const M=MAPS[key], N=M.half.length, nodes=[];
-  const mk=(x,y,size,owner,vi)=>({id:nodes.length,x,y,size,owner,ships:owner?20:6+size*5+((vi*7)%5),prod:0,def:0,rally:null,rallyT:0,pulse:0});
-  M.half.forEach((h,i)=>nodes.push(mk(h[0],h[1],h[2],h[3]?1:0,i)));
-  M.half.forEach((h,i)=>nodes.push(mk(W0-h[0],H0-h[1],h[2],h[3]?2:0,i)));
-  M.center.forEach((c,i)=>nodes.push(mk(c[0],c[1],c[2],0,i+3)));
+let G=null, mapKey="vega", diffKey="normal", speed=1, ratio=1, autoQty=5, cur=null;
+const PACE=1/1.5; // rythme de base : 1× est 1,5 fois plus lent que la v1
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+{const st=store.get("constella-munitions",null);if(st&&[3,5,10].includes(st.q))autoQty=st.q;}
+const saveMun=()=>store.set("constella-munitions",{q:autoQty});
+let progress=store.get("constella-progress",{done:{}});if(!progress.done)progress={done:{}};
+const lkey=(wi,li)=>wi+"-"+li;
+const isDone=(wi,li)=>progress.done[lkey(wi,li)]!=null;
+const isOpen=idx=>idx===0||isDone(FLAT[idx-1].wi,FLAT[idx-1].li);
+
+function mkNode(id,x,y,size,owner,ships){return {id,x,y,size,owner,ships,prod:0,def:0,kind:null,shield:0,rally:null,pulse:0};}
+function finalize(W,H,nodes,edgeList,players,cfg,seed){
+  const adj=nodes.map(()=>[]),edges=[];
+  for(const[a,b]of edgeList){const len=Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y);adj[a].push({to:b,len});adj[b].push({to:a,len});edges.push([a,b]);}
+  const names=NAMES.slice();let s=seed||3;for(let i=names.length-1;i>0;i--){s=(s*16807)%2147483647;const j=s%(i+1);[names[i],names[j]]=[names[j],names[i]];}
+  nodes.forEach((n,i)=>n.name=names[i%names.length]);
+  return {W,H,nodes,adj,edges,players,fleets:[],fx:[],time:0,aiT:{},over:false,sel:null,relayMode:false,captured:0,cfg};
+}
+function buildFree(key,cfg){
+  const M=MAPS[key],N=M.half.length,nodes=[];
+  const mk=(x,y,size,owner,vi)=>nodes.push(mkNode(nodes.length,x,y,size,owner,owner?20:6+size*5+((vi*7)%5)));
+  M.half.forEach((h,i)=>mk(h[0],h[1],h[2],h[3]?1:0,i));
+  M.half.forEach((h,i)=>mk(W0-h[0],H0-h[1],h[2],h[3]?2:0,i));
+  M.center.forEach((c,i)=>mk(c[0],c[1],c[2],0,i+3));
   const idx=t=>t[0]==="C"?2*N+(+t.slice(1)):t.endsWith("'")?N+(+t.slice(0,-1)):+t;
   const mir=i=>i<N?i+N:i<2*N?i-N:i;
-  const adj=nodes.map(()=>[]),seen=new Set(),edges=[];
-  const add=(a,b)=>{const k=a<b?a+"-"+b:b+"-"+a;if(seen.has(k)||a===b)return;seen.add(k);
-    const len=Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y);adj[a].push({to:b,len});adj[b].push({to:a,len});edges.push([a,b]);};
+  const seen=new Set(),list=[];
+  const add=(a,b)=>{const k=a<b?a+"-"+b:b+"-"+a;if(seen.has(k)||a===b)return;seen.add(k);list.push([a,b]);};
   M.links.forEach(l=>{const[a,b]=l.split("-").map(idx);add(a,b);add(mir(a),mir(b));});
-  const names=NAMES.slice().sort((a,b)=>((a.charCodeAt(0)*31+key.length)%17)-((b.charCodeAt(0)*31+key.length)%17));
-  nodes.forEach((n,i)=>n.name=names[i%names.length]);
-  return {nodes,adj,edges,fleets:[],fx:[],time:0,aiT:0,over:false,sel:null,relayMode:false,captured:0,lost:0,cfg:DIFF[diffKey]};
+  return finalize(W0,H0,nodes,list,2,cfg,key.length*7);
 }
 
+// Générateur de cartes équitables : un secteur tiré au hasard (graine fixe), recopié par rotation pour chaque joueur
+function segCross(a,b,c,d){
+  const o=(p,q,r)=>Math.sign((q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x));
+  if(a===c||a===d||b===c||b===d)return false;
+  return o(a,b,c)!==o(a,b,d)&&o(c,d,a)!==o(c,d,b)&&o(a,b,c)!==0&&o(c,d,a)!==0;
+}
+function segDist(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy)));return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy);}
+function genLevel(L,seed0){
+  for(let attempt=0;attempt<60;attempt++){
+    let seed=((seed0*9973+attempt*7919)%2147483646)+1;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;rnd();
+    const k=L.k,st=k===2?1.6:1,Rm=440,mg=90,W=Math.round(2*Rm*st+2*mg),H=2*Rm+2*mg,cx=W/2,cy=H/2,rot0=k===2?Math.PI:Math.PI/2;
+    const pos=(a,r,s)=>{const ang=rot0+s*2*Math.PI/k+a;return {x:cx+Math.cos(ang)*r*Rm*st,y:cy+Math.sin(ang)*r*Rm};};
+    const minD=k>=4?150:k===3?160:170,sec=[{a:0,r:.9,size:3}];
+    const ok=(a,r)=>{const mine=[];for(let s=0;s<k;s++)mine.push(pos(a,r,s));
+      for(let i=0;i<k;i++){for(let j=i+1;j<k;j++)if(Math.hypot(mine[i].x-mine[j].x,mine[i].y-mine[j].y)<minD)return false;
+        if(L.center&&Math.hypot(mine[i].x-cx,mine[i].y-cy)<minD+20)return false;
+        for(const q of sec)for(let s=0;s<k;s++){const p=pos(q.a,q.r,s);if(Math.hypot(mine[i].x-p.x,mine[i].y-p.y)<minD)return false;}}
+      return true;};
+    for(let t=0;t<900&&sec.length<1+L.n;t++){const a=(rnd()*2-1)*Math.PI/k*.95,r=.15+rnd()*.83;if(ok(a,r)){const u=rnd();sec.push({a,r,size:u<.5?1:u<.82?2:3});}}
+    if(sec.length<1+L.n)continue;
+    const m=sec.length,home=pos(0,.9,0);
+    const order=sec.map((q,i)=>i).slice(1).sort((i,j)=>{const p=pos(sec[i].a,sec[i].r,0),q=pos(sec[j].a,sec[j].r,0);return Math.hypot(p.x-home.x,p.y-home.y)-Math.hypot(q.x-home.x,q.y-home.y);});
+    const extra=new Set(order.slice(0,(L.start||1)-1));
+    const neuShips=sec.map(q=>Math.round((4+q.size*4+rnd()*5)*(L.neu||1)));
+    const nodes=[];
+    for(let s=0;s<k;s++)sec.forEach((q,i)=>{const p=pos(q.a,q.r,s),own=(i===0||extra.has(i))?s+1:0;
+      const ships=i===0?(s===0?20:(L.aiShips||20)):own?10:neuShips[i];nodes.push(mkNode(nodes.length,p.x,p.y,i===0?2:q.size,own,ships));});
+    const centerIdx=L.center?nodes.length:-1;
+    if(L.center)nodes.push(mkNode(nodes.length,cx,cy,3,0,Math.round(22*(L.neu||1))));
+    const rot=(i,s)=>i===centerIdx?i:((Math.floor(i/m)+s)%k)*m+i%m;
+    const cands=[];for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const d=Math.hypot(nodes[i].x-nodes[j].x,nodes[i].y-nodes[j].y);if(d<Rm*.85)cands.push([i,j,d]);}
+    cands.sort((a,b)=>a[2]-b[2]);
+    const E=[],keys=new Set(),deg=nodes.map(()=>0);
+    const valid=(grp,strict)=>{const tmp=deg.slice();
+      for(let g=0;g<grp.length;g++){const[a,b]=grp[g];
+        if(strict&&(++tmp[a]>4||++tmp[b]>4))return false;
+        for(const n of nodes)if(n.id!==a&&n.id!==b&&segDist(n,nodes[a],nodes[b])<34)return false;
+        for(const[c,d]of E.concat(grp.slice(0,g)))if(segCross(nodes[a],nodes[b],nodes[c],nodes[d]))return false;}
+      return true;};
+    const group=(i,j)=>{const out=[],seenG=new Set();for(let s=0;s<k;s++){let a=rot(i,s),b=rot(j,s);if(a>b)[a,b]=[b,a];const key=a+"-"+b;if(!seenG.has(key)&&!keys.has(key)){seenG.add(key);out.push([a,b]);}}return out;};
+    const addG=grp=>grp.forEach(([a,b])=>{keys.add(a+"-"+b);E.push([a,b]);deg[a]++;deg[b]++;});
+    for(const[i,j]of cands){const grp=group(i,j);if(grp.length&&valid(grp,true))addG(grp);}
+    const comp=()=>{const p=nodes.map((_,i)=>i),f=x=>p[x]===x?x:(p[x]=f(p[x]));E.forEach(([a,b])=>p[f(a)]=f(b));return nodes.map((_,i)=>f(i));};
+    let guard=0,cc=comp();
+    while(new Set(cc).size>1&&guard++<20){const c=cands.find(([i,j])=>cc[i]!==cc[j]&&valid(group(i,j),false));if(!c)break;addG(group(c[0],c[1]));cc=comp();}
+    if(new Set(cc).size>1)continue;
+    // recadrage sur les étoiles réellement placées, pour remplir l'écran
+    let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;nodes.forEach(n=>{x0=Math.min(x0,n.x);y0=Math.min(y0,n.y);x1=Math.max(x1,n.x);y1=Math.max(y1,n.y);});
+    const pad=85;nodes.forEach(n=>{n.x+=pad-x0;n.y+=pad-y0;});
+    return finalize(Math.round(x1-x0+2*pad),Math.round(y1-y0+2*pad),nodes,E,k,DIFF[L.ai],seed0);
+  }
+  return null;
+}
+function buildLevel(wi,li){return genLevel(WORLDS[wi].levels[li],1000+wi*97+li*31);}
+
 // Règles
-const rate=n=>(0.5+0.45*n.size)*(1+0.4*n.prod)*(n.owner===2?G.cfg.bonus:1);
+const isAI=o=>o>=2;
+const rate=n=>(0.5+0.45*n.size)*(1+0.4*n.prod)*(isAI(n.owner)?G.cfg.bonus:1)*(n.kind==="rapide"?1.4:n.kind==="bouclier"?.75:1);
 const cap=n=>30+n.size*25+n.prod*20;
-const defMult=n=>1+0.4*n.def;
+const defMult=n=>n.kind==="rapide"?1:1+0.4*n.def;
 const prodCost=n=>20+15*n.prod, defCost=n=>15+10*n.def;
 
 function path(from,to,owner){
@@ -224,40 +358,42 @@ function send(n,t,count){
   if(!n||!t||n===t)return false;
   count=Math.floor(Math.min(count,n.ships));if(count<1)return false;
   const p=path(n.id,t.id,n.owner);if(!p)return false;
-  n.ships-=count;G.fleets.push({owner:n.owner,ships:count,path:p,seg:0,t:0,len:edgeLen(p[0],p[1]),dest:t.id});
+  n.ships-=count;G.fleets.push({owner:n.owner,ships:count,path:p,seg:0,t:0,len:edgeLen(p[0],p[1]),dest:t.id,spd:n.kind==="rapide"?1.4:1});
   return true;
 }
 function upgrade(n,kind){
   if(kind==="prod"&&n.prod<3&&n.ships>=prodCost(n)){n.ships-=prodCost(n);n.prod++;fx(n,C.gold);return true;}
-  if(kind==="def"&&n.def<3&&n.ships>=defCost(n)){n.ships-=defCost(n);n.def++;fx(n,C.gold);return true;}
+  if(kind==="def"&&n.kind!=="rapide"&&n.def<3&&n.ships>=defCost(n)){n.ships-=defCost(n);n.def++;fx(n,C.gold);return true;}
+  if((kind==="rapide"||kind==="bouclier")&&!n.kind&&n.ships>=SPECIAL_COST){n.ships-=SPECIAL_COST;n.kind=kind;n.shield=0;fx(n,kind==="rapide"?OWN_COL[n.owner]:C.shield);return true;}
   return false;
 }
 function fx(n,col){G.fx.push({x:n.x,y:n.y,col,t:0,seed:Math.random()*6});}
 function arrive(f,n){
   if(n.owner===f.owner){n.ships+=f.ships;return;}
+  if(n.kind==="bouclier"&&n.shield>0){const k=Math.min(n.shield,f.ships);n.shield-=k;f.ships-=k;if(f.ships<=0){n.pulse=1;return;}}
   const m=defMult(n),eff=n.ships*m;
   if(f.ships>eff+1e-6){
-    if(n.owner===2&&f.owner===1)G.captured++;
-    if(n.owner===1)G.lost++;
-    n.owner=f.owner;n.ships=f.ships-eff;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;
+    if(isAI(n.owner)&&f.owner===1)G.captured++;
+    n.owner=f.owner;n.ships=f.ships-eff;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;n.kind=null;n.shield=0;
     G.nodes.forEach(o=>{if(o.rally===n.id&&o.owner!==n.owner)o.rally=null;});
     if(G.sel===n.id&&n.owner!==1)G.sel=null;
     fx(n,OWN_COL[f.owner]);
   } else n.ships=Math.max(0,(eff-f.ships)/m);
   n.pulse=1;
 }
+const has=o=>G.nodes.some(n=>n.owner===o)||G.fleets.some(f=>f.owner===o);
 
 function step(dt){
   G.time+=dt;
   for(const n of G.nodes){
     if(n.owner&&n.ships<cap(n))n.ships=Math.min(cap(n),n.ships+rate(n)*dt);
+    if(n.kind==="bouclier"&&n.shield<SHIELD_MAX)n.shield=Math.min(SHIELD_MAX,n.shield+SHIELD_REGEN*dt);
     n.pulse=Math.max(0,n.pulse-dt*2);
     if(n.rally!==null&&n.owner&&n.ships>=autoQty)send(n,G.nodes[n.rally],autoQty);
   }
-  // flottes
   const alive=[];
   for(const f of G.fleets){
-    f.t+=FLEET_SPEED*dt/f.len;
+    f.t+=FLEET_SPEED*f.spd*dt/f.len;
     if(f.t>=1){
       const at=G.nodes[f.path[f.seg+1]];
       if(at.owner===f.owner&&f.seg+1<f.path.length-1){f.seg++;f.t=0;f.len=edgeLen(f.path[f.seg],f.path[f.seg+1]);alive.push(f);}
@@ -265,7 +401,6 @@ function step(dt){
     } else alive.push(f);
   }
   G.fleets=alive;
-  // collisions en vol sur un même lien
   for(let i=0;i<G.fleets.length;i++)for(let j=i+1;j<G.fleets.length;j++){
     const a=G.fleets[i],b=G.fleets[j];if(a.owner===b.owner||a.ships<=0||b.ships<=0)continue;
     if(a.path[a.seg]===b.path[b.seg+1]&&a.path[a.seg+1]===b.path[b.seg]&&a.t+b.t>=1){
@@ -276,12 +411,12 @@ function step(dt){
   }
   G.fleets=G.fleets.filter(f=>f.ships>=0.5);
   G.fx.forEach(e=>e.t+=dt);G.fx=G.fx.filter(e=>e.t<0.8);
-  G.aiT+=dt;if(G.aiT>=G.cfg.think){G.aiT=0;ai(2);}
-  const has=o=>G.nodes.some(n=>n.owner===o)||G.fleets.some(f=>f.owner===o);
-  if(!has(2))finish(true);else if(!has(1))finish(false);
+  for(let o=G.demo?1:2;o<=G.players;o++){G.aiT[o]=(G.aiT[o]||o*.37)+dt;if(G.aiT[o]>=G.cfg.think){G.aiT[o]=0;if(has(o))ai(o);}}
+  let foes=0;for(let o=2;o<=G.players;o++)if(has(o))foes++;
+  if(!foes)finish(true);else if(!has(1))finish(false);
 }
 
-// IA simple : attaque les cibles rentables, achemine les renforts vers le front, améliore à l'arrière
+// IA : attaque les cibles rentables, achemine les renforts vers le front, améliore et spécialise ses étoiles
 function ai(P){
   const cfg=G.cfg,nodes=G.nodes,incoming={};
   for(const f of G.fleets)if(f.owner===P)incoming[f.dest]=(incoming[f.dest]||0)+f.ships;
@@ -289,6 +424,7 @@ function ai(P){
     if(n.owner!==P)continue;
     const hostile=G.adj[n.id].filter(e=>nodes[e.to].owner!==P);
     if(!hostile.length){
+      if(!n.kind&&Math.random()<cfg.special&&n.ships>=SPECIAL_COST+8){upgrade(n,"rapide");continue;}
       if(Math.random()<cfg.upg&&n.prod<3&&n.ships>=prodCost(n)+5){upgrade(n,"prod");continue;}
       if(n.ships>8){const t=frontier(n,P);if(t)send(n,t,n.ships*.85);}
       continue;
@@ -298,12 +434,13 @@ function ai(P){
     let best=null;
     for(const e of hostile){
       const t=nodes[e.to];
-      const need=t.ships*defMult(t)+(t.owner?rate(t)*e.len/FLEET_SPEED:0)+1-(incoming[t.id]||0);
+      const need=t.ships*defMult(t)+(t.kind==="bouclier"?t.shield:0)+(t.owner?rate(t)*e.len/FLEET_SPEED:0)+1-(incoming[t.id]||0);
       if(need<=0)continue;
       const score=(t.size+1)/Math.max(need,1)*(t.owner?1:1.25);
       if(need+cfg.margin<avail&&(!best||score>best.score))best={t,need,score};
     }
     if(best){send(n,best.t,Math.ceil(best.need+cfg.margin));incoming[best.t.id]=(incoming[best.t.id]||0)+best.need+cfg.margin;continue;}
+    if(threat>0&&!n.kind&&Math.random()<cfg.special&&n.ships>=SPECIAL_COST+threat*.3){upgrade(n,"bouclier");continue;}
     if(Math.random()<cfg.upg){
       if(threat>0&&n.def<3&&n.ships>=defCost(n)+threat*.6)upgrade(n,"def");
       else if(n.prod<2&&n.ships>=prodCost(n)+15)upgrade(n,"prod");
@@ -320,12 +457,15 @@ function frontier(n,P){
 
 // Rendu
 const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
-let vw=0,vh=0,dpr=1,sc=1,ox=0,oy=0,portrait=false,stars=null,twinkle=[];
+let vw=0,vh=0,dpr=1,sc=1,ox=0,oy=0,portrait=false,rotMap=false,stars=null,twinkle=[];
+function layout(){
+  if(!G)return;portrait=vh>vw*1.05;rotMap=portrait&&G.W>G.H*1.1;
+  const mw=rotMap?G.H:G.W,mh=rotMap?G.W:G.H,top=portrait?96:70,bot=portrait?150:118,side=28;
+  sc=Math.min((vw-2*side)/mw,(vh-top-bot)/mh);ox=(vw-mw*sc)/2;oy=top+((vh-top-bot)-mh*sc)/2;
+}
 function resize(){
   dpr=Math.min(2,window.devicePixelRatio||1);vw=cv.clientWidth;vh=cv.clientHeight;
-  cv.width=vw*dpr;cv.height=vh*dpr;portrait=vh>vw*1.05;
-  const mw=portrait?H0:W0,mh=portrait?W0:H0,top=portrait?96:70,bot=portrait?150:118,side=28;
-  sc=Math.min((vw-2*side)/mw,(vh-top-bot)/mh);ox=(vw-mw*sc)/2;oy=top+((vh-top-bot)-mh*sc)/2;
+  cv.width=vw*dpr;cv.height=vh*dpr;layout();
   stars=document.createElement("canvas");stars.width=cv.width;stars.height=cv.height;
   const s=stars.getContext("2d");let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
   const g=s.createRadialGradient(cv.width*.5,cv.height*.45,0,cv.width*.5,cv.height*.45,Math.max(cv.width,cv.height)*.7);
@@ -336,7 +476,7 @@ function resize(){
     q.addColorStop(0,`rgba(${c},.06)`);q.addColorStop(1,`rgba(${c},0)`);s.fillStyle=q;s.fillRect(0,0,cv.width,cv.height);}
   twinkle=[];for(let i=0;i<Math.min(50,(vw*vh)/15000);i++)twinkle.push({x:rnd()*vw,y:rnd()*vh,r:.6+rnd(),ph:rnd()*7,sp:.5+rnd()*1.5});
 }
-const P=(x,y)=>portrait?[ox+y*sc,oy+(W0-x)*sc]:[ox+x*sc,oy+y*sc];
+const P=(x,y)=>rotMap?[ox+y*sc,oy+(G.W-x)*sc]:[ox+x*sc,oy+y*sc];
 const R=n=>Math.max(11,(15+n.size*7)*sc*1.25);
 const font=(px,w=700)=>`${w} ${px}px "Chakra Petch",ui-sans-serif,system-ui,sans-serif`;
 
@@ -349,17 +489,14 @@ function draw(){
   ctx.globalAlpha=1;
   if(!G)return;
   const nodes=G.nodes;nodes.forEach(n=>{[n.sx,n.sy]=P(n.x,n.y);n.r=R(n);});
-  // liens
   for(const[a,b]of G.edges){const A=nodes[a],B=nodes[b];
     ctx.strokeStyle=(A.owner&&A.owner===B.owner)?OWN_COL[A.owner]+"55":"#2f3466";ctx.lineWidth=2;ctx.setLineDash([]);
     ctx.beginPath();ctx.moveTo(A.sx,A.sy);ctx.lineTo(B.sx,B.sy);ctx.stroke();}
-  // relais
   const tdash=(G.time*30)%16;
-  for(const n of nodes){if(n.rally===null||!n.owner)continue;const p=path(n.id,n.rally,n.owner);if(!p)continue;
+  for(const n of nodes){if(n.rally===null||n.owner!==1)continue;const p=path(n.id,n.rally,n.owner);if(!p)continue;
     ctx.strokeStyle=C.gold;ctx.globalAlpha=.75;ctx.lineWidth=2;ctx.setLineDash([6,10]);ctx.lineDashOffset=-tdash;
     ctx.beginPath();ctx.moveTo(nodes[p[0]].sx,nodes[p[0]].sy);p.slice(1).forEach(i=>ctx.lineTo(nodes[i].sx,nodes[i].sy));ctx.stroke();
     ctx.setLineDash([]);ctx.globalAlpha=1;const t=nodes[n.rally];ctx.strokeStyle=C.gold;ctx.beginPath();ctx.arc(t.sx,t.sy,t.r+9,0,7);ctx.stroke();}
-  // planètes
   for(const n of nodes){
     const col=OWN_COL[n.owner],r=n.r;
     const g=ctx.createRadialGradient(n.sx,n.sy,r*.3,n.sx,n.sy,r*2.2);g.addColorStop(0,col+(n.owner?"40":"22"));g.addColorStop(1,col+"00");
@@ -368,42 +505,41 @@ function draw(){
     body.addColorStop(0,n.owner?col+"66":"#3b3d5e");body.addColorStop(1,"#10122b");
     ctx.fillStyle=body;ctx.beginPath();ctx.arc(n.sx,n.sy,r,0,7);ctx.fill();
     ctx.lineWidth=2.5+n.pulse*3;ctx.strokeStyle=col;ctx.beginPath();ctx.arc(n.sx,n.sy,r,0,7);ctx.stroke();
-    if(n.owner){ctx.lineWidth=1;ctx.strokeStyle=col+"66";ctx.setLineDash([3,7]);ctx.lineDashOffset=-now*8*(n.owner===1?1:-1);ctx.beginPath();ctx.arc(n.sx,n.sy,r+5,0,7);ctx.stroke();ctx.setLineDash([]);}
-    // boucliers
+    if(n.owner&&!n.kind){ctx.lineWidth=1;ctx.strokeStyle=col+"66";ctx.setLineDash([3,7]);ctx.lineDashOffset=-now*8*(n.owner===1?1:-1);ctx.beginPath();ctx.arc(n.sx,n.sy,r+5,0,7);ctx.stroke();ctx.setLineDash([]);}
     for(let d=0;d<n.def;d++){ctx.lineWidth=2;ctx.strokeStyle=col+"bb";ctx.beginPath();ctx.arc(n.sx,n.sy,r+4+d*4,-2.4,-.74);ctx.stroke();}
-    // niveaux de production
-    for(let p=0;p<n.prod;p++){ctx.fillStyle=C.gold;ctx.beginPath();ctx.arc(n.sx-(n.prod-1)*5+p*10,n.sy+r+7,2.6,0,7);ctx.fill();}
+    const ro=r+6+n.def*4;
+    if(n.kind==="rapide"){ctx.strokeStyle=col;ctx.lineWidth=2.2;for(let k=0;k<3;k++){const a=now*3.2+k*2.094;ctx.beginPath();ctx.arc(n.sx,n.sy,ro,a,a+.45);ctx.stroke();
+        const ex=n.sx+Math.cos(a+.45)*ro,ey=n.sy+Math.sin(a+.45)*ro,ta=a+.45+Math.PI/2;ctx.beginPath();ctx.moveTo(ex+Math.cos(ta-2.4)*4,ey+Math.sin(ta-2.4)*4);ctx.lineTo(ex,ey);ctx.lineTo(ex+Math.cos(ta+2.4)*4,ey+Math.sin(ta+2.4)*4);ctx.stroke();}}
+    if(n.kind==="bouclier"){ctx.lineWidth=3;ctx.strokeStyle=C.shield+"26";ctx.beginPath();ctx.arc(n.sx,n.sy,ro,0,7);ctx.stroke();
+      if(n.shield>0){ctx.strokeStyle=C.shield;ctx.shadowColor=C.shield;ctx.shadowBlur=6;ctx.beginPath();ctx.arc(n.sx,n.sy,ro,-Math.PI/2,-Math.PI/2+6.283*n.shield/SHIELD_MAX);ctx.stroke();ctx.shadowBlur=0;}}
+    for(let p=0;p<n.prod;p++){ctx.fillStyle=C.gold;ctx.beginPath();ctx.arc(n.sx-(n.prod-1)*5+p*10,n.sy+r+7+(n.kind?6:0),2.6,0,7);ctx.fill();}
     ctx.fillStyle=C.ink;ctx.font=font(Math.max(12,r*.75));ctx.textAlign="center";ctx.textBaseline="middle";
     ctx.shadowColor="rgba(0,0,0,.6)";ctx.shadowBlur=4;ctx.fillText(Math.floor(n.ships),n.sx,n.sy+1);ctx.shadowBlur=0;
   }
-  // sélection
   if(G.sel!==null){const n=nodes[G.sel];const k=1+Math.sin(performance.now()/220)*.08;
-    ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(n.sx,n.sy,(n.r+14)*k,0,7);ctx.stroke();ctx.setLineDash([]);
-    if(G.relayMode){ctx.fillStyle=C.gold;ctx.font=font(12,600);ctx.fillText("choisis le point de passage",n.sx,n.sy-n.r-22);}}
-  // flottes
-  for(const f of G.fleets){const A=nodes[f.path[f.seg]],B=nodes[f.path[f.seg+1]];
+    ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(n.sx,n.sy,(n.r+16)*k,0,7);ctx.stroke();ctx.setLineDash([]);
+    if(G.relayMode){ctx.fillStyle=C.gold;ctx.font=font(12,600);ctx.fillText("choisis la cible",n.sx,n.sy-n.r-24);}}
+  for(const f of G.fleets){const A=nodes[f.path[f.seg]],B=nodes[f.path[f.seg+1]],col=OWN_COL[f.owner];
     const x=A.sx+(B.sx-A.sx)*f.t,y=A.sy+(B.sy-A.sy)*f.t,ang=Math.atan2(B.sy-A.sy,B.sx-A.sx),s=5+Math.min(7,Math.log2(f.ships+1)*1.4);
-    const tl=12+s*1.6,tg=ctx.createLinearGradient(x-Math.cos(ang)*tl,y-Math.sin(ang)*tl,x,y);tg.addColorStop(0,OWN_COL[f.owner]+"00");tg.addColorStop(1,OWN_COL[f.owner]+"77");
+    const tl=(12+s*1.6)*(f.spd>1?1.6:1),tg=ctx.createLinearGradient(x-Math.cos(ang)*tl,y-Math.sin(ang)*tl,x,y);tg.addColorStop(0,col+"00");tg.addColorStop(1,col+"77");
     ctx.strokeStyle=tg;ctx.lineWidth=s*.7;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(x-Math.cos(ang)*tl,y-Math.sin(ang)*tl);ctx.lineTo(x,y);ctx.stroke();
-    ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.fillStyle=OWN_COL[f.owner];
+    ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.fillStyle=col;
     ctx.beginPath();ctx.moveTo(s,0);ctx.lineTo(-s*.8,s*.65);ctx.lineTo(-s*.4,0);ctx.lineTo(-s*.8,-s*.65);ctx.closePath();ctx.fill();ctx.restore();
-    ctx.fillStyle=OWN_COL[f.owner];ctx.font=font(11,600);ctx.fillText(Math.floor(f.ships),x,y-s-7);}
-  // effets
+    ctx.fillStyle=col;ctx.font=font(11,600);ctx.textAlign="center";ctx.fillText(Math.floor(f.ships),x,y-s-7);}
   for(const e of G.fx){const[x,y]=P(e.x,e.y),k=e.t/.8;ctx.globalAlpha=1-k;ctx.strokeStyle=e.col;ctx.lineWidth=2;
     ctx.beginPath();ctx.arc(x,y,(e.small?6:20)+k*(e.small?18:50)*Math.max(.6,sc),0,7);ctx.stroke();
     if(!e.small){ctx.fillStyle=e.col;for(let i=0;i<10;i++){const a=i/10*6.283+(e.seed||0),d=14+k*55*Math.max(.6,sc);ctx.beginPath();ctx.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,1.8*(1-k)+.3,0,7);ctx.fill();}}
     ctx.globalAlpha=1;}
-  // glisser
   if(drag&&drag.moved&&drag.from!==null){const n=nodes[drag.from];const over=hit(drag.x,drag.y);
     ctx.strokeStyle=C.gold;ctx.lineWidth=2.5;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(n.sx,n.sy);
     if(over!==null&&over!==drag.from){const p=path(drag.from,over,1)||[];p.slice(1).forEach(i=>ctx.lineTo(nodes[i].sx,nodes[i].sy));}else ctx.lineTo(drag.x,drag.y);
     ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=C.gold;ctx.font=font(13,700);ctx.fillText((n.rally===over&&over!==null)?"arrêter l'envoi auto":`auto · tout, puis par ${autoQty}`,drag.x,drag.y-24);}
+    ctx.fillStyle=C.gold;ctx.font=font(13,700);ctx.textAlign="center";ctx.fillText((n.rally===over&&over!==null)?"arrêter l'envoi auto":`auto · tout, puis par ${autoQty}`,drag.x,drag.y-24);}
 }
 
 // Saisie
 function hit(x,y){let best=null,bd=Infinity;for(const n of G.nodes){const d=Math.hypot(n.sx-x,n.sy-y);if(d<Math.max(n.r+10,26)&&d<bd){bd=d;best=n.id;}}return best;}
-cv.addEventListener("pointerdown",e=>{if(!G||G.over)return;cv.setPointerCapture(e.pointerId);
+cv.addEventListener("pointerdown",e=>{if(!G||G.over||G.demo)return;cv.setPointerCapture(e.pointerId);
   const h=hit(e.offsetX,e.offsetY);drag={x0:e.offsetX,y0:e.offsetY,x:e.offsetX,y:e.offsetY,moved:false,from:(h!==null&&G.nodes[h].owner===1)?h:null,down:h};});
 cv.addEventListener("pointermove",e=>{if(!drag)return;drag.x=e.offsetX;drag.y=e.offsetY;if(Math.hypot(drag.x-drag.x0,drag.y-drag.y0)>12)drag.moved=true;});
 cv.addEventListener("pointercancel",()=>drag=null);
@@ -424,19 +560,24 @@ function tap(id){
 
 // HUD
 const $=id=>document.getElementById(id);
+const fr=v=>v.toFixed(1).replace(".",",");
 function refreshPanel(){
-  const n=G&&G.sel!==null?G.nodes[G.sel]:null;
+  const n=G&&!G.demo&&G.sel!==null?G.nodes[G.sel]:null;
   $("panel").hidden=!n;$("hint").hidden=!!n;if(!n)return;
-  $("pName").textContent=n.name+" · taille "+n.size;
-  $("pInfo").textContent=Math.floor(n.ships)+" vaisseaux · +"+rate(n).toFixed(1).replace(".",",")+"/s · bouclier ×"+defMult(n).toFixed(1).replace(".",",");
+  $("pName").textContent=n.name+(n.kind==="rapide"?" · Rapide":n.kind==="bouclier"?" · Bouclier":"")+" · taille "+n.size;
+  $("pInfo").textContent=Math.floor(n.ships)+" vaisseaux · +"+fr(rate(n))+"/s · défense ×"+fr(defMult(n))+(n.kind==="bouclier"?" · protection "+Math.floor(n.shield)+"/"+SHIELD_MAX:"");
+  $("mkFast").hidden=$("mkShield").hidden=!!n.kind;
+  $("mkFast").disabled=$("mkShield").disabled=n.ships<SPECIAL_COST;
   const pc=prodCost(n),dc=defCost(n);
   $("upProd").querySelector("small").textContent=n.prod>=3?"niveau max":`niv. ${n.prod}→${n.prod+1} · ${pc} vx`;
   $("upProd").disabled=n.prod>=3||n.ships<pc;
-  $("upDef").querySelector("small").textContent=n.def>=3?"niveau max":`niv. ${n.def}→${n.def+1} · ${dc} vx`;
-  $("upDef").disabled=n.def>=3||n.ships<dc;
+  $("upDef").querySelector("small").textContent=n.kind==="rapide"?"bloquée (Rapide)":n.def>=3?"niveau max":`niv. ${n.def}→${n.def+1} · ${dc} vx`;
+  $("upDef").disabled=n.kind==="rapide"||n.def>=3||n.ships<dc;
   $("relay").setAttribute("aria-pressed",String(n.rally!==null||G.relayMode));
   $("relay").querySelector("small").textContent=G.relayMode?"touche la cible":n.rally!==null?"vers "+G.nodes[n.rally].name+" · arrêter":`par ${autoQty} · choisir cible`;
 }
+$("mkFast").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"rapide");refreshPanel();};
+$("mkShield").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"bouclier");refreshPanel();};
 $("upProd").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"prod");refreshPanel();};
 $("upDef").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"def");refreshPanel();};
 $("relay").onclick=()=>{const n=G.nodes[G.sel];if(!n)return;if(n.rally!==null||G.relayMode){n.rally=null;G.relayMode=false;}else G.relayMode=true;refreshPanel();};
@@ -448,48 +589,88 @@ segGroup("qty","q",v=>{autoQty=+v;saveMun();});
 const mark=(id,attr,val)=>$(id).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset[attr]===val)));
 mark("qty","q",autoQty);
 function scoreHud(){
-  if(!G)return;let a=0,b=0,z=0;
-  G.nodes.forEach(n=>{if(n.owner===1)a+=n.ships;else if(n.owner===2)b+=n.ships;else z+=n.ships*.3;});
-  G.fleets.forEach(f=>f.owner===1?a+=f.ships:b+=f.ships);
-  const pa=G.nodes.filter(n=>n.owner===1).length,pb=G.nodes.filter(n=>n.owner===2).length,t=a+b+z||1;
-  $("sMe").textContent=pa+" · "+Math.floor(a);$("sFoe").textContent=Math.floor(b)+" · "+pb;
-  $("barMe").style.width=(a/t*100)+"%";$("barNeu").style.width=(z/t*100)+"%";$("barFoe").style.width=(b/t*100)+"%";
+  if(!G)return;const tot=[0,0,0,0,0],pl=[0,0,0,0,0];
+  G.nodes.forEach(n=>{tot[n.owner]+=n.owner?n.ships:n.ships*.3;pl[n.owner]++;});
+  G.fleets.forEach(f=>tot[f.owner]+=f.ships);
+  const t=tot.reduce((a,b)=>a+b,0)||1;let foe=0,foeP=0;for(let o=2;o<=4;o++){foe+=tot[o];foeP+=pl[o];}
+  $("sMe").textContent=pl[1]+" · "+Math.floor(tot[1]);$("sFoe").textContent=Math.floor(foe)+" · "+foeP;
+  const bar=$("bar");if(bar.children.length!==G.players+1){bar.innerHTML="";[1,0,2,3,4].slice(0,G.players+1).forEach(o=>{const i=document.createElement("i");i.dataset.o=o;i.style.background=o?OWN_COL[o]:"#3a3d68";bar.appendChild(i);});}
+  for(const i of bar.children)i.style.width=(tot[+i.dataset.o]/t*100)+"%";
 }
+let toastT=null;
+function toast(title,text){const el=$("toast");el.innerHTML="";const b=document.createElement("b");b.textContent=title;el.appendChild(b);if(text)el.appendChild(document.createTextNode(text));
+  el.hidden=false;el.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>{el.style.opacity=0;setTimeout(()=>el.hidden=true,400);},text?5000:2500);}
 
-// Menu
+// Menu, mondes, fin de partie
 const mapsEl=$("maps");
 Object.entries(MAPS).forEach(([k,m])=>{const b=document.createElement("button");b.className="map";b.setAttribute("aria-pressed",String(k===mapKey));
   b.innerHTML=`<b>${m.name}</b><small>${m.desc}</small>`;b.onclick=()=>{mapKey=k;mapsEl.querySelectorAll(".map").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");};mapsEl.appendChild(b);});
 let menuOpen=true;
-function start(){G=build(mapKey);$("menu").hidden=true;$("end").hidden=true;menuOpen=false;refreshPanel();}
-$("start").onclick=start;
-$("again").onclick=start;
-$("toMenu").onclick=()=>{$("end").hidden=true;openMenu();};
+const show=id=>["menu","worlds","end"].forEach(s=>$(s).hidden=s!==id);
+function begin(g){G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
+  $("brand").textContent=cur?`MONDE ${cur.wi+1} · ${cur.li+1}`:"CONSTELLA";}
+function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast("Partie libre",null);}
+function startLevel(wi,li){cur={wi,li};const L=WORLDS[wi].levels[li];begin(buildLevel(wi,li));
+  const foes=L.k-1;toast(`Monde ${wi+1} · Niveau ${li+1}`,(foes===1?"1 ennemi":foes+" ennemis")+(L.tip?". "+L.tip:""));}
+function nextIndex(){for(let i=0;i<FLAT.length;i++)if(!isDone(FLAT[i].wi,FLAT[i].li))return i;return -1;}
+function fmtT(s){const m=Math.floor(s/60);return m+":"+String(Math.floor(s%60)).padStart(2,"0");}
+function renderWorlds(){
+  const list=$("wList");list.innerHTML="";const nx=nextIndex();let idx=0;
+  WORLDS.forEach((w,wi)=>{
+    const sec=document.createElement("section");sec.className="world";const firstIdx=idx;
+    const foes=w.levels[0].k-1;
+    sec.innerHTML=`<div class="wh"><div><span class="num">Monde ${wi+1}</span><b></b></div><span class="foes"></span></div><p></p><div class="lv"></div>`;
+    sec.querySelector("b").textContent=w.name;sec.querySelector("p").textContent=w.desc;
+    const fs=sec.querySelector(".foes");for(let o=2;o<=foes+1;o++){const i=document.createElement("i");i.style.background=OWN_COL[o];fs.appendChild(i);}
+    fs.appendChild(document.createTextNode(foes===1?"1 ennemi":foes+" ennemis"));
+    const lv=sec.querySelector(".lv");
+    w.levels.forEach((L,li)=>{const b=document.createElement("button"),i=idx++,open=isOpen(i),done=isDone(wi,li);
+      b.innerHTML=`<b>${li+1}</b><small></small>`;
+      b.querySelector("small").textContent=done?"✓ "+fmtT(progress.done[lkey(wi,li)]):open?(L.start>1?L.start+" contre "+L.start:"à jouer"):"verrouillé";
+      if(done)b.classList.add("done");if(i===nx)b.classList.add("next");
+      b.disabled=!open;b.setAttribute("aria-label",`Monde ${wi+1}, niveau ${li+1}`);
+      b.onclick=()=>startLevel(wi,li);lv.appendChild(b);});
+    if(!isOpen(firstIdx))sec.classList.add("locked");
+    list.appendChild(sec);});
+}
+function campLabel(){const nx=nextIndex();$("campNext").textContent=nx<0?"Tous les niveaux sont terminés":`Prochain : monde ${FLAT[nx].wi+1}, niveau ${FLAT[nx].li+1}`;}
+$("campaign").onclick=()=>{renderWorlds();show("worlds");};
+$("wBack").onclick=()=>{campLabel();show("menu");};
+$("start").onclick=startFree;
 $("menuBtn").onclick=openMenu;
-$("resume").onclick=()=>{$("menu").hidden=true;menuOpen=false;refreshPanel();};
-function openMenu(){menuOpen=true;$("menu").hidden=false;$("resume").hidden=!(G&&!G.over);}
+$("resume").onclick=()=>{show(null);menuOpen=false;refreshPanel();};
+function openMenu(){menuOpen=true;campLabel();show("menu");$("resume").hidden=!(G&&!G.over&&!G.demo);}
 function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;refreshPanel();
-  const m=Math.floor(G.time/60),s=String(Math.floor(G.time%60)).padStart(2,"0");
+  const t=fmtT(G.time);let next=null;
+  if(cur&&win){const k=lkey(cur.wi,cur.li),old=progress.done[k];progress.done[k]=old==null?Math.round(G.time):Math.min(old,Math.round(G.time));store.set("constella-progress",progress);
+    const i=FLAT.findIndex(f=>f.wi===cur.wi&&f.li===cur.li);next=FLAT[i+1]||null;}
   $("endTitle").textContent=win?"Victoire":"Défaite";$("endTitle").style.color=win?C.me:C.foe;
-  $("endStats").textContent=`${MAPS[mapKey].name} · ${diffKey} · ${m} min ${s} s de jeu · ${G.captured} systèmes pris à l'adversaire`;
-  setTimeout(()=>{$("end").hidden=false;},700);}
+  $("endStats").textContent=(cur?`Monde ${cur.wi+1} · niveau ${cur.li+1}`:`${MAPS[mapKey].name} · ${diffKey}`)+` · ${t} de jeu · ${G.captured} systèmes pris aux ennemis`+
+    (cur&&win&&next&&next.wi!==cur.wi?` · Monde ${next.wi+1} débloqué : ${WORLDS[next.wi].name}`:"")+(cur&&win&&!next?" · Campagne terminée, bravo !":"");
+  const again=$("again"),other=$("toMenu");
+  if(cur&&win&&next){again.textContent="Niveau suivant";again.onclick=()=>startLevel(next.wi,next.li);}
+  else if(cur){again.textContent="Rejouer";again.onclick=()=>startLevel(cur.wi,cur.li);}
+  else{again.textContent="Rejouer";again.onclick=startFree;}
+  if(cur){other.textContent="Mondes";other.onclick=()=>{renderWorlds();show("worlds");menuOpen=true;};}
+  else{other.textContent="Menu";other.onclick=openMenu;}
+  setTimeout(()=>{show("end");menuOpen=true;},700);}
 
 // Démo en fond du menu : l'IA joue contre elle-même
-function demo(){G=build("vega");G.demo=true;}
-demo();
+function demo(){cur=null;G=buildFree("vega",DIFF.normal);G.demo=true;layout();}
+demo();campLabel();
 
 let last=performance.now(),hudT=0;
 function loop(now){
   let dt=Math.min(.1,(now-last)/1000);last=now;
   if(G&&!G.over){
     let sim=G.demo?dt:(menuOpen?0:dt*speed*PACE);
-    if(G.demo){G.demoT=(G.demoT||0)+dt;if(G.demoT>1.2){G.demoT=0;ai(1);}}
     while(sim>0){const s=Math.min(.05,sim);step(s);sim-=s;}
-    if(G.demo&&G.over){demo();}
+    if(G.demo&&G.over)demo();
   }
   draw();hudT+=dt;if(hudT>.2){hudT=0;scoreHud();if(G&&!G.demo&&G.sel!==null)refreshPanel();}
   requestAnimationFrame(loop);
 }
+window.__constella={WORLDS,buildLevel,get G(){return G;},startLevel,ai,step};
 window.addEventListener("resize",resize);resize();requestAnimationFrame(loop);
 })();
 </script>
