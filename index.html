@@ -173,6 +173,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
           <li><b>Touche</b> ton étoile puis une cible : elle envoie ses vaisseaux une fois (25, 50 ou 100 %).</li>
           <li><b>Reste appuyé et glisse</b> vers une étoile : elle envoie d'abord tous ses vaisseaux, puis un paquet (3, 5 ou 10) dès qu'elle l'a produit. Glisse à nouveau vers la même cible pour arrêter.</li>
           <li>Une attaque réussit si tu envoies <b>plus de vaisseaux que la défense</b>.</li>
+          <li>Plus tu gardes une étoile longtemps, plus un <b>mur</b> se construit autour d'elle : un segment toutes les 6 secondes, jusqu'à 5. Chaque segment arrête 1 vaisseau ennemi avant les défenseurs. Le mur repart de zéro si l'étoile est prise.</li>
           <li>Dès 5 vaisseaux, transforme une étoile en <b>Rapide</b> (produit et envoie plus vite, sans défense) ou en <b>Bouclier</b> (produit un peu moins, mais une protection se recharge jusqu'à 10).</li>
           <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux).</li>
           <li>Tu gagnes quand plus aucun ennemi n'a de système ni de flotte.</li>
@@ -202,7 +203,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
 "use strict";
 const C={me:"#5ee6c9",foe:"#ff7a59",foe2:"#b18cff",foe3:"#ff5fa2",neu:"#a29fc2",gold:"#f2c14e",shield:"#bfe6ff",edge:"#2a2e5a",ink:"#ecebf7",void:"#0a0c1b"};
 const OWN_COL=[C.neu,C.me,C.foe,C.foe2,C.foe3];
-const W0=1600,H0=900,FLEET_SPEED=95,SPECIAL_COST=5,SHIELD_MAX=10,SHIELD_REGEN=.5;
+const W0=1600,H0=900,FLEET_SPEED=95,SPECIAL_COST=5,SHIELD_MAX=10,SHIELD_REGEN=.5,WALL_MAX=5,WALL_TIME=6; // mur : +1 toutes les 6 s de possession, jusqu'à 5
 const NAMES=["Aldra","Vesk","Tirun","Moba","Kael","Ysor","Pherin","Duna","Oriel","Saph","Neral","Quill","Hesk","Lumo","Brann","Ithe","Zorae","Calix","Tem","Varo","Nyx","Elar","Opa","Rhen","Sel","Ganth","Iru","Pell","Xan","Meru"];
 
 // Cartes de partie libre : moitié + centre, complétées par symétrie centrale
@@ -260,7 +261,7 @@ const lkey=(wi,li)=>wi+"-"+li;
 const isDone=(wi,li)=>progress.done[lkey(wi,li)]!=null;
 const isOpen=idx=>idx===0||isDone(FLAT[idx-1].wi,FLAT[idx-1].li);
 
-function mkNode(id,x,y,size,owner,ships){return {id,x,y,size,owner,ships,prod:0,def:0,kind:null,shield:0,rally:null,pulse:0};}
+function mkNode(id,x,y,size,owner,ships){return {id,x,y,size,owner,ships,prod:0,def:0,kind:null,shield:0,wall:0,rally:null,pulse:0};}
 function finalize(W,H,nodes,edgeList,players,cfg,seed){
   const adj=nodes.map(()=>[]),edges=[];
   for(const[a,b]of edgeList){const len=Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y);adj[a].push({to:b,len});adj[b].push({to:a,len});edges.push([a,b]);}
@@ -370,11 +371,12 @@ function upgrade(n,kind){
 function fx(n,col){G.fx.push({x:n.x,y:n.y,col,t:0,seed:Math.random()*6});}
 function arrive(f,n){
   if(n.owner===f.owner){n.ships+=f.ships;return;}
+  if(n.wall>0){const k=Math.min(n.wall,f.ships);n.wall-=k;f.ships-=k;if(f.ships<=0){n.pulse=1;return;}}
   if(n.kind==="bouclier"&&n.shield>0){const k=Math.min(n.shield,f.ships);n.shield-=k;f.ships-=k;if(f.ships<=0){n.pulse=1;return;}}
   const m=defMult(n),eff=n.ships*m;
   if(f.ships>eff+1e-6){
     if(isAI(n.owner)&&f.owner===1)G.captured++;
-    n.owner=f.owner;n.ships=f.ships-eff;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;n.kind=null;n.shield=0;
+    n.owner=f.owner;n.ships=f.ships-eff;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;n.kind=null;n.shield=0;n.wall=0;
     G.nodes.forEach(o=>{if(o.rally===n.id&&o.owner!==n.owner)o.rally=null;});
     if(G.sel===n.id&&n.owner!==1)G.sel=null;
     fx(n,OWN_COL[f.owner]);
@@ -387,6 +389,7 @@ function step(dt){
   G.time+=dt;
   for(const n of G.nodes){
     if(n.owner&&n.ships<cap(n))n.ships=Math.min(cap(n),n.ships+rate(n)*dt);
+    if(n.owner&&n.wall<WALL_MAX)n.wall=Math.min(WALL_MAX,n.wall+dt/WALL_TIME);
     if(n.kind==="bouclier"&&n.shield<SHIELD_MAX)n.shield=Math.min(SHIELD_MAX,n.shield+SHIELD_REGEN*dt);
     n.pulse=Math.max(0,n.pulse-dt*2);
     if(n.rally!==null&&n.owner&&n.ships>=autoQty)send(n,G.nodes[n.rally],autoQty);
@@ -434,7 +437,7 @@ function ai(P){
     let best=null;
     for(const e of hostile){
       const t=nodes[e.to];
-      const need=t.ships*defMult(t)+(t.kind==="bouclier"?t.shield:0)+(t.owner?rate(t)*e.len/FLEET_SPEED:0)+1-(incoming[t.id]||0);
+      const need=t.ships*defMult(t)+t.wall+(t.kind==="bouclier"?t.shield:0)+(t.owner?rate(t)*e.len/FLEET_SPEED:0)+1-(incoming[t.id]||0);
       if(need<=0)continue;
       const score=(t.size+1)/Math.max(need,1)*(t.owner?1:1.25);
       if(need+cfg.margin<avail&&(!best||score>best.score))best={t,need,score};
@@ -518,9 +521,13 @@ function draw(){
     else{ctx.fillStyle="#191c3c";ctx.beginPath();ctx.arc(n.sx,n.sy,r,0,7);ctx.fill();ctx.strokeStyle="rgba(170,175,220,.55)";ctx.lineWidth=1.5;ctx.stroke();}
     ctx.fillStyle="#0b0d22";ctx.beginPath();ctx.arc(n.sx,n.sy,core,0,7);ctx.fill();
     ctx.strokeStyle=n.owner?"rgba(0,0,0,.35)":"rgba(170,175,220,.25)";ctx.lineWidth=1;ctx.stroke();
-    // anneau segmenté
-    const seg=12,ra=r+4,spin=n.owner?now*.35*(n.owner===1?1:-1):0;ctx.strokeStyle=col+(n.owner?"dd":"66");ctx.lineWidth=1.6+n.pulse*2.5;
-    for(let i=0;i<seg;i++){const a=spin+i*6.283/seg;ctx.beginPath();ctx.arc(n.sx,n.sy,ra,a,a+6.283/seg*.55);ctx.stroke();}
+    // mur de protection : 5 segments qui se construisent avec le temps (trace fantôme = emplacement vide)
+    if(n.owner){const ra=r+4.5,span=6.283/WALL_MAX,gapA=.16,full=Math.floor(n.wall+1e-6),part=n.wall-full;
+      ctx.lineWidth=1;ctx.strokeStyle=col+"2a";for(let i=0;i<WALL_MAX;i++){const a=-Math.PI/2+i*span+gapA/2;ctx.beginPath();ctx.arc(n.sx,n.sy,ra,a,a+span-gapA);ctx.stroke();}
+      ctx.lineWidth=2.6+n.pulse*2;ctx.strokeStyle=col;
+      for(let i=0;i<WALL_MAX;i++){const a=-Math.PI/2+i*span+gapA/2,len=(span-gapA)*(i<full?1:i===full?part:0);if(len<=0)continue;
+        ctx.globalAlpha=i<full?1:.55;ctx.beginPath();ctx.arc(n.sx,n.sy,ra,a,a+len);ctx.stroke();}
+      ctx.globalAlpha=1;}
     for(let d=0;d<n.def;d++){ctx.lineWidth=2.2;ctx.strokeStyle=col+"cc";ctx.beginPath();ctx.arc(n.sx,n.sy,r+9+d*4,-2.4,-.74);ctx.stroke();}
     const ro=r+10+n.def*4;
     if(n.kind==="rapide"){ctx.strokeStyle=col;ctx.lineWidth=2.2;for(let k=0;k<3;k++){const a=now*3.2+k*2.094;ctx.beginPath();ctx.arc(n.sx,n.sy,ro,a,a+.45);ctx.stroke();
@@ -581,7 +588,7 @@ function refreshPanel(){
   const n=G&&!G.demo&&G.sel!==null?G.nodes[G.sel]:null;
   $("panel").hidden=!n;$("hint").hidden=!!n;if(!n)return;
   $("pName").textContent=n.name+(n.kind==="rapide"?" · Rapide":n.kind==="bouclier"?" · Bouclier":"")+" · taille "+n.size;
-  $("pInfo").textContent=Math.floor(n.ships)+" vaisseaux · +"+fr(rate(n))+"/s · défense ×"+fr(defMult(n))+(n.kind==="bouclier"?" · protection "+Math.floor(n.shield)+"/"+SHIELD_MAX:"");
+  $("pInfo").textContent=Math.floor(n.ships)+" vaisseaux · +"+fr(rate(n))+"/s · défense ×"+fr(defMult(n))+" · mur "+Math.floor(n.wall)+"/"+WALL_MAX+(n.kind==="bouclier"?" · protection "+Math.floor(n.shield)+"/"+SHIELD_MAX:"");
   $("mkFast").hidden=$("mkShield").hidden=!!n.kind;
   $("mkFast").disabled=$("mkShield").disabled=n.ships<SPECIAL_COST;
   const pc=prodCost(n),dc=defCost(n);
