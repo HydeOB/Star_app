@@ -112,8 +112,8 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
     </div>
     <div class="chip seg" id="speed" role="group" aria-label="Vitesse du jeu">
       <button data-s="0" title="Pause">II</button>
-      <button data-s="0.5">½×</button>
-      <button data-s="1" aria-pressed="true">1×</button>
+      <button data-s="0.5" aria-pressed="true">½×</button>
+      <button data-s="1">1×</button>
       <button data-s="1.5">1,5×</button>
       <button data-s="2">2×</button>
       <button data-s="3">3×</button>
@@ -251,7 +251,7 @@ const WORLDS=[
 ];
 const FLAT=[];WORLDS.forEach((w,wi)=>w.levels.forEach((l,li)=>FLAT.push({wi,li})));
 
-let G=null, mapKey="vega", diffKey="normal", speed=1, ratio=1, autoQty=5, cur=null;
+let G=null, mapKey="vega", diffKey="normal", speed=.5, ratio=1, autoQty=5, cur=null;
 const PACE=1/1.5; // rythme de base : 1× est 1,5 fois plus lent que la v1
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 {const st=store.get("constella-munitions",null);if(st&&[3,5,10].includes(st.q))autoQty=st.q;}

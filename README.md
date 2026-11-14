@@ -26,7 +26,7 @@ Les cartes de campagne sont générées à partir d'une graine fixe et sont sym�
 - **Améliorations** : dépense des vaisseaux pour monter Production et Défense (3 niveaux chacune).
 - **Mur de protection** : plus tu gardes une étoile, plus un mur se construit autour d'elle (un segment toutes les 6 s, jusqu'à 5). Chaque segment arrête 1 vaisseau ennemi avant les défenseurs. Le mur repart de zéro quand l'étoile change de camp.
 - **Étoiles spéciales** (dès 5 vaisseaux, coût 5) : **Rapide** produit 40 % plus vite et ses flottes volent 40 % plus vite, mais sa défense reste à ×1. **Bouclier** produit 25 % moins vite, mais une protection se recharge jusqu'à 10 et absorbe les attaques avant les vaisseaux.
-- Vitesse du jeu : pause, ½×, 1×, 1,5×, 2×, 3× (1× est volontairement posé pour une première partie).
+- Vitesse du jeu : pause, ½×, 1×, 1,5×, 2×, 3× (½× par défaut, pour bien démarrer).
 - Victoire quand l'adversaire n'a plus aucun système ni flotte.
 
 ## Contenu du prototype
