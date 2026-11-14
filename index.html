@@ -53,6 +53,15 @@ button:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 #endStars{font-size:44px;color:var(--gold);letter-spacing:6px;margin:0;line-height:1}
 #endGoals{color:var(--muted);margin:0;font-size:13.5px}
 .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 4px 0 8px;display:flex;align-items:center}
+#tuto{position:absolute;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 24px));padding:10px 14px;display:flex;flex-direction:column;gap:6px;border-color:rgba(242,193,78,.55);box-shadow:0 0 0 1px rgba(242,193,78,.15),0 8px 30px rgba(0,0,0,.4)}
+#tutoN{font-family:var(--display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+#tutoT{margin:0;font-size:14px;line-height:1.45}
+#tuto .tb{display:flex;gap:8px;justify-content:flex-end;align-items:center}
+#tutoSkip{font-size:12.5px;color:var(--muted);padding:6px 8px}
+#tutoOk{background:var(--gold);color:#241a02;font-family:var(--display);font-weight:700;padding:7px 14px;border-radius:9px}
+.icon{padding:7px 9px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.icon svg{width:20px;height:20px;display:block}
+.icon[aria-pressed="false"]{color:var(--foe)}
 #toast{position:absolute;left:50%;top:76px;transform:translateX(-50%);max-width:min(520px,calc(100% - 32px));padding:10px 14px;text-align:center;font-size:14px;line-height:1.4;pointer-events:none;transition:opacity .4s}
 #toast b{font-family:var(--display);letter-spacing:.06em;display:block;font-size:15px;margin-bottom:2px}
 /* Écrans */
@@ -121,10 +130,13 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
       <button data-s="2">2×</button>
       <button data-s="3">3×</button>
     </div>
+    <button class="chip icon" id="sndBtn" aria-label="Son" aria-pressed="true" title="Couper ou remettre le son"></button>
     <button class="chip" id="menuBtn" style="padding:8px 12px;font-family:var(--display);font-weight:600">Menu</button>
   </div>
 
   <div class="chip" id="toast" hidden></div>
+  <div class="chip" id="tuto" hidden role="status"><span id="tutoN"></span><p id="tutoT"></p>
+    <div class="tb"><button id="tutoSkip">Passer le tutoriel</button><button id="tutoOk" hidden>OK</button></div></div>
 
   <div class="hud" id="bottom">
     <div class="row">
@@ -171,6 +183,12 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
             <button data-q="3">3</button><button data-q="5" aria-pressed="true">5</button><button data-q="10">10</button>
           </div></div>
       </div>
+      <div><h2>Son et vibration</h2>
+        <div class="setrow"><span>Bruitages</span>
+          <div class="chip seg" id="optSnd" role="group" aria-label="Bruitages"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+        <div class="setrow"><span>Vibration (mobile)</span>
+          <div class="chip seg" id="optVib" role="group" aria-label="Vibration"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+      </div>
       <div><h2>Comment jouer</h2>
         <ul class="rules">
           <li>Chaque étoile à toi <b>produit des vaisseaux</b> en continu. Les grosses produisent plus.</li>
@@ -185,7 +203,9 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
           <li>Chaque niveau de campagne rapporte <b>1 à 3 étoiles</b> : 1 pour la victoire, 2 sous le temps cible, 3 sous le temps record (temps de jeu, affiché en haut).</li>
           <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux).</li>
           <li>Tu gagnes quand plus aucun ennemi n'a de système ni de flotte.</li>
+          <li>Les ennemis ont un caractère : <b>agressif</b> (il te vise en priorité et attaque vite), <b>prudent</b> (il se protège et prend d'abord les neutres) ou <b>équilibré</b>.</li>
         </ul>
+        <button class="ghost" id="tutoAgain" style="margin-top:10px;width:100%">Revoir le tutoriel</button>
       </div>
     </div>
   </div>
@@ -228,10 +248,17 @@ const MAPS={
     links:["0-1","0-2","1-3","1-4","2-4","3-5","5-6","3-C0","4-C0","4-6'"]}
 };
 const DIFF={
-  facile:{think:2.6,aggr:.7,margin:2,upg:.12,bonus:.85,safety:0,special:0},
-  normal:{think:1.5,aggr:.85,margin:3,upg:.3,bonus:1,safety:.3,special:.15},
-  difficile:{think:.85,aggr:.95,margin:4,upg:.5,bonus:1.15,safety:.5,special:.3}
+  facile:{think:2.6,aggr:.7,margin:2,upg:.12,bonus:.85,safety:0,special:0,defend:0,maxSrc:1},
+  normal:{think:1.5,aggr:.85,margin:3,upg:.3,bonus:1,safety:.3,special:.15,defend:.6,maxSrc:2},
+  difficile:{think:.85,aggr:.95,margin:4,upg:.5,bonus:1.15,safety:.5,special:.3,defend:1,maxSrc:3}
 };
+// Caractère des ennemis : agressif (te vise, attaque tôt), prudent (se protège, prend les neutres), équilibré
+const STYLE={
+  equilibre:{aggr:1,safety:1,hunt:1.15,neutral:1.15,shield:1,margin:1},
+  agressif:{aggr:1.12,safety:.5,hunt:1.7,neutral:.85,shield:.5,margin:.8},
+  prudent:{aggr:.85,safety:1.7,hunt:.8,neutral:1.4,shield:2,margin:1.4}
+};
+const STYLE_NAME={equilibre:"équilibré",agressif:"agressif",prudent:"prudent"};
 
 // Campagne : 4 mondes, de plus en plus durs. k = nombre de joueurs (toi + ennemis), n = étoiles par secteur
 const WORLDS=[
@@ -240,13 +267,13 @@ const WORLDS=[
     {k:2,n:3,start:1,ai:"facile",tip:"Glisse d'une étoile à une autre pour créer un envoi automatique."},
     {k:2,n:4,start:1,ai:"facile",center:1,tip:"Améliore la Production de ton étoile principale pour prendre de l'avance."},
     {k:2,n:5,start:2,ai:"normal",tip:"Nouveau : dès 5 vaisseaux, transforme une étoile en Rapide, Bouclier ou Phare."},
-    {k:2,n:5,start:1,ai:"normal",center:1}]},
+    {k:2,n:5,start:1,ai:"normal",center:1,st:["agressif"],tip:"Cet ennemi est agressif : il visera tes étoiles les plus faibles."}]},
   {name:"Nébuleuse de Vesk",desc:"Un adversaire plus vif, des cartes plus grandes.",levels:[
     {k:2,n:6,start:1,ai:"normal"},
     {k:2,n:6,start:1,ai:"normal",center:1,neu:1.3,tip:"Les neutres sont mieux défendus ici."},
     {k:2,n:7,start:1,ai:"normal",aiShips:32},
     {k:2,n:7,start:1,ai:"difficile",center:1},
-    {k:2,n:8,start:1,ai:"difficile",center:1,aiShips:35}]},
+    {k:2,n:8,start:1,ai:"difficile",center:1,aiShips:35,st:["agressif"]}]},
   {name:"Triangle de Kael",desc:"Deux ennemis en même temps. Ils se battent aussi entre eux.",levels:[
     {k:3,n:3,start:1,ai:"facile",center:1,tip:"Deux ennemis : laisse-les s'affaiblir entre eux avant de frapper."},
     {k:3,n:4,start:1,ai:"normal"},
@@ -352,7 +379,8 @@ function genLevel(L,seed0){
   }
   return null;
 }
-function buildLevel(wi,li){return genLevel(WORLDS[wi].levels[li],1000+wi*97+li*31);}
+function levelStyles(L,li){const st={};for(let o=2;o<=L.k;o++)st[o]=L.st?L.st[(o-2)%L.st.length]:L.k===2?["prudent","agressif"][li%2]:["agressif","prudent","equilibre"][(o-2+li)%3];return st;}
+function buildLevel(wi,li){const L=WORLDS[wi].levels[li],g=genLevel(L,1000+wi*97+li*31);if(g)g.style=levelStyles(L,li);return g;}
 
 // Règles
 const isAI=o=>o>=2;
@@ -363,6 +391,40 @@ const wallMax=n=>n.kind==="bouclier"?10:WALL_MAX, wallTime=n=>n.kind==="bouclier
 const KIND_NAME={rapide:"Rapide",bouclier:"Bouclier",phare:"Phare"};
 const boosted=n=>n.kind==="phare"||G.adj[n.id].some(e=>{const o=G.nodes[e.to];return o.owner===n.owner&&o.kind==="phare";});
 const prodCost=n=>20+15*n.prod, defCost=n=>15+10*n.def;
+
+// Sons synthétisés (Web Audio, aucun fichier) et vibration sur mobile
+const snd={on:store.get("constella-son",true),vib:store.get("constella-vibration",true),ctx:null,out:null,nb:null,last:{}};
+function audio(){
+  if(!snd.ctx){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;
+    try{snd.ctx=new A();const comp=snd.ctx.createDynamicsCompressor();snd.out=snd.ctx.createGain();snd.out.gain.value=.7;snd.out.connect(comp).connect(snd.ctx.destination);
+      const len=Math.floor(snd.ctx.sampleRate*.5);snd.nb=snd.ctx.createBuffer(1,len,snd.ctx.sampleRate);const ch=snd.nb.getChannelData(0);for(let i=0;i<len;i++)ch[i]=Math.random()*2-1;}catch(e){snd.ctx=null;return null;}}
+  if(snd.ctx.state==="suspended")snd.ctx.resume();return snd.ctx;
+}
+["pointerdown","touchend","click","keydown"].forEach(ev=>document.addEventListener(ev,()=>{if(snd.on)audio();},true));
+function tone(a,f,d,{f2=0,type="sine",v=.12,t0=0}={}){const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(snd.out);o.start(t);o.stop(t+d+.05);}
+function noise(a,d,{v=.2,f=1400,t0=0}={}){const t=a.currentTime+t0,s=a.createBufferSource(),fl=a.createBiquadFilter(),g=a.createGain();s.buffer=snd.nb;
+  fl.type="lowpass";fl.frequency.setValueAtTime(f,t);fl.frequency.exponentialRampToValueAtTime(90,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  s.connect(fl).connect(g).connect(snd.out);s.start(t,Math.random()*.2,d+.05);}
+const GAP={send:.06,boom:.08,boomFar:.25,capture:.05,lost:.15,block:.12,upgrade:.05,far:.3,tick:.05};
+function sfx(name){
+  if(!snd.on||!G||G.demo)return;const a=audio();if(!a||a.state!=="running")return;
+  const now=a.currentTime;if(now-(snd.last[name]||-9)<(GAP[name]||0))return;snd.last[name]=now;
+  switch(name){
+    case"send":tone(a,520,.09,{f2:780,type:"triangle",v:.06});break;
+    case"capture":tone(a,523,.12,{v:.11});tone(a,784,.16,{v:.11,t0:.07});tone(a,1046,.22,{v:.08,t0:.14});break;
+    case"lost":tone(a,330,.35,{f2:140,type:"triangle",v:.13});noise(a,.25,{v:.08,f:700});break;
+    case"far":tone(a,260,.08,{type:"triangle",v:.035});break;
+    case"boom":noise(a,.28,{v:.22,f:1600});tone(a,150,.22,{f2:45,v:.12});break;
+    case"boomFar":noise(a,.18,{v:.06,f:900});break;
+    case"block":tone(a,980,.06,{type:"square",v:.025});tone(a,740,.08,{type:"square",v:.02,t0:.04});break;
+    case"upgrade":[660,880,1320].forEach((f,i)=>tone(a,f,.12,{v:.07,t0:i*.05}));break;
+    case"tick":tone(a,880,.07,{v:.05});break;
+    case"win":[523,659,784,1046].forEach((f,i)=>tone(a,f,.3,{v:.12,t0:i*.12,type:"triangle"}));break;
+    case"lose":[392,330,262].forEach((f,i)=>tone(a,f,.4,{v:.12,t0:i*.18,type:"triangle"}));break;
+  }
+}
+function buzz(p){if(snd.vib&&G&&!G.demo&&navigator.vibrate)try{navigator.vibrate(p);}catch(e){}}
 
 function path(from,to,owner){
   const nodes=G.nodes,dist=nodes.map(()=>Infinity),prev=nodes.map(()=>-1),done=new Set();
@@ -382,19 +444,26 @@ function send(n,t,count){
   return true;
 }
 function upgrade(n,kind){
+  const ok=(()=>{
   if(kind==="prod"&&n.prod<3&&n.ships>=prodCost(n)){n.ships-=prodCost(n);n.prod++;fx(n,C.gold);return true;}
   if(kind==="def"&&n.kind!=="rapide"&&n.def<3&&n.ships>=defCost(n)){n.ships-=defCost(n);n.def++;fx(n,C.gold);return true;}
   if(KIND_NAME[kind]&&!n.kind&&n.ships>=SPECIAL_COST){n.ships-=SPECIAL_COST;n.kind=kind;fx(n,kind==="bouclier"?C.shield:kind==="phare"?C.gold:OWN_COL[n.owner]);return true;}
-  return false;
+  return false;})();
+  if(ok&&n.owner===1){sfx("upgrade");buzz(12);}
+  return ok;
 }
 function fx(n,col){G.fx.push({x:n.x,y:n.y,col,t:0,seed:Math.random()*6});}
+// petite explosion quand deux flottes se percutent : éclair blanc + étincelles aux deux couleurs
+function boom(x,y,c1,c2,k){const sp=[];for(let i=0;i<14;i++)sp.push({a:Math.random()*6.283,v:.45+Math.random()*.6,c:i%2?c1:c2});
+  G.fx.push({x,y,t:0,boom:1,size:Math.min(6,Math.log2(k+1)),sp,col:C.ink});}
 function arrive(f,n){
   if(n.owner===f.owner){n.ships+=f.ships;return;}
   const pw=f.pow||1;let att=f.ships*pw;
-  if(n.wall>0){const k=Math.min(n.wall,att);n.wall-=k;att-=k;if(att<=1e-6){n.pulse=1;return;}}
+  if(n.wall>0){const k=Math.min(n.wall,att);n.wall-=k;att-=k;if(att<=1e-6){n.pulse=1;if(n.owner===1||f.owner===1)sfx("block");return;}}
   const m=defMult(n),eff=n.ships*m;
   if(att>eff+1e-6){
     if(isAI(n.owner)&&f.owner===1)G.captured++;
+    if(f.owner===1){sfx("capture");buzz(18);}else if(n.owner===1){sfx("lost");buzz([50,40,50]);}else sfx("far");
     n.owner=f.owner;n.ships=(att-eff)/pw;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;n.kind=null;n.wall=0;
     G.nodes.forEach(o=>{if(o.rally===n.id&&o.owner!==n.owner)o.rally=null;});
     if(G.sel===n.id&&n.owner!==1)G.sel=null;
@@ -426,8 +495,9 @@ function step(dt){
     const a=G.fleets[i],b=G.fleets[j];if(a.owner===b.owner||a.ships<=0||b.ships<=0)continue;
     if(a.path[a.seg]===b.path[b.seg+1]&&a.path[a.seg+1]===b.path[b.seg]&&a.t+b.t>=1){
       const k=Math.min(a.ships,b.ships);a.ships-=k;b.ships-=k;
-      const px=G.nodes[a.path[a.seg]],py=G.nodes[a.path[a.seg+1]];
-      G.fx.push({x:px.x+(py.x-px.x)*a.t,y:px.y+(py.y-px.y)*a.t,col:C.ink,t:0,small:1});
+      const px=G.nodes[a.path[a.seg]],py=G.nodes[a.path[a.seg+1]],me=a.owner===1||b.owner===1;
+      boom(px.x+(py.x-px.x)*a.t,px.y+(py.y-px.y)*a.t,OWN_COL[a.owner],OWN_COL[b.owner],k);
+      if(me){sfx("boom");buzz(10);}else sfx("boomFar");
     }
   }
   G.fleets=G.fleets.filter(f=>f.ships>=0.5);
@@ -437,33 +507,69 @@ function step(dt){
   if(!foes)finish(true);else if(!has(1))finish(false);
 }
 
-// IA : attaque les cibles rentables, achemine les renforts vers le front, améliore et spécialise ses étoiles
+// IA : défend ses étoiles menacées, vise les étoiles faibles (en combinant plusieurs étoiles), puis améliore et achemine les renforts
+function hitNode(f){for(let i=f.seg+1;i<f.path.length;i++){const n=G.nodes[f.path[i]];if(n.owner!==f.owner||i===f.path.length-1)return n;}return null;}
 function ai(P){
-  const cfg=G.cfg,nodes=G.nodes,incoming={};
-  for(const f of G.fleets)if(f.owner===P)incoming[f.dest]=(incoming[f.dest]||0)+f.ships;
-  for(const n of nodes){
-    if(n.owner!==P)continue;
-    const hostile=G.adj[n.id].filter(e=>nodes[e.to].owner!==P);
-    if(!hostile.length){
+  const cfg=G.cfg,st=STYLE[(G.style&&G.style[P])||"equilibre"],nodes=G.nodes,incoming={},danger={};
+  for(const f of G.fleets){
+    if(f.owner===P){incoming[f.dest]=(incoming[f.dest]||0)+f.ships;continue;}
+    const h=hitNode(f);if(h&&h.owner===P)danger[h.id]=(danger[h.id]||0)+f.ships*(f.pow||1);
+  }
+  const mine=nodes.filter(n=>n.owner===P),avail={},threatOf={};
+  for(const n of mine){let th=0;
+    for(const e of G.adj[n.id]){const t=nodes[e.to];if(t.owner&&t.owner!==P)th=Math.max(th,t.ships*(boosted(t)?1.25:1));}
+    threatOf[n.id]=th;avail[n.id]=Math.max(0,n.ships*cfg.aggr*st.aggr-th*cfg.safety*st.safety);}
+  // 1. défense : une étoile visée garde ses vaisseaux et appelle ses voisines à l'aide
+  if(cfg.defend&&Math.random()<cfg.defend)for(const n of mine){
+    const d=danger[n.id];if(!d)continue;
+    let deficit=d-(n.ships*defMult(n)+n.wall+(incoming[n.id]||0)*defMult(n))+2;
+    avail[n.id]=0;if(deficit<=0)continue;
+    for(const e of G.adj[n.id].slice().sort((x,y)=>x.len-y.len)){const m=nodes[e.to];
+      if(m.owner!==P||danger[m.id])continue;
+      const give=Math.ceil(Math.min(avail[m.id],deficit/defMult(n)+1));if(give<2)continue;
+      if(send(m,n,give)){avail[m.id]-=give;deficit-=give*defMult(n);incoming[n.id]=(incoming[n.id]||0)+give;}
+      if(deficit<=0)break;}
+  }
+  // 2. attaques : la cible la plus rentable, en combinant jusqu'à maxSrc étoiles voisines
+  const used=new Set();
+  for(let round=0;round<4;round++){
+    let best=null;
+    for(const t of nodes){
+      if(t.owner===P)continue;
+      const srcs=G.adj[t.id].map(e=>({n:nodes[e.to],len:e.len})).filter(x=>x.n.owner===P&&avail[x.n.id]>=2)
+        .sort((x,y)=>avail[y.n.id]-avail[x.n.id]).slice(0,cfg.maxSrc||1);
+      if(!srcs.length)continue;
+      const far=Math.max(...srcs.map(x=>x.len));
+      const need=t.ships*defMult(t)+t.wall+(t.owner?rate(t)*far/FLEET_SPEED:0)+1-(incoming[t.id]||0);
+      if(need<=0)continue;
+      const margin=cfg.margin*st.margin,total=srcs.reduce((acc,x)=>acc+avail[x.n.id],0);
+      if(total<need+margin)continue;
+      let w=t.owner===1?st.hunt:t.owner?1:st.neutral;
+      if(t.owner&&t.ships<8)w*=1.4; // étoile ennemie dégarnie : on en profite
+      if(t.kind==="phare")w*=1.2;
+      const score=(t.size+1)/Math.max(need,1)*w*(srcs.length>1?.9:1);
+      if(!best||score>best.score)best={t,need:need+margin,srcs,score};
+    }
+    if(!best)break;
+    let left=best.need;
+    for(const x of best.srcs){const amt=Math.ceil(Math.min(avail[x.n.id],left));if(amt<1)continue;
+      if(send(x.n,best.t,amt)){avail[x.n.id]-=amt;left-=amt;used.add(x.n.id);}if(left<=0)break;}
+    incoming[best.t.id]=(incoming[best.t.id]||0)+best.need;
+  }
+  // 3. le reste : spécialisations, améliorations, renforts vers le front
+  for(const n of mine){
+    if(used.has(n.id))continue;
+    const hostile=G.adj[n.id].some(e=>nodes[e.to].owner!==P);
+    if(!hostile){
       if(!n.kind&&Math.random()<cfg.special&&n.ships>=SPECIAL_COST+8){const mates=G.adj[n.id].filter(e=>nodes[e.to].owner===P).length;upgrade(n,mates>=3&&Math.random()<.5?"phare":"rapide");continue;}
       if(Math.random()<cfg.upg&&n.prod<3&&n.ships>=prodCost(n)+5){upgrade(n,"prod");continue;}
       if(n.ships>8){const t=frontier(n,P);if(t)send(n,t,n.ships*.85);}
       continue;
     }
-    let threat=0;for(const e of hostile){const t=nodes[e.to];if(t.owner&&t.owner!==P)threat=Math.max(threat,t.ships);}
-    const avail=n.ships*cfg.aggr-threat*cfg.safety;
-    let best=null;
-    for(const e of hostile){
-      const t=nodes[e.to];
-      const need=t.ships*defMult(t)+t.wall+(t.owner?rate(t)*e.len/FLEET_SPEED:0)+1-(incoming[t.id]||0);
-      if(need<=0)continue;
-      const score=(t.size+1)/Math.max(need,1)*(t.owner?1:1.25);
-      if(need+cfg.margin<avail&&(!best||score>best.score))best={t,need,score};
-    }
-    if(best){send(n,best.t,Math.ceil(best.need+cfg.margin));incoming[best.t.id]=(incoming[best.t.id]||0)+best.need+cfg.margin;continue;}
-    if(threat>0&&!n.kind&&Math.random()<cfg.special&&n.ships>=SPECIAL_COST+threat*.3){upgrade(n,"bouclier");continue;}
+    const threat=Math.max(threatOf[n.id],danger[n.id]||0);
+    if(threat>0&&!n.kind&&Math.random()<cfg.special*st.shield&&n.ships>=SPECIAL_COST+threat*.3){upgrade(n,"bouclier");continue;}
     if(Math.random()<cfg.upg){
-      if(threat>0&&n.def<3&&n.ships>=defCost(n)+threat*.6)upgrade(n,"def");
+      if(threat>0&&n.def<3&&n.ships>=defCost(n)+threat*.6/st.safety)upgrade(n,"def");
       else if(n.prod<2&&n.ships>=prodCost(n)+15)upgrade(n,"prod");
     }
   }
@@ -481,7 +587,8 @@ const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 let vw=0,vh=0,dpr=1,sc=1,ox=0,oy=0,portrait=false,rotMap=false,stars=null,twinkle=[];
 function layout(){
   if(!G)return;portrait=vh>vw*1.05;rotMap=portrait&&G.W>G.H*1.1;
-  const mw=rotMap?G.H:G.W,mh=rotMap?G.W:G.H,top=portrait?96:70,bot=portrait?150:118,side=28;
+  const mw=rotMap?G.H:G.W,mh=rotMap?G.W:G.H,top=(portrait?96:70)+(tuto?(portrait?118:92):0),bot=portrait?150:118,side=28;
+  const tb=document.getElementById("tuto");if(tb)tb.style.top=(portrait?94:64)+"px";
   sc=Math.min((vw-2*side)/mw,(vh-top-bot)/mh);ox=(vw-mw*sc)/2;oy=top+((vh-top-bot)-mh*sc)/2;
 }
 function resize(){
@@ -569,10 +676,27 @@ function draw(){
       ctx.globalAlpha=a;ctx.fillStyle=i===0?"#ffffff":col;ctx.beginPath();ctx.arc(x-ux*back,y-uy*back,i===0?3.9:2.9,0,7);ctx.fill();}
     ctx.globalAlpha=1;ctx.shadowBlur=0;
     ctx.fillStyle=col;ctx.font=font(11,700);ctx.textAlign="center";ctx.fillText(Math.floor(f.ships),x-uy*12,y+ux*12-2);}
-  for(const e of G.fx){const[x,y]=P(e.x,e.y),k=e.t/.8;ctx.globalAlpha=1-k;ctx.strokeStyle=e.col;ctx.lineWidth=2;
+  for(const e of G.fx){const[x,y]=P(e.x,e.y),k=e.t/.8;
+    if(e.boom){const R0=(9+e.size*3.2)*Math.max(.7,sc),kk=Math.min(1,k*1.6);
+      const fl=ctx.createRadialGradient(x,y,0,x,y,R0*(.6+kk));fl.addColorStop(0,`rgba(255,250,235,${(.95*(1-kk)).toFixed(3)})`);fl.addColorStop(.4,`rgba(255,200,150,${(.35*(1-kk)).toFixed(3)})`);fl.addColorStop(1,"rgba(255,200,150,0)");
+      ctx.fillStyle=fl;ctx.beginPath();ctx.arc(x,y,R0*(.6+kk),0,7);ctx.fill();
+      ctx.globalAlpha=1-k;for(const p of e.sp){const d=p.v*R0*(.3+k*2.1);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(x+Math.cos(p.a)*d,y+Math.sin(p.a)*d,1.9*(1-k)+.4,0,7);ctx.fill();}
+      ctx.strokeStyle="#fff";ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,R0*(.4+k*1.4),0,7);ctx.stroke();ctx.globalAlpha=1;continue;}
+    ctx.globalAlpha=1-k;ctx.strokeStyle=e.col;ctx.lineWidth=2;
     ctx.beginPath();ctx.arc(x,y,(e.small?6:20)+k*(e.small?18:50)*Math.max(.6,sc),0,7);ctx.stroke();
     if(!e.small){ctx.fillStyle=e.col;for(let i=0;i<10;i++){const a=i/10*6.283+(e.seed||0),d=14+k*55*Math.max(.6,sc);ctx.beginPath();ctx.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,1.8*(1-k)+.3,0,7);ctx.fill();}}
     ctx.globalAlpha=1;}
+  if(tuto&&!menuOpen){const s=TUTO[tuto.step],k=.5+.5*Math.sin(now*4);
+    ctx.strokeStyle=C.gold;ctx.lineWidth=2.5;
+    for(const id of (s.hl?s.hl():[])){const n=nodes[id];if(!n)continue;ctx.globalAlpha=.55+.45*k;ctx.setLineDash([6,6]);ctx.lineDashOffset=-now*20;
+      ctx.beginPath();ctx.arc(n.sx,n.sy,n.r+16+k*6,0,7);ctx.stroke();ctx.setLineDash([]);
+      ctx.globalAlpha=1;ctx.fillStyle=C.gold;const ty=n.sy-n.r-30-k*6;ctx.beginPath();ctx.moveTo(n.sx,ty+12);ctx.lineTo(n.sx-8,ty);ctx.lineTo(n.sx+8,ty);ctx.closePath();ctx.fill();}
+    const ln=s.line?s.line():s.drag?s.drag():null;
+    if(ln&&nodes[ln[0]]&&nodes[ln[1]]){const A=nodes[ln[0]],B=nodes[ln[1]],p=path(A.id,B.id,1)||[A.id,B.id];
+      ctx.globalAlpha=.6;ctx.setLineDash([5,9]);ctx.lineDashOffset=-now*25;ctx.beginPath();ctx.moveTo(A.sx,A.sy);p.slice(1).forEach(i=>ctx.lineTo(nodes[i].sx,nodes[i].sy));ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+      if(s.drag){const u=(now*.6)%1,e2=u<.8?u/.8:1;const pts=p.map(i=>nodes[i]);let L=0;const segs=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i].sx-pts[i-1].sx,pts[i].sy-pts[i-1].sy);segs.push(l);L+=l;}
+        let d=e2*L,i=0;while(i<segs.length-1&&d>segs[i]){d-=segs[i];i++;}const q=Math.min(1,d/(segs[i]||1)),fx_=pts[i].sx+(pts[i+1].sx-pts[i].sx)*q,fy_=pts[i].sy+(pts[i+1].sy-pts[i].sy)*q;
+        ctx.globalAlpha=u<.8?1:1-(u-.8)/.2;ctx.fillStyle="#fff";ctx.shadowColor=C.gold;ctx.shadowBlur=14;ctx.beginPath();ctx.arc(fx_,fy_,9,0,7);ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}}}
   if(drag&&drag.moved&&drag.from!==null){const n=nodes[drag.from];const over=hit(drag.x,drag.y);
     ctx.strokeStyle=C.gold;ctx.lineWidth=2.5;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(n.sx,n.sy);
     if(over!==null&&over!==drag.from){const p=path(drag.from,over,1)||[];p.slice(1).forEach(i=>ctx.lineTo(nodes[i].sx,nodes[i].sy));}else ctx.lineTo(drag.x,drag.y);
@@ -587,15 +711,17 @@ cv.addEventListener("pointerdown",e=>{if(!G||G.over||G.demo)return;cv.setPointer
 cv.addEventListener("pointermove",e=>{if(!drag)return;drag.x=e.offsetX;drag.y=e.offsetY;if(Math.hypot(drag.x-drag.x0,drag.y-drag.y0)>12)drag.moved=true;});
 cv.addEventListener("pointercancel",()=>drag=null);
 cv.addEventListener("pointerup",e=>{if(!drag)return;const d=drag;drag=null;const up=hit(e.offsetX,e.offsetY);
+  if(d.moved&&tuto&&TUTO[tuto.step].only)return;
   if(d.moved){if(d.from!==null&&up!==null&&up!==d.from){const n=G.nodes[d.from];if(n.rally===up)n.rally=null;else startAuto(n,up);}refreshPanel();return;}
   tap(up);});
-function startAuto(n,to){n.rally=to;send(n,G.nodes[to],n.ships);fx(G.nodes[to],C.gold);}
+function startAuto(n,to){n.rally=to;send(n,G.nodes[to],n.ships);fx(G.nodes[to],C.gold);sfx("send");}
 function tap(id){
+  if(tuto&&TUTO[tuto.step].only&&!TUTO[tuto.step].only().includes(id))return;
   const sel=G.sel!==null?G.nodes[G.sel]:null;
   if(id===null){G.sel=null;G.relayMode=false;}
   else if(G.relayMode&&sel){if(id!==sel.id)startAuto(sel,id);G.relayMode=false;}
   else{const n=G.nodes[id];
-    if(sel&&sel.owner===1&&id!==sel.id){send(sel,n,sel.ships*ratio);G.sel=null;}
+    if(sel&&sel.owner===1&&id!==sel.id){if(send(sel,n,sel.ships*ratio))sfx("send");G.sel=null;}
     else if(n.owner===1){G.sel=(G.sel===id)?null:id;}
   }
   refreshPanel();
@@ -637,7 +763,7 @@ function scoreHud(){
   G.nodes.forEach(n=>{tot[n.owner]+=n.owner?n.ships:n.ships*.3;pl[n.owner]++;});
   G.fleets.forEach(f=>tot[f.owner]+=f.ships);
   const t=tot.reduce((a,b)=>a+b,0)||1;let foe=0,foeP=0;for(let o=2;o<=4;o++){foe+=tot[o];foeP+=pl[o];}
-  if(!G.demo)$("brand").textContent=(cur?`${cur.wi+1}-${cur.li+1} · `:"")+fmtT(G.time);
+  if(!G.demo)$("brand").textContent=(cur?`${cur.wi+1}-${cur.li+1} · `:"")+fmtT(playTime(G));
   $("sMe").textContent=pl[1]+" · "+Math.floor(tot[1]);$("sFoe").textContent=Math.floor(foe)+" · "+foeP;
   const bar=$("bar");if(bar.children.length!==G.players+1){bar.innerHTML="";[1,0,2,3,4].slice(0,G.players+1).forEach(o=>{const i=document.createElement("i");i.dataset.o=o;i.style.background=o?OWN_COL[o]:"#3a3d68";bar.appendChild(i);});}
   for(const i of bar.children)i.style.width=(tot[+i.dataset.o]/t*100)+"%";
@@ -652,11 +778,13 @@ Object.entries(MAPS).forEach(([k,m])=>{const b=document.createElement("button");
   b.innerHTML=`<b>${m.name}</b><small>${m.desc}</small>`;b.onclick=()=>{mapKey=k;mapsEl.querySelectorAll(".map").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");};mapsEl.appendChild(b);});
 let menuOpen=true;
 const show=id=>["menu","worlds","end"].forEach(s=>$(s).hidden=s!==id);
-function begin(g){G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
+function begin(g){if(tuto)tutoEnd(true);G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
   $("brand").textContent=cur?`MONDE ${cur.wi+1} · ${cur.li+1}`:"CONSTELLA";}
 function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast("Partie libre",null);}
-function startLevel(wi,li){cur={wi,li};const L=WORLDS[wi].levels[li];begin(buildLevel(wi,li));
-  const foes=L.k-1;toast(`Monde ${wi+1} · Niveau ${li+1}`,(foes===1?"1 ennemi":foes+" ennemis")+` · ★★ en moins de ${fmtT(parTime(G))}, ★★★ en moins de ${fmtT(recordTime(G))}`+(L.tip?". "+L.tip:""));}
+function startLevel(wi,li,forceTuto){cur={wi,li};const L=WORLDS[wi].levels[li];begin(buildLevel(wi,li));
+  if(wi===0&&li===0&&(forceTuto||!store.get("constella-tuto",false))){tutoStart();return;}
+  const foes=L.k-1,chars=Object.values(G.style).map(x=>STYLE_NAME[x]);
+  toast(`Monde ${wi+1} · Niveau ${li+1}`,(foes===1?"1 ennemi "+chars[0]:foes+" ennemis ("+chars.join(", ")+")")+` · ★★ en moins de ${fmtT(parTime(G))}, ★★★ en moins de ${fmtT(recordTime(G))}`+(L.tip?". "+L.tip:""));}
 function nextIndex(){for(let i=0;i<FLAT.length;i++)if(!isDone(FLAT[i].wi,FLAT[i].li))return i;return -1;}
 function fmtT(s){const m=Math.floor(s/60);return m+":"+String(Math.floor(s%60)).padStart(2,"0");}
 function renderWorlds(){
@@ -688,9 +816,9 @@ $("menuBtn").onclick=openMenu;
 $("resume").onclick=()=>{show(null);menuOpen=false;refreshPanel();};
 function openMenu(){menuOpen=true;campLabel();show("menu");$("resume").hidden=!(G&&!G.over&&!G.demo);}
 function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;refreshPanel();
-  const t=fmtT(G.time);let next=null;
+  const t=fmtT(playTime(G));let next=null;if(tuto)tutoEnd(true);sfx(win?"win":"lose");buzz(win?[30,40,30,40,90]:[220]);
   let got=0;
-  if(cur&&win){const k=lkey(cur.wi,cur.li),old=progress.done[k],tt=Math.round(G.time);got=starsFor(G,tt);
+  if(cur&&win){const k=lkey(cur.wi,cur.li),old=progress.done[k],tt=Math.round(playTime(G));got=starsFor(G,tt);
     progress.done[k]=old?{t:Math.min(old.t,tt),s:Math.max(old.s,got)}:{t:tt,s:got};store.set("constella-progress",progress);
     const i=FLAT.findIndex(f=>f.wi===cur.wi&&f.li===cur.li);next=FLAT[i+1]||null;}
   $("endStars").hidden=!(cur&&win);$("endStars").textContent=starStr(got);
@@ -706,6 +834,53 @@ function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;re
   else{other.textContent="Menu";other.onclick=openMenu;}
   const g0=G;setTimeout(()=>{if(G!==g0)return;show("end");menuOpen=true;},700);}
 
+// Tutoriel de la première partie (monde 1, niveau 1)
+let tuto=null;
+const playTime=g=>Math.max(0,g.time-(g.tutoT||0));
+const TUTO=[
+  {txt:()=>"Voici ton étoile. Elle produit des vaisseaux en continu, le nombre est affiché en son centre. Touche-la pour la sélectionner.",
+    hl:()=>[tuto.a],pause:1,only:()=>[tuto.a],done:()=>G.sel===tuto.a},
+  {txt:()=>"Touche maintenant l'étoile grise indiquée : tes vaisseaux partent vers elle.",
+    hl:()=>[tuto.b],line:()=>[tuto.a,tuto.b],pause:1,only:()=>[tuto.a,tuto.b],done:()=>G.fleets.some(f=>f.owner===1)},
+  {txt:()=>"Une étoile est capturée si tu envoies plus de vaisseaux qu'elle n'en a. Regarde ta flotte arriver.",
+    hl:()=>[tuto.b],done:()=>!G.fleets.some(f=>f.owner===1)},
+  {enter:()=>{let best=null;for(const n of G.nodes){if(n.owner!==1)continue;for(const e of G.adj[n.id]){const m=G.nodes[e.to];if(m.owner===1)continue;
+      const sc=(m.owner?50:0)+m.ships;if(!best||sc<best.sc)best={sc,s:n.id,c:m.id};}}
+      if(best){tuto.s=best.s;tuto.c=best.c;}else{tuto.s=tuto.a;tuto.c=tuto.b;}},
+    txt:()=>(G.nodes[tuto.b].owner===1?"Bravo, elle est à toi ! ":"Presque : il fallait plus de vaisseaux. ")+"Maintenant, reste appuyé sur une de tes étoiles et glisse jusqu'à une autre : elle enverra ses vaisseaux automatiquement, par paquets.",
+    hl:()=>[tuto.c],drag:()=>[tuto.s,tuto.c],done:()=>G.nodes.some(n=>n.owner===1&&n.rally!==null)},
+  {txt:()=>"Parfait. Un mur se construit avec le temps autour de tes étoiles et arrête les premiers attaquants. Pour gagner, prends toutes les étoiles orange de l'ennemi. Bonne chance !",
+    ok:"C'est parti",pause:1,only:()=>[]}
+];
+function tutoStart(){
+  const mine=G.nodes.filter(n=>n.owner===1).sort((x,y)=>y.ships-x.ships),a=mine[0];let b=null;
+  for(const n of G.nodes){if(n.owner!==0)continue;const p=path(a.id,n.id,1);if(!p||p.slice(1,-1).some(i=>G.nodes[i].owner!==1))continue;if(!b||n.ships<b.ships)b=n;}
+  if(!b)return;
+  if(b.ships>=a.ships*.8)b.ships=Math.floor(a.ships*.5);
+  tuto={step:0,a:a.id,b:b.id};$("toast").hidden=true;$("tuto").hidden=false;layout();tutoShow();
+}
+function tutoShow(){const s=TUTO[tuto.step];if(s.enter)s.enter();
+  $("tutoN").textContent=`Tutoriel · ${tuto.step+1}/${TUTO.length}`;$("tutoT").textContent=s.txt();
+  $("tutoOk").hidden=!s.ok;if(s.ok)$("tutoOk").textContent=s.ok;$("tutoSkip").hidden=!!s.ok;}
+function tutoTick(){const s=TUTO[tuto.step];if(s.done&&s.done())tutoNext();}
+function tutoNext(){tuto.step++;sfx("tick");if(tuto.step>=TUTO.length)tutoEnd();else tutoShow();}
+function tutoEnd(silent){tuto=null;store.set("constella-tuto",true);$("tuto").hidden=true;layout();
+  if(!silent&&G&&cur)toast("À toi de jouer",`★★ en moins de ${fmtT(parTime(G))}, ★★★ en moins de ${fmtT(recordTime(G))}. Le chrono démarre maintenant.`);}
+$("tutoOk").onclick=()=>{if(tuto)tutoNext();};
+$("tutoSkip").onclick=()=>{if(tuto)tutoEnd();};
+$("tutoAgain").onclick=()=>startLevel(0,0,true);
+
+// Son et vibration
+const SVG_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" stroke="none"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
+const SVG_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" stroke="none"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>';
+function soundUi(){$("sndBtn").innerHTML=snd.on?SVG_ON:SVG_OFF;$("sndBtn").setAttribute("aria-pressed",String(snd.on));$("sndBtn").setAttribute("aria-label",snd.on?"Couper le son":"Remettre le son");
+  mark("optSnd","v",snd.on?1:0);mark("optVib","v",snd.vib?1:0);}
+function setSound(v){snd.on=v;store.set("constella-son",v);if(v){audio();setTimeout(()=>{const d=G&&G.demo;if(d)G.demo=false;sfx("tick");if(d)G.demo=true;},30);}soundUi();}
+$("sndBtn").onclick=()=>setSound(!snd.on);
+segGroup("optSnd","v",v=>setSound(v==="1"));
+segGroup("optVib","v",v=>{snd.vib=v==="1";store.set("constella-vibration",snd.vib);if(snd.vib&&navigator.vibrate)try{navigator.vibrate(25);}catch(e){}soundUi();});
+soundUi();
+
 // Démo en fond du menu : l'IA joue contre elle-même
 function demo(){cur=null;G=buildFree("vega",DIFF.normal);G.demo=true;layout();}
 demo();campLabel();
@@ -714,8 +889,10 @@ let last=performance.now(),hudT=0;
 function loop(now){
   let dt=Math.min(.1,(now-last)/1000);last=now;
   if(G&&!G.over){
-    let sim=G.demo?dt:(menuOpen?0:dt*speed*PACE);
+    let sim=G.demo?dt:(menuOpen||(tuto&&TUTO[tuto.step].pause)?0:dt*speed*PACE);
+    if(tuto&&!G.demo)G.tutoT=(G.tutoT||0)+sim;
     while(sim>0){const s=Math.min(.05,sim);step(s);sim-=s;}
+    if(tuto&&!menuOpen)tutoTick();
     if(G.demo&&G.over)demo();
   }
   draw();hudT+=dt;if(hudT>.2){hudT=0;scoreHud();if(G&&!G.demo&&G.sel!==null)refreshPanel();}

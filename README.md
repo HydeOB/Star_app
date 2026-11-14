@@ -37,7 +37,10 @@ Chaque niveau de campagne rapporte 1 à 3 étoiles : 1 pour la victoire, 2 si tu
 
 - Campagne : 4 mondes, 19 niveaux, jusqu'à 3 ennemis
 - Partie libre : 2 cartes (Anneau de Véga, Delta du Cygne)
-- IA à 3 niveaux : Facile, Normal, Difficile
+- IA à 3 niveaux : Facile, Normal, Difficile. Elle défend ses étoiles menacées (renforts des voisines), vise les étoiles faibles et combine plusieurs étoiles pour attaquer
+- Caractère des ennemis selon le niveau : agressif (te vise en priorité), prudent (se protège, prend d'abord les neutres) ou équilibré
+- Sons synthétisés (captures, explosions quand les flottes se percutent, améliorations, victoire), vibration sur mobile, bouton pour couper le son
+- Tutoriel guidé au premier niveau (revoir depuis le menu)
 - Contrôles tactiles et souris, affichage portrait et paysage
 
 ## Prochaines étapes possibles
