@@ -17,6 +17,10 @@ Ouvre `index.html` dans un navigateur (PC ou téléphone). Aucun serveur ni inst
 
 Les cartes de campagne sont générées à partir d'une graine fixe et sont symétriques, donc équitables et identiques à chaque partie.
 
+## Score
+
+Chaque niveau de campagne rapporte 1 à 3 étoiles : 1 pour la victoire, 2 si tu gagnes sous le temps cible, 3 sous le temps record. Les temps dépendent de la taille de la carte et sont comptés en temps de jeu (affiché en haut à gauche). Le meilleur score et le meilleur temps sont gardés.
+
 ## Règles
 
 - Chaque planète que tu possèdes produit des vaisseaux en continu. Les grosses planètes produisent plus.
@@ -25,7 +29,7 @@ Les cartes de campagne sont générées à partir d'une graine fixe et sont sym�
 - Une attaque réussit si la flotte compte plus de vaisseaux que la défense (vaisseaux × bouclier).
 - **Améliorations** : dépense des vaisseaux pour monter Production et Défense (3 niveaux chacune).
 - **Mur de protection** : plus tu gardes une étoile, plus un mur se construit autour d'elle (un segment toutes les 6 s, jusqu'à 5). Chaque segment arrête 1 vaisseau ennemi avant les défenseurs. Le mur repart de zéro quand l'étoile change de camp.
-- **Étoiles spéciales** (dès 5 vaisseaux, coût 5) : **Rapide** produit 40 % plus vite et ses flottes volent 40 % plus vite, mais sa défense reste à ×1. **Bouclier** produit 25 % moins vite, mais une protection se recharge jusqu'à 10 et absorbe les attaques avant les vaisseaux.
+- **Étoiles spéciales** (dès 5 vaisseaux, coût 5) : **Rapide** produit et envoie 40 % plus vite, sans défense. **Bouclier** produit 25 % de moins, mais son mur se construit 2 fois plus vite (3 s par segment) et monte jusqu'à 10. **Phare** produit 25 % de moins, mais les flottes qui partent de lui ou de tes étoiles voisines volent 25 % plus vite et frappent 25 % plus fort.
 - Vitesse du jeu : pause, ½×, 1×, 1,5×, 2×, 3× (½× par défaut, pour bien démarrer).
 - Victoire quand l'adversaire n'a plus aucun système ni flotte.
 

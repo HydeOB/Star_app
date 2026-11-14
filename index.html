@@ -48,7 +48,10 @@ button:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 .act small{color:var(--muted);font-variant-numeric:tabular-nums}
 .act:disabled{opacity:.4;cursor:default}
 .act[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
-.act.fast{border-color:rgba(94,230,201,.45)} .act.shield{border-color:rgba(191,230,255,.45)}
+.act.fast{border-color:rgba(94,230,201,.45)} .act.shield{border-color:rgba(191,230,255,.45)} .act.beacon{border-color:rgba(242,193,78,.45)}
+.st{color:var(--gold);font-size:12px;letter-spacing:1px;line-height:1}
+#endStars{font-size:44px;color:var(--gold);letter-spacing:6px;margin:0;line-height:1}
+#endGoals{color:var(--muted);margin:0;font-size:13.5px}
 .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 4px 0 8px;display:flex;align-items:center}
 #toast{position:absolute;left:50%;top:76px;transform:translateX(-50%);max-width:min(520px,calc(100% - 32px));padding:10px 14px;text-align:center;font-size:14px;line-height:1.4;pointer-events:none;transition:opacity .4s}
 #toast b{font-family:var(--display);letter-spacing:.06em;display:block;font-size:15px;margin-bottom:2px}
@@ -136,6 +139,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
         <div class="pTitle"><span id="pName">—</span><span id="pInfo"></span></div>
         <button class="act fast" id="mkFast"><b>Rapide</b><small>5 vx</small></button>
         <button class="act shield" id="mkShield"><b>Bouclier</b><small>5 vx</small></button>
+        <button class="act beacon" id="mkBeacon"><b>Phare</b><small>5 vx</small></button>
         <button class="act" id="upProd"><b>Production</b><small></small></button>
         <button class="act" id="upDef"><b>Défense</b><small></small></button>
         <button class="act" id="relay"><b>Envoi auto</b><small>choisir cible</small></button>
@@ -174,7 +178,11 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
           <li><b>Reste appuyé et glisse</b> vers une étoile : elle envoie d'abord tous ses vaisseaux, puis un paquet (3, 5 ou 10) dès qu'elle l'a produit. Glisse à nouveau vers la même cible pour arrêter.</li>
           <li>Une attaque réussit si tu envoies <b>plus de vaisseaux que la défense</b>.</li>
           <li>Plus tu gardes une étoile longtemps, plus un <b>mur</b> se construit autour d'elle : un segment toutes les 6 secondes, jusqu'à 5. Chaque segment arrête 1 vaisseau ennemi avant les défenseurs. Le mur repart de zéro si l'étoile est prise.</li>
-          <li>Dès 5 vaisseaux, transforme une étoile en <b>Rapide</b> (produit et envoie plus vite, sans défense) ou en <b>Bouclier</b> (produit un peu moins, mais une protection se recharge jusqu'à 10).</li>
+          <li>Dès 5 vaisseaux, transforme une étoile (coût 5) :
+            <b>Rapide</b> produit et envoie 40 % plus vite, sans défense ;
+            <b>Bouclier</b> produit 25 % de moins, mais son mur se construit 2 fois plus vite et monte jusqu'à 10 ;
+            <b>Phare</b> produit 25 % de moins, mais les flottes qui partent de lui ou de tes étoiles voisines volent 25 % plus vite et frappent 25 % plus fort.</li>
+          <li>Chaque niveau de campagne rapporte <b>1 à 3 étoiles</b> : 1 pour la victoire, 2 sous le temps cible, 3 sous le temps record (temps de jeu, affiché en haut).</li>
           <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux).</li>
           <li>Tu gagnes quand plus aucun ennemi n'a de système ni de flotte.</li>
         </ul>
@@ -192,7 +200,9 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
   <div class="screen" id="end" hidden>
     <div class="card">
       <h1 id="endTitle">Victoire</h1>
+      <p id="endStars" hidden></p>
       <p id="endStats"></p>
+      <p id="endGoals" hidden></p>
       <div class="btns"><button class="go" id="again">Rejouer</button><button class="ghost" id="toMenu">Menu</button></div>
     </div>
   </div>
@@ -203,7 +213,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
 "use strict";
 const C={me:"#5ee6c9",foe:"#ff7a59",foe2:"#b18cff",foe3:"#ff5fa2",neu:"#a29fc2",gold:"#f2c14e",shield:"#bfe6ff",edge:"#2a2e5a",ink:"#ecebf7",void:"#0a0c1b"};
 const OWN_COL=[C.neu,C.me,C.foe,C.foe2,C.foe3];
-const W0=1600,H0=900,FLEET_SPEED=95,SPECIAL_COST=5,SHIELD_MAX=10,SHIELD_REGEN=.5,WALL_MAX=5,WALL_TIME=6; // mur : +1 toutes les 6 s de possession, jusqu'à 5
+const W0=1600,H0=900,FLEET_SPEED=95,SPECIAL_COST=5,WALL_MAX=5,WALL_TIME=6; // mur : +1 toutes les 6 s de possession, jusqu'à 5
 const NAMES=["Aldra","Vesk","Tirun","Moba","Kael","Ysor","Pherin","Duna","Oriel","Saph","Neral","Quill","Hesk","Lumo","Brann","Ithe","Zorae","Calix","Tem","Varo","Nyx","Elar","Opa","Rhen","Sel","Ganth","Iru","Pell","Xan","Meru"];
 
 // Cartes de partie libre : moitié + centre, complétées par symétrie centrale
@@ -229,7 +239,7 @@ const WORLDS=[
     {k:2,n:2,start:2,ai:"facile",tip:"2 étoiles contre 2. Touche ton étoile puis une neutre pour la capturer."},
     {k:2,n:3,start:1,ai:"facile",tip:"Glisse d'une étoile à une autre pour créer un envoi automatique."},
     {k:2,n:4,start:1,ai:"facile",center:1,tip:"Améliore la Production de ton étoile principale pour prendre de l'avance."},
-    {k:2,n:5,start:2,ai:"normal",tip:"Nouveau : dès 5 vaisseaux, transforme une étoile en Rapide ou en Bouclier."},
+    {k:2,n:5,start:2,ai:"normal",tip:"Nouveau : dès 5 vaisseaux, transforme une étoile en Rapide, Bouclier ou Phare."},
     {k:2,n:5,start:1,ai:"normal",center:1}]},
   {name:"Nébuleuse de Vesk",desc:"Un adversaire plus vif, des cartes plus grandes.",levels:[
     {k:2,n:6,start:1,ai:"normal"},
@@ -257,11 +267,17 @@ const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||"null");re
 {const st=store.get("constella-munitions",null);if(st&&[3,5,10].includes(st.q))autoQty=st.q;}
 const saveMun=()=>store.set("constella-munitions",{q:autoQty});
 let progress=store.get("constella-progress",{done:{}});if(!progress.done)progress={done:{}};
+for(const k in progress.done)if(typeof progress.done[k]==="number")progress.done[k]={t:progress.done[k],s:1};
+const rec=(wi,li)=>progress.done[wi+"-"+li]||null;
+const parTime=g=>30+g.nodes.length*10, recordTime=g=>Math.round(parTime(g)*.6);
+const starsFor=(g,t)=>t<=recordTime(g)?3:t<=parTime(g)?2:1;
+const starStr=n=>"★".repeat(n)+"☆".repeat(3-n);
+const totalStars=()=>Object.values(progress.done).reduce((a,r)=>a+(r.s||0),0);
 const lkey=(wi,li)=>wi+"-"+li;
 const isDone=(wi,li)=>progress.done[lkey(wi,li)]!=null;
 const isOpen=idx=>idx===0||isDone(FLAT[idx-1].wi,FLAT[idx-1].li);
 
-function mkNode(id,x,y,size,owner,ships){return {id,x,y,size,owner,ships,prod:0,def:0,kind:null,shield:0,wall:0,rally:null,pulse:0};}
+function mkNode(id,x,y,size,owner,ships){return {id,x,y,size,owner,ships,prod:0,def:0,kind:null,wall:0,rally:null,pulse:0};}
 function finalize(W,H,nodes,edgeList,players,cfg,seed){
   const adj=nodes.map(()=>[]),edges=[];
   for(const[a,b]of edgeList){const len=Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y);adj[a].push({to:b,len});adj[b].push({to:a,len});edges.push([a,b]);}
@@ -340,9 +356,12 @@ function buildLevel(wi,li){return genLevel(WORLDS[wi].levels[li],1000+wi*97+li*3
 
 // Règles
 const isAI=o=>o>=2;
-const rate=n=>(0.5+0.45*n.size)*(1+0.4*n.prod)*(isAI(n.owner)?G.cfg.bonus:1)*(n.kind==="rapide"?1.4:n.kind==="bouclier"?.75:1);
+const rate=n=>(0.5+0.45*n.size)*(1+0.4*n.prod)*(isAI(n.owner)?G.cfg.bonus:1)*(n.kind==="rapide"?1.4:n.kind==="bouclier"||n.kind==="phare"?.75:1);
 const cap=n=>30+n.size*25+n.prod*20;
 const defMult=n=>n.kind==="rapide"?1:1+0.4*n.def;
+const wallMax=n=>n.kind==="bouclier"?10:WALL_MAX, wallTime=n=>n.kind==="bouclier"?WALL_TIME/2:WALL_TIME;
+const KIND_NAME={rapide:"Rapide",bouclier:"Bouclier",phare:"Phare"};
+const boosted=n=>n.kind==="phare"||G.adj[n.id].some(e=>{const o=G.nodes[e.to];return o.owner===n.owner&&o.kind==="phare";});
 const prodCost=n=>20+15*n.prod, defCost=n=>15+10*n.def;
 
 function path(from,to,owner){
@@ -359,28 +378,28 @@ function send(n,t,count){
   if(!n||!t||n===t)return false;
   count=Math.floor(Math.min(count,n.ships));if(count<1)return false;
   const p=path(n.id,t.id,n.owner);if(!p)return false;
-  n.ships-=count;G.fleets.push({owner:n.owner,ships:count,path:p,seg:0,t:0,len:edgeLen(p[0],p[1]),dest:t.id,spd:n.kind==="rapide"?1.4:1});
+  n.ships-=count;G.fleets.push({owner:n.owner,ships:count,path:p,seg:0,t:0,len:edgeLen(p[0],p[1]),dest:t.id,spd:(n.kind==="rapide"?1.4:1)*(boosted(n)?1.25:1),pow:boosted(n)?1.25:1});
   return true;
 }
 function upgrade(n,kind){
   if(kind==="prod"&&n.prod<3&&n.ships>=prodCost(n)){n.ships-=prodCost(n);n.prod++;fx(n,C.gold);return true;}
   if(kind==="def"&&n.kind!=="rapide"&&n.def<3&&n.ships>=defCost(n)){n.ships-=defCost(n);n.def++;fx(n,C.gold);return true;}
-  if((kind==="rapide"||kind==="bouclier")&&!n.kind&&n.ships>=SPECIAL_COST){n.ships-=SPECIAL_COST;n.kind=kind;n.shield=0;fx(n,kind==="rapide"?OWN_COL[n.owner]:C.shield);return true;}
+  if(KIND_NAME[kind]&&!n.kind&&n.ships>=SPECIAL_COST){n.ships-=SPECIAL_COST;n.kind=kind;fx(n,kind==="bouclier"?C.shield:kind==="phare"?C.gold:OWN_COL[n.owner]);return true;}
   return false;
 }
 function fx(n,col){G.fx.push({x:n.x,y:n.y,col,t:0,seed:Math.random()*6});}
 function arrive(f,n){
   if(n.owner===f.owner){n.ships+=f.ships;return;}
-  if(n.wall>0){const k=Math.min(n.wall,f.ships);n.wall-=k;f.ships-=k;if(f.ships<=0){n.pulse=1;return;}}
-  if(n.kind==="bouclier"&&n.shield>0){const k=Math.min(n.shield,f.ships);n.shield-=k;f.ships-=k;if(f.ships<=0){n.pulse=1;return;}}
+  const pw=f.pow||1;let att=f.ships*pw;
+  if(n.wall>0){const k=Math.min(n.wall,att);n.wall-=k;att-=k;if(att<=1e-6){n.pulse=1;return;}}
   const m=defMult(n),eff=n.ships*m;
-  if(f.ships>eff+1e-6){
+  if(att>eff+1e-6){
     if(isAI(n.owner)&&f.owner===1)G.captured++;
-    n.owner=f.owner;n.ships=f.ships-eff;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;n.kind=null;n.shield=0;n.wall=0;
+    n.owner=f.owner;n.ships=(att-eff)/pw;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;n.kind=null;n.wall=0;
     G.nodes.forEach(o=>{if(o.rally===n.id&&o.owner!==n.owner)o.rally=null;});
     if(G.sel===n.id&&n.owner!==1)G.sel=null;
     fx(n,OWN_COL[f.owner]);
-  } else n.ships=Math.max(0,(eff-f.ships)/m);
+  } else n.ships=Math.max(0,(eff-att)/m);
   n.pulse=1;
 }
 const has=o=>G.nodes.some(n=>n.owner===o)||G.fleets.some(f=>f.owner===o);
@@ -389,8 +408,7 @@ function step(dt){
   G.time+=dt;
   for(const n of G.nodes){
     if(n.owner&&n.ships<cap(n))n.ships=Math.min(cap(n),n.ships+rate(n)*dt);
-    if(n.owner&&n.wall<WALL_MAX)n.wall=Math.min(WALL_MAX,n.wall+dt/WALL_TIME);
-    if(n.kind==="bouclier"&&n.shield<SHIELD_MAX)n.shield=Math.min(SHIELD_MAX,n.shield+SHIELD_REGEN*dt);
+    if(n.owner&&n.wall<wallMax(n))n.wall=Math.min(wallMax(n),n.wall+dt/wallTime(n));
     n.pulse=Math.max(0,n.pulse-dt*2);
     if(n.rally!==null&&n.owner&&n.ships>=autoQty)send(n,G.nodes[n.rally],autoQty);
   }
@@ -427,7 +445,7 @@ function ai(P){
     if(n.owner!==P)continue;
     const hostile=G.adj[n.id].filter(e=>nodes[e.to].owner!==P);
     if(!hostile.length){
-      if(!n.kind&&Math.random()<cfg.special&&n.ships>=SPECIAL_COST+8){upgrade(n,"rapide");continue;}
+      if(!n.kind&&Math.random()<cfg.special&&n.ships>=SPECIAL_COST+8){const mates=G.adj[n.id].filter(e=>nodes[e.to].owner===P).length;upgrade(n,mates>=3&&Math.random()<.5?"phare":"rapide");continue;}
       if(Math.random()<cfg.upg&&n.prod<3&&n.ships>=prodCost(n)+5){upgrade(n,"prod");continue;}
       if(n.ships>8){const t=frontier(n,P);if(t)send(n,t,n.ships*.85);}
       continue;
@@ -437,7 +455,7 @@ function ai(P){
     let best=null;
     for(const e of hostile){
       const t=nodes[e.to];
-      const need=t.ships*defMult(t)+t.wall+(t.kind==="bouclier"?t.shield:0)+(t.owner?rate(t)*e.len/FLEET_SPEED:0)+1-(incoming[t.id]||0);
+      const need=t.ships*defMult(t)+t.wall+(t.owner?rate(t)*e.len/FLEET_SPEED:0)+1-(incoming[t.id]||0);
       if(need<=0)continue;
       const score=(t.size+1)/Math.max(need,1)*(t.owner?1:1.25);
       if(need+cfg.margin<avail&&(!best||score>best.score))best={t,need,score};
@@ -522,18 +540,20 @@ function draw(){
     ctx.fillStyle="#0b0d22";ctx.beginPath();ctx.arc(n.sx,n.sy,core,0,7);ctx.fill();
     ctx.strokeStyle=n.owner?"rgba(0,0,0,.35)":"rgba(170,175,220,.25)";ctx.lineWidth=1;ctx.stroke();
     // mur de protection : 5 segments qui se construisent avec le temps (trace fantôme = emplacement vide)
-    if(n.owner){const ra=r+4.5,span=6.283/WALL_MAX,gapA=.16,full=Math.floor(n.wall+1e-6),part=n.wall-full;
-      ctx.lineWidth=1;ctx.strokeStyle=col+"2a";for(let i=0;i<WALL_MAX;i++){const a=-Math.PI/2+i*span+gapA/2;ctx.beginPath();ctx.arc(n.sx,n.sy,ra,a,a+span-gapA);ctx.stroke();}
+    if(n.owner){const WM=wallMax(n),ra=r+4.5,span=6.283/WM,gapA=.16,full=Math.floor(n.wall+1e-6),part=n.wall-full;
+      ctx.lineWidth=1;ctx.strokeStyle=col+"2a";for(let i=0;i<WM;i++){const a=-Math.PI/2+i*span+gapA/2;ctx.beginPath();ctx.arc(n.sx,n.sy,ra,a,a+span-gapA);ctx.stroke();}
       ctx.lineWidth=2.6+n.pulse*2;ctx.strokeStyle=col;
-      for(let i=0;i<WALL_MAX;i++){const a=-Math.PI/2+i*span+gapA/2,len=(span-gapA)*(i<full?1:i===full?part:0);if(len<=0)continue;
+      for(let i=0;i<WM;i++){const a=-Math.PI/2+i*span+gapA/2,len=(span-gapA)*(i<full?1:i===full?part:0);if(len<=0)continue;
         ctx.globalAlpha=i<full?1:.55;ctx.beginPath();ctx.arc(n.sx,n.sy,ra,a,a+len);ctx.stroke();}
       ctx.globalAlpha=1;}
     for(let d=0;d<n.def;d++){ctx.lineWidth=2.2;ctx.strokeStyle=col+"cc";ctx.beginPath();ctx.arc(n.sx,n.sy,r+9+d*4,-2.4,-.74);ctx.stroke();}
     const ro=r+10+n.def*4;
     if(n.kind==="rapide"){ctx.strokeStyle=col;ctx.lineWidth=2.2;for(let k=0;k<3;k++){const a=now*3.2+k*2.094;ctx.beginPath();ctx.arc(n.sx,n.sy,ro,a,a+.45);ctx.stroke();
         const ex=n.sx+Math.cos(a+.45)*ro,ey=n.sy+Math.sin(a+.45)*ro,ta=a+.45+Math.PI/2;ctx.beginPath();ctx.moveTo(ex+Math.cos(ta-2.4)*4,ey+Math.sin(ta-2.4)*4);ctx.lineTo(ex,ey);ctx.lineTo(ex+Math.cos(ta+2.4)*4,ey+Math.sin(ta+2.4)*4);ctx.stroke();}}
-    if(n.kind==="bouclier"){ctx.lineWidth=3;ctx.strokeStyle=C.shield+"26";ctx.beginPath();ctx.arc(n.sx,n.sy,ro,0,7);ctx.stroke();
-      if(n.shield>0){ctx.strokeStyle=C.shield;ctx.shadowColor=C.shield;ctx.shadowBlur=6;ctx.beginPath();ctx.arc(n.sx,n.sy,ro,-Math.PI/2,-Math.PI/2+6.283*n.shield/SHIELD_MAX);ctx.stroke();ctx.shadowBlur=0;}}
+    if(n.kind==="bouclier"){ctx.lineWidth=1.2;ctx.strokeStyle=C.shield+"aa";ctx.beginPath();ctx.arc(n.sx,n.sy,ro-1,0,7);ctx.stroke();ctx.beginPath();ctx.arc(n.sx,n.sy,ro+2,0,7);ctx.stroke();}
+    if(n.kind==="phare"){ctx.strokeStyle=C.gold;ctx.lineWidth=2;for(let k=0;k<4;k++){const a=now*.6+k*Math.PI/2,c=Math.cos(a),si=Math.sin(a);
+        ctx.beginPath();ctx.moveTo(n.sx+c*(ro-2),n.sy+si*(ro-2));ctx.lineTo(n.sx+c*(ro+6),n.sy+si*(ro+6));ctx.stroke();}
+      for(const e of G.adj[n.id]){const o=nodes[e.to];if(o.owner!==n.owner)continue;ctx.strokeStyle=C.gold+"55";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(n.sx,n.sy);ctx.lineTo(o.sx,o.sy);ctx.stroke();}}
     for(let p=0;p<n.prod;p++){ctx.fillStyle=C.gold;ctx.beginPath();ctx.arc(n.sx-(n.prod-1)*5+p*10,n.sy+r+10+(n.kind?5:0),2.6,0,7);ctx.fill();}
     ctx.fillStyle=n.owner?"#ffffff":C.ink;ctx.font=font(Math.max(11,r*.66));ctx.textAlign="center";ctx.textBaseline="middle";
     ctx.shadowColor="rgba(0,0,0,.6)";ctx.shadowBlur=4;ctx.fillText(Math.floor(n.ships),n.sx,n.sy+1);ctx.shadowBlur=0;
@@ -587,10 +607,10 @@ const fr=v=>v.toFixed(1).replace(".",",");
 function refreshPanel(){
   const n=G&&!G.demo&&G.sel!==null?G.nodes[G.sel]:null;
   $("panel").hidden=!n;$("hint").hidden=!!n;if(!n)return;
-  $("pName").textContent=n.name+(n.kind==="rapide"?" · Rapide":n.kind==="bouclier"?" · Bouclier":"")+" · taille "+n.size;
-  $("pInfo").textContent=Math.floor(n.ships)+" vaisseaux · +"+fr(rate(n))+"/s · défense ×"+fr(defMult(n))+" · mur "+Math.floor(n.wall)+"/"+WALL_MAX+(n.kind==="bouclier"?" · protection "+Math.floor(n.shield)+"/"+SHIELD_MAX:"");
-  $("mkFast").hidden=$("mkShield").hidden=!!n.kind;
-  $("mkFast").disabled=$("mkShield").disabled=n.ships<SPECIAL_COST;
+  $("pName").textContent=n.name+(n.kind?" · "+KIND_NAME[n.kind]:"")+" · taille "+n.size;
+  $("pInfo").textContent=Math.floor(n.ships)+" vaisseaux · +"+fr(rate(n))+"/s · défense ×"+fr(defMult(n))+" · mur "+Math.floor(n.wall)+"/"+wallMax(n)+(boosted(n)?" · flottes +25 %":"");
+  $("mkFast").hidden=$("mkShield").hidden=$("mkBeacon").hidden=!!n.kind;
+  $("mkFast").disabled=$("mkShield").disabled=$("mkBeacon").disabled=n.ships<SPECIAL_COST;
   const pc=prodCost(n),dc=defCost(n);
   $("upProd").querySelector("small").textContent=n.prod>=3?"niveau max":`niv. ${n.prod}→${n.prod+1} · ${pc} vx`;
   $("upProd").disabled=n.prod>=3||n.ships<pc;
@@ -601,6 +621,7 @@ function refreshPanel(){
 }
 $("mkFast").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"rapide");refreshPanel();};
 $("mkShield").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"bouclier");refreshPanel();};
+$("mkBeacon").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"phare");refreshPanel();};
 $("upProd").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"prod");refreshPanel();};
 $("upDef").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"def");refreshPanel();};
 $("relay").onclick=()=>{const n=G.nodes[G.sel];if(!n)return;if(n.rally!==null||G.relayMode){n.rally=null;G.relayMode=false;}else G.relayMode=true;refreshPanel();};
@@ -616,6 +637,7 @@ function scoreHud(){
   G.nodes.forEach(n=>{tot[n.owner]+=n.owner?n.ships:n.ships*.3;pl[n.owner]++;});
   G.fleets.forEach(f=>tot[f.owner]+=f.ships);
   const t=tot.reduce((a,b)=>a+b,0)||1;let foe=0,foeP=0;for(let o=2;o<=4;o++){foe+=tot[o];foeP+=pl[o];}
+  if(!G.demo)$("brand").textContent=(cur?`${cur.wi+1}-${cur.li+1} · `:"")+fmtT(G.time);
   $("sMe").textContent=pl[1]+" · "+Math.floor(tot[1]);$("sFoe").textContent=Math.floor(foe)+" · "+foeP;
   const bar=$("bar");if(bar.children.length!==G.players+1){bar.innerHTML="";[1,0,2,3,4].slice(0,G.players+1).forEach(o=>{const i=document.createElement("i");i.dataset.o=o;i.style.background=o?OWN_COL[o]:"#3a3d68";bar.appendChild(i);});}
   for(const i of bar.children)i.style.width=(tot[+i.dataset.o]/t*100)+"%";
@@ -634,7 +656,7 @@ function begin(g){G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar")
   $("brand").textContent=cur?`MONDE ${cur.wi+1} · ${cur.li+1}`:"CONSTELLA";}
 function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast("Partie libre",null);}
 function startLevel(wi,li){cur={wi,li};const L=WORLDS[wi].levels[li];begin(buildLevel(wi,li));
-  const foes=L.k-1;toast(`Monde ${wi+1} · Niveau ${li+1}`,(foes===1?"1 ennemi":foes+" ennemis")+(L.tip?". "+L.tip:""));}
+  const foes=L.k-1;toast(`Monde ${wi+1} · Niveau ${li+1}`,(foes===1?"1 ennemi":foes+" ennemis")+` · ★★ en moins de ${fmtT(parTime(G))}, ★★★ en moins de ${fmtT(recordTime(G))}`+(L.tip?". "+L.tip:""));}
 function nextIndex(){for(let i=0;i<FLAT.length;i++)if(!isDone(FLAT[i].wi,FLAT[i].li))return i;return -1;}
 function fmtT(s){const m=Math.floor(s/60);return m+":"+String(Math.floor(s%60)).padStart(2,"0");}
 function renderWorlds(){
@@ -645,18 +667,20 @@ function renderWorlds(){
     sec.innerHTML=`<div class="wh"><div><span class="num">Monde ${wi+1}</span><b></b></div><span class="foes"></span></div><p></p><div class="lv"></div>`;
     sec.querySelector("b").textContent=w.name;sec.querySelector("p").textContent=w.desc;
     const fs=sec.querySelector(".foes");for(let o=2;o<=foes+1;o++){const i=document.createElement("i");i.style.background=OWN_COL[o];fs.appendChild(i);}
-    fs.appendChild(document.createTextNode(foes===1?"1 ennemi":foes+" ennemis"));
+    let ws=0;w.levels.forEach((L,li)=>{const r=rec(wi,li);if(r)ws+=r.s;});
+    fs.appendChild(document.createTextNode((foes===1?"1 ennemi":foes+" ennemis")+` · ${ws}/${w.levels.length*3} ★`));
     const lv=sec.querySelector(".lv");
     w.levels.forEach((L,li)=>{const b=document.createElement("button"),i=idx++,open=isOpen(i),done=isDone(wi,li);
-      b.innerHTML=`<b>${li+1}</b><small></small>`;
-      b.querySelector("small").textContent=done?"✓ "+fmtT(progress.done[lkey(wi,li)]):open?(L.start>1?L.start+" contre "+L.start:"à jouer"):"verrouillé";
+      const r=rec(wi,li);b.innerHTML=`<b>${li+1}</b><span class="st"></span><small></small>`;
+      b.querySelector(".st").textContent=done?starStr(r.s):"";
+      b.querySelector("small").textContent=done?fmtT(r.t):open?(L.start>1?L.start+" contre "+L.start:"à jouer"):"verrouillé";
       if(done)b.classList.add("done");if(i===nx)b.classList.add("next");
       b.disabled=!open;b.setAttribute("aria-label",`Monde ${wi+1}, niveau ${li+1}`);
       b.onclick=()=>startLevel(wi,li);lv.appendChild(b);});
     if(!isOpen(firstIdx))sec.classList.add("locked");
     list.appendChild(sec);});
 }
-function campLabel(){const nx=nextIndex();$("campNext").textContent=nx<0?"Tous les niveaux sont terminés":`Prochain : monde ${FLAT[nx].wi+1}, niveau ${FLAT[nx].li+1}`;}
+function campLabel(){const nx=nextIndex();$("campNext").textContent=(nx<0?"Tous les niveaux sont terminés":`Prochain : monde ${FLAT[nx].wi+1}, niveau ${FLAT[nx].li+1}`)+` · ${totalStars()}/${FLAT.length*3} ★`;}
 $("campaign").onclick=()=>{renderWorlds();show("worlds");};
 $("wBack").onclick=()=>{campLabel();show("menu");};
 $("start").onclick=startFree;
@@ -665,8 +689,12 @@ $("resume").onclick=()=>{show(null);menuOpen=false;refreshPanel();};
 function openMenu(){menuOpen=true;campLabel();show("menu");$("resume").hidden=!(G&&!G.over&&!G.demo);}
 function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;refreshPanel();
   const t=fmtT(G.time);let next=null;
-  if(cur&&win){const k=lkey(cur.wi,cur.li),old=progress.done[k];progress.done[k]=old==null?Math.round(G.time):Math.min(old,Math.round(G.time));store.set("constella-progress",progress);
+  let got=0;
+  if(cur&&win){const k=lkey(cur.wi,cur.li),old=progress.done[k],tt=Math.round(G.time);got=starsFor(G,tt);
+    progress.done[k]=old?{t:Math.min(old.t,tt),s:Math.max(old.s,got)}:{t:tt,s:got};store.set("constella-progress",progress);
     const i=FLAT.findIndex(f=>f.wi===cur.wi&&f.li===cur.li);next=FLAT[i+1]||null;}
+  $("endStars").hidden=!(cur&&win);$("endStars").textContent=starStr(got);
+  $("endGoals").hidden=!cur;if(cur)$("endGoals").textContent=`★★ en moins de ${fmtT(parTime(G))} · ★★★ en moins de ${fmtT(recordTime(G))} (temps de jeu)`;
   $("endTitle").textContent=win?"Victoire":"Défaite";$("endTitle").style.color=win?C.me:C.foe;
   $("endStats").textContent=(cur?`Monde ${cur.wi+1} · niveau ${cur.li+1}`:`${MAPS[mapKey].name} · ${diffKey}`)+` · ${t} de jeu · ${G.captured} systèmes pris aux ennemis`+
     (cur&&win&&next&&next.wi!==cur.wi?` · Monde ${next.wi+1} débloqué : ${WORLDS[next.wi].name}`:"")+(cur&&win&&!next?" · Campagne terminée, bravo !":"");
@@ -676,7 +704,7 @@ function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;re
   else{again.textContent="Rejouer";again.onclick=startFree;}
   if(cur){other.textContent="Mondes";other.onclick=()=>{renderWorlds();show("worlds");menuOpen=true;};}
   else{other.textContent="Menu";other.onclick=openMenu;}
-  setTimeout(()=>{show("end");menuOpen=true;},700);}
+  const g0=G;setTimeout(()=>{if(G!==g0)return;show("end");menuOpen=true;},700);}
 
 // Démo en fond du menu : l'IA joue contre elle-même
 function demo(){cur=null;G=buildFree("vega",DIFF.normal);G.demo=true;layout();}
