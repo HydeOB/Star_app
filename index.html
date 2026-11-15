@@ -218,6 +218,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
             <b>Bouclier</b> produit 25 % de moins, mais son mur se construit 2 fois plus vite et monte jusqu'à 10 ;
             <b>Phare</b> produit 25 % de moins, mais les flottes qui partent de lui ou de tes étoiles voisines volent 25 % plus vite et frappent 25 % plus fort.</li>
           <li>Chaque niveau de campagne rapporte <b>1 à 3 étoiles</b> : 1 pour la victoire, 2 sous le temps cible, 3 sous le temps record (temps de jeu, affiché en haut).</li>
+          <li>Trois catégories d'étoiles : <b>normale</b>, <b>2 points</b> et <b>3 points</b> (les points sont sous l'étoile). Plus elle a de points, plus elle est grande, produit vite et coûte cher à prendre. Elles apparaissent au fil des mondes.</li>
           <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux). Les types d'étoiles montent aussi jusqu'au niveau 3. Touche ton étoile : les icônes apparaissent autour d'elle.</li>
           <li>En campagne, les améliorations se <b>débloquent petit à petit</b>, niveau après niveau.</li>
           <li><b>Zoom</b> : pince l'écran ou utilise la molette, glisse dans le vide pour déplacer la carte.</li>
@@ -352,6 +353,8 @@ function segCross(a,b,c,d){
   return o(a,b,c)!==o(a,b,d)&&o(c,d,a)!==o(c,d,b)&&o(a,b,c)!==0&&o(c,d,a)!==0;
 }
 function segDist(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy)));return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy);}
+// défense des étoiles neutres selon leur catégorie : normale, 2 points, 3 points
+const NEU_BASE=[0,6,14,26];
 function genLevel(L,seed0){
   for(let attempt=0;attempt<60;attempt++){
     let seed=((seed0*9973+attempt*7919)%2147483646)+1;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;rnd();
@@ -363,17 +366,17 @@ function genLevel(L,seed0){
         if(L.center&&Math.hypot(mine[i].x-cx,mine[i].y-cy)<minD+20)return false;
         for(const q of sec)for(let s=0;s<k;s++){const p=pos(q.a,q.r,s);if(Math.hypot(mine[i].x-p.x,mine[i].y-p.y)<minD)return false;}}
       return true;};
-    for(let t=0;t<900&&sec.length<1+L.n;t++){const a=(rnd()*2-1)*Math.PI/k*.95,r=.15+rnd()*.83;if(ok(a,r)){const u=rnd();sec.push({a,r,size:u<.5?1:u<.82?2:3});}}
+    for(let t=0;t<900&&sec.length<1+L.n;t++){const a=(rnd()*2-1)*Math.PI/k*.95,r=.15+rnd()*.83;if(ok(a,r)){const u=rnd();sec.push({a,r,size:Math.min(L.maxSize||3,u<.5?1:u<.82?2:3)});}}
     if(sec.length<1+L.n)continue;
     const m=sec.length,home=pos(0,.9,0);
     const order=sec.map((q,i)=>i).slice(1).sort((i,j)=>{const p=pos(sec[i].a,sec[i].r,0),q=pos(sec[j].a,sec[j].r,0);return Math.hypot(p.x-home.x,p.y-home.y)-Math.hypot(q.x-home.x,q.y-home.y);});
     const extra=new Set(order.slice(0,(L.start||1)-1));
-    const neuShips=sec.map(q=>Math.round((4+q.size*4+rnd()*5)*(L.neu||1)));
+    const neuShips=sec.map(q=>Math.round((NEU_BASE[q.size]+rnd()*5)*(L.neu||1)));
     const nodes=[];
     for(let s=0;s<k;s++)sec.forEach((q,i)=>{const p=pos(q.a,q.r,s),own=(i===0||extra.has(i))?s+1:0;
-      const ships=i===0?(s===0?20:(L.aiShips||20)):own?10:neuShips[i];nodes.push(mkNode(nodes.length,p.x,p.y,i===0?2:q.size,own,ships));});
+      const ships=i===0?(s===0?20:(L.aiShips||20)):own?10:neuShips[i];nodes.push(mkNode(nodes.length,p.x,p.y,i===0?Math.min(2,L.maxSize||3):q.size,own,ships));});
     const centerIdx=L.center?nodes.length:-1;
-    if(L.center)nodes.push(mkNode(nodes.length,cx,cy,3,0,Math.round(22*(L.neu||1))));
+    if(L.center){const cs=Math.min(3,L.maxSize||3);nodes.push(mkNode(nodes.length,cx,cy,cs,0,Math.round((NEU_BASE[cs]+6)*(L.neu||1))));}
     const rot=(i,s)=>i===centerIdx?i:((Math.floor(i/m)+s)%k)*m+i%m;
     const cands=[];for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const d=Math.hypot(nodes[i].x-nodes[j].x,nodes[i].y-nodes[j].y);if(d<Rm*.85)cands.push([i,j,d]);}
     cands.sort((a,b)=>a[2]-b[2]);
@@ -399,7 +402,7 @@ function genLevel(L,seed0){
   return null;
 }
 function levelStyles(L,li){const st={};for(let o=2;o<=L.k;o++)st[o]=L.st?L.st[(o-2)%L.st.length]:L.k===2?["prudent","agressif"][li%2]:["agressif","prudent","equilibre"][(o-2+li)%3];return st;}
-function buildLevel(wi,li){const L=WORLDS[wi].levels[li],g=genLevel(L,1000+wi*97+li*31);if(g)g.style=levelStyles(L,li);return g;}
+function buildLevel(wi,li){const L=WORLDS[wi].levels[li],g=genLevel(Object.assign({maxSize:[1,2,3,3][wi]},L),1000+wi*97+li*31);if(g)g.style=levelStyles(L,li);return g;}
 
 // Règles
 const isAI=o=>o>=2;
@@ -407,14 +410,15 @@ const isAI=o=>o>=2;
 const KL=n=>n.klv||1, RAP=[1,1.4,1.55,1.7], BOU_MAX=[5,10,13,16], BOU_T=[6,3,2.5,2], PHA=[1,1.25,1.35,1.45], klvCost=n=>5+10*KL(n);
 const FULL={prod:3,def:3,rapide:1,bouclier:1,phare:1,klv:3};
 const U=()=>G.unlock||FULL;
-const rate=n=>(0.5+0.45*n.size)*(1+0.4*n.prod)*(isAI(n.owner)?G.cfg.bonus:1)*(n.kind==="rapide"?RAP[KL(n)]:n.kind==="bouclier"||n.kind==="phare"?.75:1);
+const SIZE_RATE=[0,.8,1.3,1.9];
+const rate=n=>SIZE_RATE[n.size]*(1+0.4*n.prod)*(isAI(n.owner)?G.cfg.bonus:1)*(n.kind==="rapide"?RAP[KL(n)]:n.kind==="bouclier"||n.kind==="phare"?.75:1);
 const cap=n=>30+n.size*25+n.prod*20;
 const defMult=n=>n.kind==="rapide"?1:1+0.4*n.def;
 const wallMax=n=>n.kind==="bouclier"?BOU_MAX[KL(n)]:WALL_MAX, wallTime=n=>n.kind==="bouclier"?BOU_T[KL(n)]:WALL_TIME;
 const KIND_NAME={rapide:"Rapide",bouclier:"Bouclier",phare:"Phare"};
 const boostOf=n=>{let b=n.kind==="phare"?PHA[KL(n)]:1;for(const e of G.adj[n.id]){const o=G.nodes[e.to];if(o.owner===n.owner&&o.kind==="phare")b=Math.max(b,PHA[KL(o)]);}return b;};
 const boosted=n=>boostOf(n)>1;
-const prodCost=n=>20+15*n.prod, defCost=n=>15+10*n.def;
+const prodCost=n=>5+10*n.prod, defCost=n=>5+10*n.def;
 
 // Sons synthétisés (Web Audio, aucun fichier) et vibration sur mobile
 const snd={on:store.get("constella-son",true),vib:store.get("constella-vibration",true),ctx:null,out:null,nb:null,last:{}};
@@ -645,7 +649,7 @@ function resize(){
 // vue : zoom VZ et décalage VX,VY appliqués par-dessus la mise à l'échelle de base
 let VZ=1,VX=0,VY=0,mapBox={x0:0,y0:0,x1:0,y1:0};
 const P=(x,y)=>{const b=rotMap?[ox+y*sc,oy+(G.W-x)*sc]:[ox+x*sc,oy+y*sc];return [b[0]*VZ+VX,b[1]*VZ+VY];};
-const R=n=>Math.max(11,(15+n.size*7)*sc*1.25*Math.pow(VZ,.8));
+const R=n=>Math.max(11,[0,18,27,37][n.size]*sc*1.25*Math.pow(VZ,.8));
 function resetView(){VZ=1;VX=0;VY=0;}
 function clampView(){if(VZ<=1.001){resetView();return;}
   const cx=vw/2,cy=vh/2;VX=Math.max(cx-mapBox.x1*VZ,Math.min(cx-mapBox.x0*VZ,VX));VY=Math.max(cy-mapBox.y1*VZ,Math.min(cy-mapBox.y0*VZ,VY));}
@@ -696,7 +700,9 @@ function draw(){
     if(n.kind==="phare"){ctx.strokeStyle=C.gold;ctx.lineWidth=2;const nr=2+2*KL(n);for(let k=0;k<nr;k++){const a=now*.6+k*6.283/nr,c=Math.cos(a),si=Math.sin(a);
         ctx.beginPath();ctx.moveTo(n.sx+c*(ro-2),n.sy+si*(ro-2));ctx.lineTo(n.sx+c*(ro+6),n.sy+si*(ro+6));ctx.stroke();}
       for(const e of G.adj[n.id]){const o=nodes[e.to];if(o.owner!==n.owner)continue;ctx.strokeStyle=C.gold+"55";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(n.sx,n.sy);ctx.lineTo(o.sx,o.sy);ctx.stroke();}}
-    for(let p=0;p<n.prod;p++){ctx.fillStyle=C.gold;ctx.beginPath();ctx.arc(n.sx-(n.prod-1)*5+p*10,n.sy+r+10+(n.kind?5:0),2.6,0,7);ctx.fill();}
+    // catégorie de l'étoile : 2 ou 3 points sous l'étoile ; niveaux de production en petits traits dorés au-dessus
+    if(n.size>1){const dy=n.sy+r+11+(n.kind?6:0);ctx.fillStyle=n.owner?"#ffffff":"#c9c7e6";for(let p=0;p<n.size;p++){ctx.beginPath();ctx.arc(n.sx-(n.size-1)*5+p*10,dy,2.7,0,7);ctx.fill();}}
+    for(let p=0;p<n.prod;p++){ctx.strokeStyle=C.gold;ctx.lineWidth=2.4;const x=n.sx-(n.prod-1)*6+p*12,y=n.sy-r-10-(n.kind?6:0);ctx.beginPath();ctx.moveTo(x-3.5,y+2);ctx.lineTo(x,y-2);ctx.lineTo(x+3.5,y+2);ctx.stroke();}
     ctx.fillStyle=n.owner?"#ffffff":C.ink;ctx.font=font(Math.max(11,r*.66));ctx.textAlign="center";ctx.textBaseline="middle";
     ctx.shadowColor="rgba(0,0,0,.6)";ctx.shadowBlur=4;ctx.fillText(Math.floor(n.ships),n.sx,n.sy+1);ctx.shadowBlur=0;
   }
@@ -779,6 +785,8 @@ const ICON={prod:'<path d="M5 19v-6M12 19V9M19 19V5"/>',def:'<path d="M5 20V8h3v
   rapide:'<path d="M13 3L5 14h6l-1 7 8-11h-6z" fill="currentColor" stroke="none"/>',bouclier:'<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>',
   phare:'<circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
   klv:'<path d="M7 13l5-5 5 5M7 18l5-5 5 5"/>',auto:'<path d="M4 12a8 8 0 0 1 13.7-5.6L20 9M20 12a8 8 0 0 1-13.7 5.6L4 15"/><path d="M20 4v5h-5M4 20v-5h5"/>',
+  t2:'<circle cx="12" cy="10" r="5.5"/><circle cx="9" cy="19.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="19.5" r="1.4" fill="currentColor" stroke="none"/>',
+  t3:'<circle cx="12" cy="10" r="6.5"/><circle cx="6.5" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="20" r="1.4" fill="currentColor" stroke="none"/>',
   zoom:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M10.5 8v5M8 10.5h5"/>'};
 const svgI=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
 const RB_LABEL={prod:"Production",def:"Défense",rapide:"Étoile Rapide",bouclier:"Étoile Bouclier",phare:"Phare",klv:"Monter le type d'étoile",auto:"Envoi automatique"};
@@ -843,7 +851,7 @@ function begin(g){if(tuto)tutoEnd(true);$("news").hidden=true;newsOpen=false;res
   $("brand").textContent=cur?`MONDE ${cur.wi+1} · ${cur.li+1}`:"CONSTELLA";}
 function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast(null,"Partie libre · "+MAPS[mapKey].name);}
 // Déblocage progressif : chaque entrée devient disponible à partir du niveau n° i de la campagne (0 = monde 1 niveau 1)
-const UNL=[{i:2,k:"prod",v:1},{i:3,k:"rapide",v:1},{i:3,k:"prod",v:2},{i:4,k:"def",v:1},{i:5,k:"bouclier",v:1},{i:5,k:"zoom",v:1},
+const UNL=[{i:2,k:"prod",v:1},{i:3,k:"rapide",v:1},{i:3,k:"prod",v:2},{i:4,k:"def",v:1},{i:5,k:"bouclier",v:1},{i:5,k:"zoom",v:1},{i:5,k:"t2",v:1},{i:10,k:"t3",v:1},
   {i:6,k:"def",v:2},{i:7,k:"phare",v:1},{i:8,k:"klv",v:2},{i:9,k:"prod",v:3},{i:10,k:"def",v:3},{i:12,k:"klv",v:3}];
 function unlockAt(idx){const u={prod:0,def:0,rapide:0,bouclier:0,phare:0,klv:1};UNL.forEach(x=>{if(x.i<=idx&&x.k in u)u[x.k]=Math.max(u[x.k],x.v);});return u;}
 const NEWS={
@@ -853,6 +861,8 @@ const NEWS={
   bouclier:()=>["Étoile Bouclier","Son mur se construit 2 fois plus vite et monte jusqu'à 10."],
   phare:()=>["Phare","Les flottes qui partent de lui et de tes étoiles voisines vont plus vite et frappent plus fort."],
   klv:v=>["Types niveau "+v,"Rapide, Bouclier et Phare peuvent monter jusqu'au niveau "+v+"."],
+  t2:()=>["Étoiles à 2 points","Plus grandes, elles produisent plus vite, mais il faut plus de vaisseaux pour les prendre."],
+  t3:()=>["Étoiles à 3 points","Les plus grandes : production encore plus rapide, défense encore plus forte."],
   zoom:()=>["Zoom","Pince l'écran ou utilise la molette. Glisse dans le vide pour déplacer la carte."]
 };
 let newsOpen=false;
