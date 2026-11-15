@@ -55,14 +55,35 @@ button:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 4px 0 8px;display:flex;align-items:center}
 #tuto{position:absolute;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 24px));padding:10px 14px;display:flex;flex-direction:column;gap:6px;border-color:rgba(242,193,78,.55);box-shadow:0 0 0 1px rgba(242,193,78,.15),0 8px 30px rgba(0,0,0,.4)}
 #tutoN{font-family:var(--display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
-#tutoT{margin:0;font-size:14px;line-height:1.45}
+#tutoT{margin:0;font-size:14px;line-height:1.4}
 #tuto .tb{display:flex;gap:8px;justify-content:flex-end;align-items:center}
 #tutoSkip{font-size:12.5px;color:var(--muted);padding:6px 8px}
 #tutoOk{background:var(--gold);color:#241a02;font-family:var(--display);font-weight:700;padding:7px 14px;border-radius:9px}
 .icon{padding:7px 9px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .icon svg{width:20px;height:20px;display:block}
 .icon[aria-pressed="false"]{color:var(--foe)}
-#toast{position:absolute;left:50%;top:76px;transform:translateX(-50%);max-width:min(520px,calc(100% - 32px));padding:10px 14px;text-align:center;font-size:14px;line-height:1.4;pointer-events:none;transition:opacity .4s}
+#toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);max-width:min(420px,calc(100% - 32px));padding:6px 12px;text-align:center;font-size:12.5px;line-height:1.35;color:var(--muted);pointer-events:none;transition:opacity .4s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Icônes autour de l'étoile sélectionnée */
+#ring{position:absolute;inset:0;pointer-events:none}
+.rb{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:rgba(14,16,38,.94);border:1.5px solid var(--edge);display:flex;align-items:center;justify-content:center;pointer-events:auto;color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.45);padding:0}
+.rb svg{width:20px;height:20px;display:block}
+.rb i{font-style:normal;font-family:var(--display);font-weight:700;font-size:10px;line-height:1;position:absolute}
+.rb .c{bottom:-8px;left:50%;transform:translateX(-50%);background:#0b0d22;border:1px solid var(--edge);border-radius:6px;padding:2px 4px;color:var(--gold)}
+.rb .lv{top:-5px;right:-5px;min-width:16px;height:16px;border-radius:8px;background:var(--gold);color:#241a02;display:flex;align-items:center;justify-content:center}
+.rb:disabled{opacity:.4;cursor:default}
+.rb[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.k-rapide,.kk-rapide{color:var(--me)!important;border-color:rgba(94,230,201,.6)!important}
+.k-bouclier,.kk-bouclier{color:var(--shield)!important;border-color:rgba(191,230,255,.6)!important}
+.k-phare,.kk-phare{color:var(--gold)!important;border-color:rgba(242,193,78,.6)!important}
+.k-prod{color:var(--gold)}
+#news{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,calc(100% - 32px));padding:14px;display:flex;flex-direction:column;gap:10px;border-color:rgba(242,193,78,.55)}
+#newsH{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.ni{display:flex;gap:12px;align-items:center}
+.ni .rb{position:relative;margin:0;flex:0 0 auto;pointer-events:none}
+.ni b{display:block;font-family:var(--display);font-size:15px}
+.ni small{color:var(--muted);font-size:13px;line-height:1.35;display:block}
+#newsOk{background:var(--gold);color:#241a02;font-family:var(--display);font-weight:700;padding:9px;border-radius:10px}
+#fitBtn{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:max(10px,env(safe-area-inset-bottom,0px))}
 #toast b{font-family:var(--display);letter-spacing:.06em;display:block;font-size:15px;margin-bottom:2px}
 /* Écrans */
 .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,9,22,.8);backdrop-filter:blur(4px);overflow:auto;
@@ -106,7 +127,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
 .lv button.done{border-color:rgba(94,230,201,.5)} .lv button.done small{color:var(--me)}
 .lv button.next{border-color:var(--me);box-shadow:0 0 0 1px var(--me) inset}
 .lv button:disabled{opacity:.45;cursor:default}
-@media (max-width:560px){ .brand{display:none} .act{min-width:76px;padding:5px 8px} #pInfo{font-size:11.5px} }
+@media (max-width:560px){ .brand{padding:7px 8px;font-size:12px;letter-spacing:.04em} #top{gap:6px} .seg button{padding:6px 5px;min-width:30px} #menuBtn{padding:8px 10px!important} #toast{top:104px} .score{min-width:120px} }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
 </style>
 </head>
@@ -146,16 +167,12 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
         <button data-r="0.5">50%</button>
         <button data-r="1" aria-pressed="true">100%</button>
       </div>
-      <div class="chip" id="hint">Touche une étoile puis une autre : envoi unique. Glisse de l'une à l'autre : envoi automatique.</div>
-      <div class="chip" id="panel" hidden>
-        <div class="pTitle"><span id="pName">—</span><span id="pInfo"></span></div>
-        <button class="act fast" id="mkFast"><b>Rapide</b><small>5 vx</small></button>
-        <button class="act shield" id="mkShield"><b>Bouclier</b><small>5 vx</small></button>
-        <button class="act beacon" id="mkBeacon"><b>Phare</b><small>5 vx</small></button>
-        <button class="act" id="upProd"><b>Production</b><small></small></button>
-        <button class="act" id="upDef"><b>Défense</b><small></small></button>
-        <button class="act" id="relay"><b>Envoi auto</b><small>choisir cible</small></button>
-      </div>
+    </div>
+  </div>
+  <button class="chip icon" id="fitBtn" hidden aria-label="Recentrer la carte" title="Recentrer la carte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  <div id="ring" hidden></div>
+  <div class="chip" id="news" hidden role="dialog" aria-label="Nouveauté"><span id="newsH">Nouveau</span><div id="newsL" style="display:flex;flex-direction:column;gap:10px"></div><button id="newsOk">Compris</button></div>
+
     </div>
   </div>
 
@@ -201,7 +218,9 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
             <b>Bouclier</b> produit 25 % de moins, mais son mur se construit 2 fois plus vite et monte jusqu'à 10 ;
             <b>Phare</b> produit 25 % de moins, mais les flottes qui partent de lui ou de tes étoiles voisines volent 25 % plus vite et frappent 25 % plus fort.</li>
           <li>Chaque niveau de campagne rapporte <b>1 à 3 étoiles</b> : 1 pour la victoire, 2 sous le temps cible, 3 sous le temps record (temps de jeu, affiché en haut).</li>
-          <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux).</li>
+          <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux). Les types d'étoiles montent aussi jusqu'au niveau 3. Touche ton étoile : les icônes apparaissent autour d'elle.</li>
+          <li>En campagne, les améliorations se <b>débloquent petit à petit</b>, niveau après niveau.</li>
+          <li><b>Zoom</b> : pince l'écran ou utilise la molette, glisse dans le vide pour déplacer la carte.</li>
           <li>Tu gagnes quand plus aucun ennemi n'a de système ni de flotte.</li>
           <li>Les ennemis ont un caractère : <b>agressif</b> (il te vise en priorité et attaque vite), <b>prudent</b> (il se protège et prend d'abord les neutres) ou <b>équilibré</b>.</li>
         </ul>
@@ -304,7 +323,7 @@ const lkey=(wi,li)=>wi+"-"+li;
 const isDone=(wi,li)=>progress.done[lkey(wi,li)]!=null;
 const isOpen=idx=>idx===0||isDone(FLAT[idx-1].wi,FLAT[idx-1].li);
 
-function mkNode(id,x,y,size,owner,ships){return {id,x,y,size,owner,ships,prod:0,def:0,kind:null,wall:0,rally:null,pulse:0};}
+function mkNode(id,x,y,size,owner,ships){return {id,x,y,size,owner,ships,prod:0,def:0,kind:null,klv:0,wall:0,rally:null,pulse:0};}
 function finalize(W,H,nodes,edgeList,players,cfg,seed){
   const adj=nodes.map(()=>[]),edges=[];
   for(const[a,b]of edgeList){const len=Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y);adj[a].push({to:b,len});adj[b].push({to:a,len});edges.push([a,b]);}
@@ -384,12 +403,17 @@ function buildLevel(wi,li){const L=WORLDS[wi].levels[li],g=genLevel(L,1000+wi*97
 
 // Règles
 const isAI=o=>o>=2;
-const rate=n=>(0.5+0.45*n.size)*(1+0.4*n.prod)*(isAI(n.owner)?G.cfg.bonus:1)*(n.kind==="rapide"?1.4:n.kind==="bouclier"||n.kind==="phare"?.75:1);
+// niveaux des types d'étoiles (1 à 3)
+const KL=n=>n.klv||1, RAP=[1,1.4,1.55,1.7], BOU_MAX=[5,10,13,16], BOU_T=[6,3,2.5,2], PHA=[1,1.25,1.35,1.45], klvCost=n=>5+10*KL(n);
+const FULL={prod:3,def:3,rapide:1,bouclier:1,phare:1,klv:3};
+const U=()=>G.unlock||FULL;
+const rate=n=>(0.5+0.45*n.size)*(1+0.4*n.prod)*(isAI(n.owner)?G.cfg.bonus:1)*(n.kind==="rapide"?RAP[KL(n)]:n.kind==="bouclier"||n.kind==="phare"?.75:1);
 const cap=n=>30+n.size*25+n.prod*20;
 const defMult=n=>n.kind==="rapide"?1:1+0.4*n.def;
-const wallMax=n=>n.kind==="bouclier"?10:WALL_MAX, wallTime=n=>n.kind==="bouclier"?WALL_TIME/2:WALL_TIME;
+const wallMax=n=>n.kind==="bouclier"?BOU_MAX[KL(n)]:WALL_MAX, wallTime=n=>n.kind==="bouclier"?BOU_T[KL(n)]:WALL_TIME;
 const KIND_NAME={rapide:"Rapide",bouclier:"Bouclier",phare:"Phare"};
-const boosted=n=>n.kind==="phare"||G.adj[n.id].some(e=>{const o=G.nodes[e.to];return o.owner===n.owner&&o.kind==="phare";});
+const boostOf=n=>{let b=n.kind==="phare"?PHA[KL(n)]:1;for(const e of G.adj[n.id]){const o=G.nodes[e.to];if(o.owner===n.owner&&o.kind==="phare")b=Math.max(b,PHA[KL(o)]);}return b;};
+const boosted=n=>boostOf(n)>1;
 const prodCost=n=>20+15*n.prod, defCost=n=>15+10*n.def;
 
 // Sons synthétisés (Web Audio, aucun fichier) et vibration sur mobile
@@ -440,14 +464,16 @@ function send(n,t,count){
   if(!n||!t||n===t)return false;
   count=Math.floor(Math.min(count,n.ships));if(count<1)return false;
   const p=path(n.id,t.id,n.owner);if(!p)return false;
-  n.ships-=count;G.fleets.push({owner:n.owner,ships:count,path:p,seg:0,t:0,len:edgeLen(p[0],p[1]),dest:t.id,spd:(n.kind==="rapide"?1.4:1)*(boosted(n)?1.25:1),pow:boosted(n)?1.25:1});
+  n.ships-=count;G.fleets.push({owner:n.owner,ships:count,path:p,seg:0,t:0,len:edgeLen(p[0],p[1]),dest:t.id,spd:(n.kind==="rapide"?RAP[KL(n)]:1)*boostOf(n),pow:boostOf(n)});
   return true;
 }
 function upgrade(n,kind){
   const ok=(()=>{
-  if(kind==="prod"&&n.prod<3&&n.ships>=prodCost(n)){n.ships-=prodCost(n);n.prod++;fx(n,C.gold);return true;}
-  if(kind==="def"&&n.kind!=="rapide"&&n.def<3&&n.ships>=defCost(n)){n.ships-=defCost(n);n.def++;fx(n,C.gold);return true;}
-  if(KIND_NAME[kind]&&!n.kind&&n.ships>=SPECIAL_COST){n.ships-=SPECIAL_COST;n.kind=kind;fx(n,kind==="bouclier"?C.shield:kind==="phare"?C.gold:OWN_COL[n.owner]);return true;}
+  const u=U();
+  if(kind==="prod"&&n.prod<u.prod&&n.ships>=prodCost(n)){n.ships-=prodCost(n);n.prod++;fx(n,C.gold);return true;}
+  if(kind==="def"&&n.kind!=="rapide"&&n.def<u.def&&n.ships>=defCost(n)){n.ships-=defCost(n);n.def++;fx(n,C.gold);return true;}
+  if(kind==="klv"&&n.kind&&KL(n)<u.klv&&n.ships>=klvCost(n)){n.ships-=klvCost(n);n.klv=KL(n)+1;fx(n,C.gold);return true;}
+  if(KIND_NAME[kind]&&u[kind]&&!n.kind&&n.ships>=SPECIAL_COST){n.ships-=SPECIAL_COST;n.kind=kind;n.klv=1;fx(n,kind==="bouclier"?C.shield:kind==="phare"?C.gold:OWN_COL[n.owner]);return true;}
   return false;})();
   if(ok&&n.owner===1){sfx("upgrade");buzz(12);}
   return ok;
@@ -464,7 +490,7 @@ function arrive(f,n){
   if(att>eff+1e-6){
     if(isAI(n.owner)&&f.owner===1)G.captured++;
     if(f.owner===1){sfx("capture");buzz(18);}else if(n.owner===1){sfx("lost");buzz([50,40,50]);}else sfx("far");
-    n.owner=f.owner;n.ships=(att-eff)/pw;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;n.kind=null;n.wall=0;
+    n.owner=f.owner;n.ships=(att-eff)/pw;n.def=0;n.prod=Math.max(0,n.prod-1);n.rally=null;n.kind=null;n.klv=0;n.wall=0;
     G.nodes.forEach(o=>{if(o.rally===n.id&&o.owner!==n.owner)o.rally=null;});
     if(G.sel===n.id&&n.owner!==1)G.sel=null;
     fx(n,OWN_COL[f.owner]);
@@ -517,7 +543,7 @@ function ai(P){
   }
   const mine=nodes.filter(n=>n.owner===P),avail={},threatOf={};
   for(const n of mine){let th=0;
-    for(const e of G.adj[n.id]){const t=nodes[e.to];if(t.owner&&t.owner!==P)th=Math.max(th,t.ships*(boosted(t)?1.25:1));}
+    for(const e of G.adj[n.id]){const t=nodes[e.to];if(t.owner&&t.owner!==P)th=Math.max(th,t.ships*boostOf(t));}
     threatOf[n.id]=th;avail[n.id]=Math.max(0,n.ships*cfg.aggr*st.aggr-th*cfg.safety*st.safety);}
   // 1. défense : une étoile visée garde ses vaisseaux et appelle ses voisines à l'aide
   if(cfg.defend&&Math.random()<cfg.defend)for(const n of mine){
@@ -561,13 +587,15 @@ function ai(P){
     if(used.has(n.id))continue;
     const hostile=G.adj[n.id].some(e=>nodes[e.to].owner!==P);
     if(!hostile){
-      if(!n.kind&&Math.random()<cfg.special&&n.ships>=SPECIAL_COST+8){const mates=G.adj[n.id].filter(e=>nodes[e.to].owner===P).length;upgrade(n,mates>=3&&Math.random()<.5?"phare":"rapide");continue;}
+      if(!n.kind&&Math.random()<cfg.special&&n.ships>=SPECIAL_COST+8){const mates=G.adj[n.id].filter(e=>nodes[e.to].owner===P).length;if(upgrade(n,mates>=3&&Math.random()<.5?"phare":"rapide"))continue;}
+      if(n.kind&&Math.random()<cfg.upg&&n.ships>=klvCost(n)+8&&upgrade(n,"klv"))continue;
       if(Math.random()<cfg.upg&&n.prod<3&&n.ships>=prodCost(n)+5){upgrade(n,"prod");continue;}
       if(n.ships>8){const t=frontier(n,P);if(t)send(n,t,n.ships*.85);}
       continue;
     }
     const threat=Math.max(threatOf[n.id],danger[n.id]||0);
-    if(threat>0&&!n.kind&&Math.random()<cfg.special*st.shield&&n.ships>=SPECIAL_COST+threat*.3){upgrade(n,"bouclier");continue;}
+    if(threat>0&&!n.kind&&Math.random()<cfg.special*st.shield&&n.ships>=SPECIAL_COST+threat*.3&&upgrade(n,"bouclier"))continue;
+    if(threat>0&&n.kind==="bouclier"&&Math.random()<cfg.upg&&n.ships>=klvCost(n)+threat*.3&&upgrade(n,"klv"))continue;
     if(Math.random()<cfg.upg){
       if(threat>0&&n.def<3&&n.ships>=defCost(n)+threat*.6/st.safety)upgrade(n,"def");
       else if(n.prod<2&&n.ships>=prodCost(n)+15)upgrade(n,"prod");
@@ -587,9 +615,10 @@ const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 let vw=0,vh=0,dpr=1,sc=1,ox=0,oy=0,portrait=false,rotMap=false,stars=null,twinkle=[];
 function layout(){
   if(!G)return;portrait=vh>vw*1.05;rotMap=portrait&&G.W>G.H*1.1;
-  const mw=rotMap?G.H:G.W,mh=rotMap?G.W:G.H,top=(portrait?96:70)+(tuto?(portrait?118:92):0),bot=portrait?150:118,side=28;
+  const mw=rotMap?G.H:G.W,mh=rotMap?G.W:G.H,top=(portrait?96:70)+(tuto?(portrait?80:70):0),bot=portrait?150:118,side=28;
   const tb=document.getElementById("tuto");if(tb)tb.style.top=(portrait?94:64)+"px";
   sc=Math.min((vw-2*side)/mw,(vh-top-bot)/mh);ox=(vw-mw*sc)/2;oy=top+((vh-top-bot)-mh*sc)/2;
+  mapBox={x0:ox,y0:oy,x1:ox+mw*sc,y1:oy+mh*sc};clampView();
 }
 function resize(){
   dpr=Math.min(2,window.devicePixelRatio||1);vw=cv.clientWidth;vh=cv.clientHeight;
@@ -613,8 +642,14 @@ function resize(){
   const v=s.createRadialGradient(W/2,H/2,M*.3,W/2,H/2,M*.75);v.addColorStop(0,"rgba(0,0,0,0)");v.addColorStop(1,"rgba(3,4,12,.55)");s.fillStyle=v;s.fillRect(0,0,W,H);
   twinkle=[];for(let i=0;i<Math.min(50,(vw*vh)/15000);i++)twinkle.push({x:rnd()*vw,y:rnd()*vh,r:.6+rnd(),ph:rnd()*7,sp:.5+rnd()*1.5});
 }
-const P=(x,y)=>rotMap?[ox+y*sc,oy+(G.W-x)*sc]:[ox+x*sc,oy+y*sc];
-const R=n=>Math.max(11,(15+n.size*7)*sc*1.25);
+// vue : zoom VZ et décalage VX,VY appliqués par-dessus la mise à l'échelle de base
+let VZ=1,VX=0,VY=0,mapBox={x0:0,y0:0,x1:0,y1:0};
+const P=(x,y)=>{const b=rotMap?[ox+y*sc,oy+(G.W-x)*sc]:[ox+x*sc,oy+y*sc];return [b[0]*VZ+VX,b[1]*VZ+VY];};
+const R=n=>Math.max(11,(15+n.size*7)*sc*1.25*Math.pow(VZ,.8));
+function resetView(){VZ=1;VX=0;VY=0;}
+function clampView(){if(VZ<=1.001){resetView();return;}
+  const cx=vw/2,cy=vh/2;VX=Math.max(cx-mapBox.x1*VZ,Math.min(cx-mapBox.x0*VZ,VX));VY=Math.max(cy-mapBox.y1*VZ,Math.min(cy-mapBox.y0*VZ,VY));}
+function zoomAt(fx,fy,nz){nz=Math.max(1,Math.min(3.5,nz));const bx=(fx-VX)/VZ,by=(fy-VY)/VZ;VZ=nz;VX=fx-bx*nz;VY=fy-by*nz;clampView();}
 const font=(px,w=700)=>`${w} ${px}px "Chakra Petch",ui-sans-serif,system-ui,sans-serif`;
 
 let drag=null;
@@ -655,10 +690,10 @@ function draw(){
       ctx.globalAlpha=1;}
     for(let d=0;d<n.def;d++){ctx.lineWidth=2.2;ctx.strokeStyle=col+"cc";ctx.beginPath();ctx.arc(n.sx,n.sy,r+9+d*4,-2.4,-.74);ctx.stroke();}
     const ro=r+10+n.def*4;
-    if(n.kind==="rapide"){ctx.strokeStyle=col;ctx.lineWidth=2.2;for(let k=0;k<3;k++){const a=now*3.2+k*2.094;ctx.beginPath();ctx.arc(n.sx,n.sy,ro,a,a+.45);ctx.stroke();
+    if(n.kind==="rapide"){ctx.strokeStyle=col;ctx.lineWidth=2.2;const nk=KL(n)+2;for(let k=0;k<nk;k++){const a=now*3.2+k*6.283/nk;ctx.beginPath();ctx.arc(n.sx,n.sy,ro,a,a+.45);ctx.stroke();
         const ex=n.sx+Math.cos(a+.45)*ro,ey=n.sy+Math.sin(a+.45)*ro,ta=a+.45+Math.PI/2;ctx.beginPath();ctx.moveTo(ex+Math.cos(ta-2.4)*4,ey+Math.sin(ta-2.4)*4);ctx.lineTo(ex,ey);ctx.lineTo(ex+Math.cos(ta+2.4)*4,ey+Math.sin(ta+2.4)*4);ctx.stroke();}}
-    if(n.kind==="bouclier"){ctx.lineWidth=1.2;ctx.strokeStyle=C.shield+"aa";ctx.beginPath();ctx.arc(n.sx,n.sy,ro-1,0,7);ctx.stroke();ctx.beginPath();ctx.arc(n.sx,n.sy,ro+2,0,7);ctx.stroke();}
-    if(n.kind==="phare"){ctx.strokeStyle=C.gold;ctx.lineWidth=2;for(let k=0;k<4;k++){const a=now*.6+k*Math.PI/2,c=Math.cos(a),si=Math.sin(a);
+    if(n.kind==="bouclier"){ctx.lineWidth=1.2;ctx.strokeStyle=C.shield+"aa";for(let k=0;k<=KL(n);k++){ctx.beginPath();ctx.arc(n.sx,n.sy,ro-1+k*3,0,7);ctx.stroke();}}
+    if(n.kind==="phare"){ctx.strokeStyle=C.gold;ctx.lineWidth=2;const nr=2+2*KL(n);for(let k=0;k<nr;k++){const a=now*.6+k*6.283/nr,c=Math.cos(a),si=Math.sin(a);
         ctx.beginPath();ctx.moveTo(n.sx+c*(ro-2),n.sy+si*(ro-2));ctx.lineTo(n.sx+c*(ro+6),n.sy+si*(ro+6));ctx.stroke();}
       for(const e of G.adj[n.id]){const o=nodes[e.to];if(o.owner!==n.owner)continue;ctx.strokeStyle=C.gold+"55";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(n.sx,n.sy);ctx.lineTo(o.sx,o.sy);ctx.stroke();}}
     for(let p=0;p<n.prod;p++){ctx.fillStyle=C.gold;ctx.beginPath();ctx.arc(n.sx-(n.prod-1)*5+p*10,n.sy+r+10+(n.kind?5:0),2.6,0,7);ctx.fill();}
@@ -697,6 +732,7 @@ function draw(){
       if(s.drag){const u=(now*.6)%1,e2=u<.8?u/.8:1;const pts=p.map(i=>nodes[i]);let L=0;const segs=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i].sx-pts[i-1].sx,pts[i].sy-pts[i-1].sy);segs.push(l);L+=l;}
         let d=e2*L,i=0;while(i<segs.length-1&&d>segs[i]){d-=segs[i];i++;}const q=Math.min(1,d/(segs[i]||1)),fx_=pts[i].sx+(pts[i+1].sx-pts[i].sx)*q,fy_=pts[i].sy+(pts[i+1].sy-pts[i].sy)*q;
         ctx.globalAlpha=u<.8?1:1-(u-.8)/.2;ctx.fillStyle="#fff";ctx.shadowColor=C.gold;ctx.shadowBlur=14;ctx.beginPath();ctx.arc(fx_,fy_,9,0,7);ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}}}
+  placeRing();
   if(drag&&drag.moved&&drag.from!==null){const n=nodes[drag.from];const over=hit(drag.x,drag.y);
     ctx.strokeStyle=C.gold;ctx.lineWidth=2.5;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(n.sx,n.sy);
     if(over!==null&&over!==drag.from){const p=path(drag.from,over,1)||[];p.slice(1).forEach(i=>ctx.lineTo(nodes[i].sx,nodes[i].sy));}else ctx.lineTo(drag.x,drag.y);
@@ -706,14 +742,23 @@ function draw(){
 
 // Saisie
 function hit(x,y){let best=null,bd=Infinity;for(const n of G.nodes){const d=Math.hypot(n.sx-x,n.sy-y);if(d<Math.max(n.r+10,26)&&d<bd){bd=d;best=n.id;}}return best;}
-cv.addEventListener("pointerdown",e=>{if(!G||G.over||G.demo)return;cv.setPointerCapture(e.pointerId);
-  const h=hit(e.offsetX,e.offsetY);drag={x0:e.offsetX,y0:e.offsetY,x:e.offsetX,y:e.offsetY,moved:false,from:(h!==null&&G.nodes[h].owner===1)?h:null,down:h};});
-cv.addEventListener("pointermove",e=>{if(!drag)return;drag.x=e.offsetX;drag.y=e.offsetY;if(Math.hypot(drag.x-drag.x0,drag.y-drag.y0)>12)drag.moved=true;});
-cv.addEventListener("pointercancel",()=>drag=null);
-cv.addEventListener("pointerup",e=>{if(!drag)return;const d=drag;drag=null;const up=hit(e.offsetX,e.offsetY);
+const ptrs=new Map();let pinch=null,noTap=false;
+cv.addEventListener("pointerdown",e=>{if(!G||G.over||G.demo)return;cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
+  if(ptrs.size===2){drag=null;noTap=true;const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:VZ,mx:(a.x+b.x)/2,my:(a.y+b.y)/2,vx:VX,vy:VY};return;}
+  if(ptrs.size>2)return;noTap=false;
+  const h=hit(e.offsetX,e.offsetY);drag={x0:e.offsetX,y0:e.offsetY,x:e.offsetX,y:e.offsetY,moved:false,from:(h!==null&&G.nodes[h].owner===1)?h:null,down:h,vx:VX,vy:VY};});
+cv.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
+  if(pinch&&ptrs.size>=2){const[a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1,mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    const nz=Math.max(1,Math.min(3.5,pinch.z*d/pinch.d)),bx=(pinch.mx-pinch.vx)/pinch.z,by=(pinch.my-pinch.vy)/pinch.z;VZ=nz;VX=mx-bx*nz;VY=my-by*nz;clampView();return;}
+  if(!drag)return;drag.x=e.offsetX;drag.y=e.offsetY;if(Math.hypot(drag.x-drag.x0,drag.y-drag.y0)>12)drag.moved=true;
+  if(drag.moved&&drag.from===null&&VZ>1){VX=drag.vx+(drag.x-drag.x0);VY=drag.vy+(drag.y-drag.y0);clampView();}});
+const endPtr=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;};
+cv.addEventListener("pointercancel",e=>{endPtr(e);drag=null;});
+cv.addEventListener("pointerup",e=>{endPtr(e);if(!drag)return;const d=drag;drag=null;if(noTap)return;const up=hit(e.offsetX,e.offsetY);
   if(d.moved&&tuto&&TUTO[tuto.step].only)return;
   if(d.moved){if(d.from!==null&&up!==null&&up!==d.from){const n=G.nodes[d.from];if(n.rally===up)n.rally=null;else startAuto(n,up);}refreshPanel();return;}
   tap(up);});
+cv.addEventListener("wheel",e=>{if(!G||G.demo||menuOpen)return;e.preventDefault();zoomAt(e.offsetX,e.offsetY,VZ*Math.exp(-e.deltaY*.0015));},{passive:false});
 function startAuto(n,to){n.rally=to;send(n,G.nodes[to],n.ships);fx(G.nodes[to],C.gold);sfx("send");}
 function tap(id){
   if(tuto&&TUTO[tuto.step].only&&!TUTO[tuto.step].only().includes(id))return;
@@ -730,27 +775,42 @@ function tap(id){
 // HUD
 const $=id=>document.getElementById(id);
 const fr=v=>v.toFixed(1).replace(".",",");
+const ICON={prod:'<path d="M5 19v-6M12 19V9M19 19V5"/>',def:'<path d="M5 20V8h3v3h3V8h2v3h3V8h3v12z"/>',
+  rapide:'<path d="M13 3L5 14h6l-1 7 8-11h-6z" fill="currentColor" stroke="none"/>',bouclier:'<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>',
+  phare:'<circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+  klv:'<path d="M7 13l5-5 5 5M7 18l5-5 5 5"/>',auto:'<path d="M4 12a8 8 0 0 1 13.7-5.6L20 9M20 12a8 8 0 0 1-13.7 5.6L4 15"/><path d="M20 4v5h-5M4 20v-5h5"/>',
+  zoom:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M10.5 8v5M8 10.5h5"/>'};
+const svgI=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+const RB_LABEL={prod:"Production",def:"Défense",rapide:"Étoile Rapide",bouclier:"Étoile Bouclier",phare:"Phare",klv:"Monter le type d'étoile",auto:"Envoi automatique"};
+const RB={};
+Object.keys(RB_LABEL).forEach(k=>{const b=document.createElement("button");b.className="rb k-"+k;b.innerHTML=svgI(k)+'<i class="c"></i><i class="lv" hidden></i>';
+  b.title=RB_LABEL[k];b.setAttribute("aria-label",RB_LABEL[k]);b.hidden=true;
+  b.addEventListener("pointerdown",e=>e.stopPropagation());
+  b.onclick=()=>{const n=G&&G.sel!==null?G.nodes[G.sel]:null;if(!n)return;
+    if(k==="auto"){if(n.rally!==null||G.relayMode){n.rally=null;G.relayMode=false;}else G.relayMode=true;}else upgrade(n,k);refreshPanel();};
+  $("ring").appendChild(b);RB[k]=b;});
 function refreshPanel(){
-  const n=G&&!G.demo&&G.sel!==null?G.nodes[G.sel]:null;
-  $("panel").hidden=!n;$("hint").hidden=!!n;if(!n)return;
-  $("pName").textContent=n.name+(n.kind?" · "+KIND_NAME[n.kind]:"")+" · taille "+n.size;
-  $("pInfo").textContent=Math.floor(n.ships)+" vaisseaux · +"+fr(rate(n))+"/s · défense ×"+fr(defMult(n))+" · mur "+Math.floor(n.wall)+"/"+wallMax(n)+(boosted(n)?" · flottes +25 %":"");
-  $("mkFast").hidden=$("mkShield").hidden=$("mkBeacon").hidden=!!n.kind;
-  $("mkFast").disabled=$("mkShield").disabled=$("mkBeacon").disabled=n.ships<SPECIAL_COST;
-  const pc=prodCost(n),dc=defCost(n);
-  $("upProd").querySelector("small").textContent=n.prod>=3?"niveau max":`niv. ${n.prod}→${n.prod+1} · ${pc} vx`;
-  $("upProd").disabled=n.prod>=3||n.ships<pc;
-  $("upDef").querySelector("small").textContent=n.kind==="rapide"?"bloquée (Rapide)":n.def>=3?"niveau max":`niv. ${n.def}→${n.def+1} · ${dc} vx`;
-  $("upDef").disabled=n.kind==="rapide"||n.def>=3||n.ships<dc;
-  $("relay").setAttribute("aria-pressed",String(n.rally!==null||G.relayMode));
-  $("relay").querySelector("small").textContent=G.relayMode?"touche la cible":n.rally!==null?"vers "+G.nodes[n.rally].name+" · arrêter":`par ${autoQty} · choisir cible`;
+  const n=G&&!G.demo&&!G.over&&G.sel!==null?G.nodes[G.sel]:null;$("ring").hidden=!n;if(!n)return;
+  const u=U();
+  const set=(k,show,cost,can,lv)=>{const b=RB[k];b.hidden=!show;if(!show)return;const c=b.querySelector(".c");c.hidden=cost==null;if(cost!=null)c.textContent=cost;
+    b.disabled=!can;const l=b.querySelector(".lv");l.hidden=!lv;if(lv)l.textContent=lv;};
+  set("prod",u.prod>0,n.prod<u.prod?prodCost(n):null,n.prod<u.prod&&n.ships>=prodCost(n),n.prod);
+  set("def",u.def>0&&n.kind!=="rapide",n.def<u.def?defCost(n):null,n.def<u.def&&n.ships>=defCost(n),n.def);
+  for(const k of["rapide","bouclier","phare"])set(k,!n.kind&&!!u[k],SPECIAL_COST,n.ships>=SPECIAL_COST,0);
+  set("klv",!!n.kind&&u.klv>1,KL(n)<u.klv?klvCost(n):null,KL(n)<u.klv&&n.ships>=klvCost(n),n.kind?KL(n):0);
+  RB.klv.className="rb k-klv"+(n.kind?" kk-"+n.kind:"");RB.klv.title=n.kind?KIND_NAME[n.kind]+" niveau "+KL(n):"";
+  set("auto",true,null,true,0);RB.auto.setAttribute("aria-pressed",String(n.rally!==null||G.relayMode));
 }
-$("mkFast").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"rapide");refreshPanel();};
-$("mkShield").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"bouclier");refreshPanel();};
-$("mkBeacon").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"phare");refreshPanel();};
-$("upProd").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"prod");refreshPanel();};
-$("upDef").onclick=()=>{if(G.sel!==null)upgrade(G.nodes[G.sel],"def");refreshPanel();};
-$("relay").onclick=()=>{const n=G.nodes[G.sel];if(!n)return;if(n.rally!==null||G.relayMode){n.rally=null;G.relayMode=false;}else G.relayMode=true;refreshPanel();};
+function placeRing(){
+  if($("ring").hidden||!G||G.sel===null)return;const n=G.nodes[G.sel];
+  $("ring").style.visibility=(n.sx<-10||n.sx>vw+10||n.sy<-10||n.sy>vh+10)?"hidden":"visible";
+  let ax=0,ay=0;for(const e of G.adj[n.id]){const o=G.nodes[e.to],dx=o.sx-n.sx,dy=o.sy-n.sy,l=Math.hypot(dx,dy)||1;ax+=dx/l;ay+=dy/l;}
+  // les icônes se placent du côté libre (à l'opposé des liens) pour ne pas cacher les cibles
+  const base=Math.hypot(ax,ay)>.3?Math.atan2(-ay,-ax):(n.sy>vh/2?-Math.PI/2:Math.PI/2);
+  const vis=Object.values(RB).filter(b=>!b.hidden),rad=n.r+42,stp=Math.min(.8,52/rad);
+  vis.forEach((b,i)=>{const a=base+(i-(vis.length-1)/2)*stp;const x=Math.max(26,Math.min(vw-26,n.sx+Math.cos(a)*rad)),y=Math.max(30,Math.min(vh-30,n.sy+Math.sin(a)*rad));
+    b.style.left=x+"px";b.style.top=y+"px";});
+}
 function segGroup(id,attr,fn){const el=$(id);el.querySelectorAll("button").forEach(b=>b.onclick=()=>{el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");fn(b.dataset[attr]);});}
 segGroup("speed","s",v=>speed=+v);
 segGroup("ratio","r",v=>ratio=+v);
@@ -763,14 +823,15 @@ function scoreHud(){
   G.nodes.forEach(n=>{tot[n.owner]+=n.owner?n.ships:n.ships*.3;pl[n.owner]++;});
   G.fleets.forEach(f=>tot[f.owner]+=f.ships);
   const t=tot.reduce((a,b)=>a+b,0)||1;let foe=0,foeP=0;for(let o=2;o<=4;o++){foe+=tot[o];foeP+=pl[o];}
-  if(!G.demo)$("brand").textContent=(cur?`${cur.wi+1}-${cur.li+1} · `:"")+fmtT(playTime(G));
+  if(!G.demo){const pt=playTime(G);let goal="";if(cur&&!tuto){if(pt<=recordTime(G))goal=` · ★★★ ${fmtT(recordTime(G))}`;else if(pt<=parTime(G))goal=` · ★★ ${fmtT(parTime(G))}`;}
+    $("brand").textContent=(cur?`${cur.wi+1}-${cur.li+1} · `:"")+fmtT(pt)+goal;}
   $("sMe").textContent=pl[1]+" · "+Math.floor(tot[1]);$("sFoe").textContent=Math.floor(foe)+" · "+foeP;
   const bar=$("bar");if(bar.children.length!==G.players+1){bar.innerHTML="";[1,0,2,3,4].slice(0,G.players+1).forEach(o=>{const i=document.createElement("i");i.dataset.o=o;i.style.background=o?OWN_COL[o]:"#3a3d68";bar.appendChild(i);});}
   for(const i of bar.children)i.style.width=(tot[+i.dataset.o]/t*100)+"%";
 }
 let toastT=null;
-function toast(title,text){const el=$("toast");el.innerHTML="";const b=document.createElement("b");b.textContent=title;el.appendChild(b);if(text)el.appendChild(document.createTextNode(text));
-  el.hidden=false;el.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>{el.style.opacity=0;setTimeout(()=>el.hidden=true,400);},text?5000:2500);}
+function toast(title,text){const el=$("toast");el.innerHTML="";if(title){const b=document.createElement("b");b.textContent=title;el.appendChild(b);}if(text)el.appendChild(document.createTextNode(text));
+  el.hidden=false;el.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>{el.style.opacity=0;setTimeout(()=>el.hidden=true,400);},3000);}
 
 // Menu, mondes, fin de partie
 const mapsEl=$("maps");
@@ -778,13 +839,39 @@ Object.entries(MAPS).forEach(([k,m])=>{const b=document.createElement("button");
   b.innerHTML=`<b>${m.name}</b><small>${m.desc}</small>`;b.onclick=()=>{mapKey=k;mapsEl.querySelectorAll(".map").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");};mapsEl.appendChild(b);});
 let menuOpen=true;
 const show=id=>["menu","worlds","end"].forEach(s=>$(s).hidden=s!==id);
-function begin(g){if(tuto)tutoEnd(true);G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
+function begin(g){if(tuto)tutoEnd(true);$("news").hidden=true;newsOpen=false;resetView();G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
   $("brand").textContent=cur?`MONDE ${cur.wi+1} · ${cur.li+1}`:"CONSTELLA";}
-function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast("Partie libre",null);}
+function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast(null,"Partie libre · "+MAPS[mapKey].name);}
+// Déblocage progressif : chaque entrée devient disponible à partir du niveau n° i de la campagne (0 = monde 1 niveau 1)
+const UNL=[{i:2,k:"prod",v:1},{i:3,k:"rapide",v:1},{i:3,k:"prod",v:2},{i:4,k:"def",v:1},{i:5,k:"bouclier",v:1},{i:5,k:"zoom",v:1},
+  {i:6,k:"def",v:2},{i:7,k:"phare",v:1},{i:8,k:"klv",v:2},{i:9,k:"prod",v:3},{i:10,k:"def",v:3},{i:12,k:"klv",v:3}];
+function unlockAt(idx){const u={prod:0,def:0,rapide:0,bouclier:0,phare:0,klv:1};UNL.forEach(x=>{if(x.i<=idx&&x.k in u)u[x.k]=Math.max(u[x.k],x.v);});return u;}
+const NEWS={
+  prod:v=>v===1?["Production","Touche ton étoile : les icônes apparaissent autour. Celle-ci fait produire ton étoile plus vite."]:["Production niveau "+v,"Ta production peut maintenant monter jusqu'au niveau "+v+"."],
+  def:v=>v===1?["Défense","Tes vaisseaux défendent 40 % mieux à chaque niveau."]:["Défense niveau "+v,"Ta défense peut maintenant monter jusqu'au niveau "+v+"."],
+  rapide:()=>["Étoile Rapide","Dès 5 vaisseaux : produit et envoie 40 % plus vite, mais sans défense."],
+  bouclier:()=>["Étoile Bouclier","Son mur se construit 2 fois plus vite et monte jusqu'à 10."],
+  phare:()=>["Phare","Les flottes qui partent de lui et de tes étoiles voisines vont plus vite et frappent plus fort."],
+  klv:v=>["Types niveau "+v,"Rapide, Bouclier et Phare peuvent monter jusqu'au niveau "+v+"."],
+  zoom:()=>["Zoom","Pince l'écran ou utilise la molette. Glisse dans le vide pour déplacer la carte."]
+};
+let newsOpen=false;
+function showNews(idx){
+  const items=UNL.filter(x=>x.i===idx);if(!items.length)return false;
+  const L=$("newsL");L.innerHTML="";
+  items.forEach(x=>{const[t,d]=NEWS[x.k](x.v);const row=document.createElement("div");row.className="ni";
+    const ic=document.createElement("span");ic.className="rb k-"+(x.k==="klv"?"klv":x.k);ic.innerHTML=svgI(x.k);
+    const tx=document.createElement("div");const b=document.createElement("b");b.textContent=t;const sm=document.createElement("small");sm.textContent=d;tx.append(b,sm);
+    row.append(ic,tx);L.appendChild(row);});
+  $("news").hidden=false;newsOpen=true;return true;
+}
+$("newsOk").onclick=()=>{$("news").hidden=true;newsOpen=false;};
 function startLevel(wi,li,forceTuto){cur={wi,li};const L=WORLDS[wi].levels[li];begin(buildLevel(wi,li));
+  const idx=FLAT.findIndex(f=>f.wi===wi&&f.li===li);G.unlock=unlockAt(idx);
   if(wi===0&&li===0&&(forceTuto||!store.get("constella-tuto",false))){tutoStart();return;}
   const foes=L.k-1,chars=Object.values(G.style).map(x=>STYLE_NAME[x]);
-  toast(`Monde ${wi+1} · Niveau ${li+1}`,(foes===1?"1 ennemi "+chars[0]:foes+" ennemis ("+chars.join(", ")+")")+` · ★★ en moins de ${fmtT(parTime(G))}, ★★★ en moins de ${fmtT(recordTime(G))}`+(L.tip?". "+L.tip:""));}
+  toast(null,`${wi+1}-${li+1} · `+(foes===1?"ennemi "+chars[0]:foes+" ennemis : "+chars.join(", ")));
+  if(!isDone(wi,li))showNews(idx);}
 function nextIndex(){for(let i=0;i<FLAT.length;i++)if(!isDone(FLAT[i].wi,FLAT[i].li))return i;return -1;}
 function fmtT(s){const m=Math.floor(s/60);return m+":"+String(Math.floor(s%60)).padStart(2,"0");}
 function renderWorlds(){
@@ -838,18 +925,18 @@ function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;re
 let tuto=null;
 const playTime=g=>Math.max(0,g.time-(g.tutoT||0));
 const TUTO=[
-  {txt:()=>"Voici ton étoile. Elle produit des vaisseaux en continu, le nombre est affiché en son centre. Touche-la pour la sélectionner.",
+  {txt:()=>"Ton étoile produit des vaisseaux. Touche-la.",
     hl:()=>[tuto.a],pause:1,only:()=>[tuto.a],done:()=>G.sel===tuto.a},
-  {txt:()=>"Touche maintenant l'étoile grise indiquée : tes vaisseaux partent vers elle.",
+  {txt:()=>"Touche l'étoile grise pour l'attaquer.",
     hl:()=>[tuto.b],line:()=>[tuto.a,tuto.b],pause:1,only:()=>[tuto.a,tuto.b],done:()=>G.fleets.some(f=>f.owner===1)},
-  {txt:()=>"Une étoile est capturée si tu envoies plus de vaisseaux qu'elle n'en a. Regarde ta flotte arriver.",
+  {txt:()=>"Il faut plus de vaisseaux qu'elle pour la prendre.",
     hl:()=>[tuto.b],done:()=>!G.fleets.some(f=>f.owner===1)},
   {enter:()=>{let best=null;for(const n of G.nodes){if(n.owner!==1)continue;for(const e of G.adj[n.id]){const m=G.nodes[e.to];if(m.owner===1)continue;
       const sc=(m.owner?50:0)+m.ships;if(!best||sc<best.sc)best={sc,s:n.id,c:m.id};}}
       if(best){tuto.s=best.s;tuto.c=best.c;}else{tuto.s=tuto.a;tuto.c=tuto.b;}},
-    txt:()=>(G.nodes[tuto.b].owner===1?"Bravo, elle est à toi ! ":"Presque : il fallait plus de vaisseaux. ")+"Maintenant, reste appuyé sur une de tes étoiles et glisse jusqu'à une autre : elle enverra ses vaisseaux automatiquement, par paquets.",
+    txt:()=>(G.nodes[tuto.b].owner===1?"Bravo ! ":"Raté, il en fallait plus. ")+"Glisse d'une étoile à une autre : envoi automatique.",
     hl:()=>[tuto.c],drag:()=>[tuto.s,tuto.c],done:()=>G.nodes.some(n=>n.owner===1&&n.rally!==null)},
-  {txt:()=>"Parfait. Un mur se construit avec le temps autour de tes étoiles et arrête les premiers attaquants. Pour gagner, prends toutes les étoiles orange de l'ennemi. Bonne chance !",
+  {txt:()=>"Le mur autour de tes étoiles grandit avec le temps. Prends toutes les étoiles orange pour gagner.",
     ok:"C'est parti",pause:1,only:()=>[]}
 ];
 function tutoStart(){
@@ -865,7 +952,7 @@ function tutoShow(){const s=TUTO[tuto.step];if(s.enter)s.enter();
 function tutoTick(){const s=TUTO[tuto.step];if(s.done&&s.done())tutoNext();}
 function tutoNext(){tuto.step++;sfx("tick");if(tuto.step>=TUTO.length)tutoEnd();else tutoShow();}
 function tutoEnd(silent){tuto=null;store.set("constella-tuto",true);$("tuto").hidden=true;layout();
-  if(!silent&&G&&cur)toast("À toi de jouer",`★★ en moins de ${fmtT(parTime(G))}, ★★★ en moins de ${fmtT(recordTime(G))}. Le chrono démarre maintenant.`);}
+  if(!silent&&G&&cur)toast(null,"À toi de jouer !");}
 $("tutoOk").onclick=()=>{if(tuto)tutoNext();};
 $("tutoSkip").onclick=()=>{if(tuto)tutoEnd();};
 $("tutoAgain").onclick=()=>startLevel(0,0,true);
@@ -877,6 +964,7 @@ function soundUi(){$("sndBtn").innerHTML=snd.on?SVG_ON:SVG_OFF;$("sndBtn").setAt
   mark("optSnd","v",snd.on?1:0);mark("optVib","v",snd.vib?1:0);}
 function setSound(v){snd.on=v;store.set("constella-son",v);if(v){audio();setTimeout(()=>{const d=G&&G.demo;if(d)G.demo=false;sfx("tick");if(d)G.demo=true;},30);}soundUi();}
 $("sndBtn").onclick=()=>setSound(!snd.on);
+$("fitBtn").onclick=()=>{resetView();$("fitBtn").hidden=true;};
 segGroup("optSnd","v",v=>setSound(v==="1"));
 segGroup("optVib","v",v=>{snd.vib=v==="1";store.set("constella-vibration",snd.vib);if(snd.vib&&navigator.vibrate)try{navigator.vibrate(25);}catch(e){}soundUi();});
 soundUi();
@@ -889,13 +977,13 @@ let last=performance.now(),hudT=0;
 function loop(now){
   let dt=Math.min(.1,(now-last)/1000);last=now;
   if(G&&!G.over){
-    let sim=G.demo?dt:(menuOpen||(tuto&&TUTO[tuto.step].pause)?0:dt*speed*PACE);
+    let sim=G.demo?dt:(menuOpen||newsOpen||(tuto&&TUTO[tuto.step].pause)?0:dt*speed*PACE);
     if(tuto&&!G.demo)G.tutoT=(G.tutoT||0)+sim;
     while(sim>0){const s=Math.min(.05,sim);step(s);sim-=s;}
     if(tuto&&!menuOpen)tutoTick();
     if(G.demo&&G.over)demo();
   }
-  draw();hudT+=dt;if(hudT>.2){hudT=0;scoreHud();if(G&&!G.demo&&G.sel!==null)refreshPanel();}
+  draw();hudT+=dt;if(hudT>.2){hudT=0;scoreHud();if(G&&!G.demo)refreshPanel();$("fitBtn").hidden=!(G&&!G.demo&&!menuOpen&&VZ>1.01);}
   requestAnimationFrame(loop);
 }
 window.__constella={WORLDS,buildLevel,get G(){return G;},startLevel,ai,step};
