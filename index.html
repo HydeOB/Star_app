@@ -629,28 +629,62 @@ function layout(){
   sc=Math.min((vw-2*side)/mw,(vh-top-bot)/mh);ox=(vw-mw*sc)/2;oy=top+((vh-top-bot)-mh*sc)/2;
   mapBox={x0:ox,y0:oy,x1:ox+mw*sc,y1:oy+mh*sc};clampView();
 }
+// Fonds « univers » générés une fois par redimensionnement (aucune image)
+function paintSpace(s,W,H,rnd,kind,dpr){
+  const M=Math.max(W,H);
+  const blob=(x,y,rr,c,a,op)=>{const q=s.createRadialGradient(x,y,0,x,y,rr);q.addColorStop(0,`rgba(${c},${a})`);q.addColorStop(.5,`rgba(${c},${a*.45})`);q.addColorStop(1,`rgba(${c},0)`);
+    s.globalCompositeOperation=op||"lighter";s.fillStyle=q;s.fillRect(x-rr,y-rr,2*rr,2*rr);s.globalCompositeOperation="source-over";};
+  const dot=(x,y,r,col,a)=>{s.globalAlpha=a;s.fillStyle=col;s.beginPath();s.arc(x,y,r,0,7);s.fill();s.globalAlpha=1;};
+  const spike=(x,y,L,col)=>{s.globalCompositeOperation="lighter";blob(x,y,L*.5,col,.5);s.strokeStyle=`rgba(${col},.55)`;s.lineWidth=dpr;
+    for(const[dx,dy]of[[1,0],[0,1]]){const g=s.createLinearGradient(x-dx*L,y-dy*L,x+dx*L,y+dy*L);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(.5,`rgba(${col},.8)`);g.addColorStop(1,`rgba(${col},0)`);
+      s.strokeStyle=g;s.beginPath();s.moveTo(x-dx*L,y-dy*L);s.lineTo(x+dx*L,y+dy*L);s.stroke();}
+    s.globalCompositeOperation="source-over";dot(x,y,1.6*dpr,"#fff",1);};
+  const field=(n,bias)=>{for(let i=0;i<n;i++){const x=rnd()*W,y=rnd()*H,b=rnd();dot(x,y,(b<.97?.35+rnd()*.7:1+rnd())*dpr,b<.15?"#ffd6b8":b<.3?"#bcd4ff":"#f2f4ff",.25+rnd()*.65);}};
+  s.fillStyle="#07080f";s.fillRect(0,0,W,H);
+  if(kind==="spirale"){
+    blob(W*.5,H*.5,M*.7,"25,30,70",.5,"source-over");
+    // galaxie spirale inclinée, en arrière-plan
+    const gx=W*.68,gy=H*.38,R=M*.42,tilt=-.5,sq=.42;
+    const P=(r,a)=>{const x=Math.cos(a)*r,y=Math.sin(a)*r*sq;return[gx+x*Math.cos(tilt)-y*Math.sin(tilt),gy+x*Math.sin(tilt)+y*Math.cos(tilt)];};
+    for(let i=0;i<70;i++){const t=rnd(),arm=rnd()<.5?0:Math.PI,r=R*(.08+t*.92),a=arm+t*4.2+(rnd()-.5)*.5;const[x,y]=P(r,a);blob(x,y,R*(.07+rnd()*.08)*(1-t*.5),t<.3?"255,200,150":rnd()<.5?"90,140,255":"170,90,230",.07);}
+    for(let i=0;i<5000;i++){const t=Math.pow(rnd(),.8),arm=rnd()<.5?0:Math.PI,r=R*(.05+t*.95),a=arm+t*4.2+(rnd()-.5)*(.35+t*.4);const[x,y]=P(r+(rnd()-.5)*R*.06,a);
+      dot(x,y,(.3+rnd()*.6)*dpr,t<.25?"#ffe2c4":rnd()<.7?"#cfe0ff":"#e7c8ff",.25+rnd()*.5);}
+    blob(gx,gy,R*.22,"255,225,180",.35);blob(gx,gy,R*.07,"255,245,230",.45);
+    blob(W*.15,H*.85,M*.35,"60,30,120",.18);
+    for(let i=0;i<4;i++){const x=rnd()*W,y=rnd()*H,r=M*(.01+rnd()*.015);s.save();s.translate(x,y);s.rotate(rnd()*3);s.scale(1,.4);blob(0,0,r,"220,210,255",.35);s.restore();}
+    field(W*H/(1100*dpr*dpr));
+  }else if(kind==="voie"){
+    // voie lactée : bande diagonale dense, nuages de gaz et lignes de poussière sombre
+    const ang=-.42,cx=W*.5,cy=H*.55,L=M*1.2;const B=(u,v)=>[cx+Math.cos(ang)*u-Math.sin(ang)*v,cy+Math.sin(ang)*u+Math.cos(ang)*v];
+    for(let i=0;i<120;i++){const u=(rnd()-.5)*L,v=(rnd()+rnd()-1)*H*.22;const[x,y]=B(u,v);const c=rnd()<.15?"255,150,110":rnd()<.5?"120,150,255":"190,170,255";blob(x,y,M*(.04+rnd()*.08),c,.06);}
+    for(let i=0;i<9000;i++){const u=(rnd()-.5)*L,v=(rnd()+rnd()+rnd()-1.5)*H*.2;const[x,y]=B(u,v);dot(x,y,(.25+rnd()*.55)*dpr,rnd()<.2?"#ffe0c8":"#e6ecff",.15+rnd()*.5);}
+    for(let i=0;i<60;i++){const u=(rnd()-.5)*L,v=(rnd()-.5)*H*.12;const[x,y]=B(u,v);blob(x,y,M*(.02+rnd()*.05),"5,5,12",.45,"source-over");}
+    field(W*H/(1600*dpr*dpr));
+    for(let i=0;i<7;i++)spike(rnd()*W,rnd()*H,(8+rnd()*14)*dpr,rnd()<.5?"190,215,255":"255,220,190");
+  }else{
+    // nébuleuse colorée : nuages turquoise, magenta et orangés, avec amas d'étoiles jeunes
+    const alt=kind==="nebuleuse2";
+    for(const[x0,y,c,n]of alt?[[.3,.3,"210,90,50",40],[.6,.6,"40,120,220",45],[.85,.25,"200,50,120",25],[.15,.8,"40,170,150",30]]:[[.25,.7,"30,170,190",40],[.6,.45,"190,40,150",45],[.82,.2,"230,110,60",25],[.4,.25,"80,70,210",30]])
+      for(let i=0,x=alt?1-x0:x0;i<n;i++)blob(W*x+(rnd()-.5)*W*.35,H*y+(rnd()-.5)*H*.35,M*(.03+rnd()*.1),c,.05+rnd()*.05);
+    for(let i=0;i<50;i++)blob(rnd()*W,rnd()*H,M*(.02+rnd()*.06),"4,4,10",.5,"source-over");
+    field(W*H/(1300*dpr*dpr));
+    for(let k=0;k<3;k++){const cx=rnd()*W,cy=rnd()*H;for(let i=0;i<60;i++)dot(cx+(rnd()-.5)*M*.08,cy+(rnd()-.5)*M*.08,(.4+rnd()*.8)*dpr,"#dff0ff",.4+rnd()*.5);spike(cx,cy,(10+rnd()*10)*dpr,"200,230,255");}
+    for(let i=0;i<5;i++)spike(rnd()*W,rnd()*H,(6+rnd()*10)*dpr,rnd()<.5?"190,215,255":"255,215,190");
+  }
+  // vignette
+  const v=s.createRadialGradient(W/2,H/2,M*.3,W/2,H/2,M*.75);v.addColorStop(0,"rgba(0,0,0,0)");v.addColorStop(1,"rgba(0,0,0,.5)");s.fillStyle=v;s.fillRect(0,0,W,H);
+}
+// un fond par monde : voie lactée, nébuleuse, galaxie spirale, puis une autre nébuleuse ; menu et partie libre : voie lactée
+let bgKey=null;
+const BG_WORLD=[["voie",1],["nebuleuse",2],["spirale",3],["nebuleuse2",4]];
+const curBg=()=>cur?BG_WORLD[cur.wi]:["voie",0];
 function resize(){
   dpr=Math.min(2,window.devicePixelRatio||1);vw=cv.clientWidth;vh=cv.clientHeight;
   cv.width=vw*dpr;cv.height=vh*dpr;layout();
   stars=document.createElement("canvas");stars.width=cv.width;stars.height=cv.height;
-  const s=stars.getContext("2d");let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
-  const g=s.createRadialGradient(cv.width*.5,cv.height*.45,0,cv.width*.5,cv.height*.45,Math.max(cv.width,cv.height)*.7);
-  g.addColorStop(0,"#161a44");g.addColorStop(1,C.void);s.fillStyle=g;s.fillRect(0,0,cv.width,cv.height);
-  for(let i=0;i<(vw*vh)/1800;i++){s.globalAlpha=.15+rnd()*.6;s.fillStyle=rnd()<.1?"#ffd9c2":"#dfe3ff";const r=rnd()*1.3*dpr;s.beginPath();s.arc(rnd()*cv.width,rnd()*cv.height,r,0,7);s.fill();}
-  s.globalAlpha=1;
+  const s=stars.getContext("2d");bgKey=curBg();let seed=[7,7,31,7,97][bgKey[1]];const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
   const W=cv.width,H=cv.height,M=Math.max(W,H);
-  // nébuleuse : grands nuages bleus et magenta, puis petites volutes pour la texture
-  s.fillStyle="#12141d";s.fillRect(0,0,W,H);
-  // fumée : bande diagonale bleu-cyan, bords violets, faite de nuages flous superposés
-  s.save();s.globalCompositeOperation="lighter";
-  for(let i=0;i<260;i++){const t=rnd(),cy0=H*(.95-t*.9),bx=W*(.15+t*.75),by=cy0+(rnd()-.5)*H*.6,rr=(.02+rnd()*.08)*M,d=Math.abs((by-cy0)/(H*.3));
-    const c=d<.45?(rnd()<.5?"40,150,230":"30,90,200"):(rnd()<.6?"130,40,170":"90,30,140"),al=(.03+rnd()*.05).toFixed(3);
-    const q=s.createRadialGradient(bx,by,0,bx,by,rr);q.addColorStop(0,`rgba(${c},${al})`);q.addColorStop(.6,`rgba(${c},${(al*.4).toFixed(3)})`);q.addColorStop(1,`rgba(${c},0)`);s.fillStyle=q;s.fillRect(bx-rr,by-rr,2*rr,2*rr);}
-  s.filter="none";s.restore();
-  for(const[x,y,rr,c,a]of[]){
-    const q=s.createRadialGradient(x*W,y*H,0,x*W,y*H,rr*M);q.addColorStop(0,`rgba(${c},${a})`);q.addColorStop(.55,`rgba(${c},${a*.35})`);q.addColorStop(1,`rgba(${c},0)`);s.fillStyle=q;s.fillRect(0,0,W,H);}
-  for(let i=0;i<60;i++){const x=rnd()*W,y=rnd()*H,rr=(.04+rnd()*.12)*M,c=rnd()<.6?"60,130,230":"180,50,150";
-    const q=s.createRadialGradient(x,y,0,x,y,rr);q.addColorStop(0,`rgba(${c},.05)`);q.addColorStop(1,`rgba(${c},0)`);s.fillStyle=q;s.fillRect(x-rr,y-rr,2*rr,2*rr);}
+  paintSpace(s,W,H,rnd,bgKey[0],dpr);
   // grille holographique discrète
   s.strokeStyle="rgba(140,180,255,0)";s.lineWidth=1;const step=46*dpr;
   for(let x=(W%step)/2;x<W;x+=step){s.beginPath();s.moveTo(x,0);s.lineTo(x,H);s.stroke();}
@@ -858,7 +892,7 @@ Object.entries(MAPS).forEach(([k,m])=>{const b=document.createElement("button");
   b.innerHTML=`<b>${m.name}</b><small>${m.desc}</small>`;b.onclick=()=>{mapKey=k;mapsEl.querySelectorAll(".map").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");};mapsEl.appendChild(b);});
 let menuOpen=true;
 const show=id=>["menu","worlds","end"].forEach(s=>$(s).hidden=s!==id);
-function begin(g){if(tuto)tutoEnd(true);$("news").hidden=true;newsOpen=false;resetView();G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
+function begin(g){if(String(curBg())!==String(bgKey))setTimeout(resize,0);if(tuto)tutoEnd(true);$("news").hidden=true;newsOpen=false;resetView();G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
   $("brand").textContent=cur?`MONDE ${cur.wi+1} · ${cur.li+1}`:"CONSTELLA";}
 function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast(null,"Partie libre · "+MAPS[mapKey].name);}
 // Déblocage progressif : chaque entrée devient disponible à partir du niveau n° i de la campagne (0 = monde 1 niveau 1)
