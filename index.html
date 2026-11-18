@@ -206,6 +206,10 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
         <div class="setrow"><span>Vibration (mobile)</span>
           <div class="chip seg" id="optVib" role="group" aria-label="Vibration"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
       </div>
+      <div><h2>Mode test</h2>
+        <div class="setrow"><span>Ouvrir tous les niveaux de la campagne</span>
+          <div class="chip seg" id="optTest" role="group" aria-label="Mode test"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+      </div>
       <div><h2>Comment jouer</h2>
         <ul class="rules">
           <li>Chaque étoile à toi <b>produit des vaisseaux</b> en continu. Les grosses produisent plus.</li>
@@ -322,7 +326,8 @@ const starStr=n=>"★".repeat(n)+"☆".repeat(3-n);
 const totalStars=()=>Object.values(progress.done).reduce((a,r)=>a+(r.s||0),0);
 const lkey=(wi,li)=>wi+"-"+li;
 const isDone=(wi,li)=>progress.done[lkey(wi,li)]!=null;
-const isOpen=idx=>idx===0||isDone(FLAT[idx-1].wi,FLAT[idx-1].li);
+let testMode=store.get("constella-test",false);
+const isOpen=idx=>testMode||idx===0||isDone(FLAT[idx-1].wi,FLAT[idx-1].li);
 
 function mkNode(id,x,y,size,owner,ships){return {id,x,y,size,owner,ships,prod:0,def:0,kind:null,klv:0,wall:0,rally:null,pulse:0};}
 function finalize(W,H,nodes,edgeList,players,cfg,seed){
@@ -978,6 +983,8 @@ $("fitBtn").onclick=()=>{resetView();$("fitBtn").hidden=true;};
 segGroup("optSnd","v",v=>setSound(v==="1"));
 segGroup("optVib","v",v=>{snd.vib=v==="1";store.set("constella-vibration",snd.vib);if(snd.vib&&navigator.vibrate)try{navigator.vibrate(25);}catch(e){}soundUi();});
 soundUi();
+segGroup("optTest","v",v=>{testMode=v==="1";store.set("constella-test",testMode);});
+mark("optTest","v",testMode?1:0);
 
 // Démo en fond du menu : l'IA joue contre elle-même
 function demo(){cur=null;G=buildFree("vega",DIFF.normal);G.demo=true;layout();}
