@@ -11,7 +11,7 @@
 /* Mise en page : carte plein écran sur canvas, HUD flottant en haut (score, vitesse) et en bas (envoi, étoile) */
 :root{
   --void:#0a0c1b; --void2:#12153a; --ink:#ecebf7; --muted:#8f8db0; --panel:rgba(18,20,44,.88); --edge:#2a2e5a;
-  --me:#5ee6c9; --foe:#ff7a59; --foe2:#b18cff; --foe3:#ff5fa2; --neutral:#a29fc2; --gold:#f2c14e; --shield:#bfe6ff;
+  --me:#3ee07a; --foe:#ff5a3c; --foe2:#b18cff; --foe3:#ff5fa2; --neutral:#a29fc2; --gold:#f2c14e; --shield:#bfe6ff;
   --display:"Chakra Petch",ui-sans-serif,system-ui,sans-serif; --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
   color-scheme:dark;
 }
@@ -48,7 +48,7 @@ button:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 .act small{color:var(--muted);font-variant-numeric:tabular-nums}
 .act:disabled{opacity:.4;cursor:default}
 .act[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
-.act.fast{border-color:rgba(94,230,201,.45)} .act.shield{border-color:rgba(191,230,255,.45)} .act.beacon{border-color:rgba(242,193,78,.45)}
+.act.fast{border-color:rgba(62,224,122,.45)} .act.shield{border-color:rgba(191,230,255,.45)} .act.beacon{border-color:rgba(242,193,78,.45)}
 .st{color:var(--gold);font-size:12px;letter-spacing:1px;line-height:1}
 #endStars{font-size:44px;color:var(--gold);letter-spacing:6px;margin:0;line-height:1}
 #endGoals{color:var(--muted);margin:0;font-size:13.5px}
@@ -72,7 +72,7 @@ button:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 .rb .lv{top:-5px;right:-5px;min-width:16px;height:16px;border-radius:8px;background:var(--gold);color:#241a02;display:flex;align-items:center;justify-content:center}
 .rb:disabled{opacity:.4;cursor:default}
 .rb[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
-.k-rapide,.kk-rapide{color:var(--me)!important;border-color:rgba(94,230,201,.6)!important}
+.k-rapide,.kk-rapide{color:var(--me)!important;border-color:rgba(62,224,122,.6)!important}
 .k-bouclier,.kk-bouclier{color:var(--shield)!important;border-color:rgba(191,230,255,.6)!important}
 .k-phare,.kk-phare{color:var(--gold)!important;border-color:rgba(242,193,78,.6)!important}
 .k-prod{color:var(--gold)}
@@ -124,7 +124,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
 .lv button{border:1px solid var(--edge);border-radius:10px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--void);min-width:0}
 .lv button b{font-family:var(--display);font-size:16px}
 .lv button small{font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.lv button.done{border-color:rgba(94,230,201,.5)} .lv button.done small{color:var(--me)}
+.lv button.done{border-color:rgba(62,224,122,.5)} .lv button.done small{color:var(--me)}
 .lv button.next{border-color:var(--me);box-shadow:0 0 0 1px var(--me) inset}
 .lv button:disabled{opacity:.45;cursor:default}
 @media (max-width:560px){ .brand{padding:7px 8px;font-size:12px;letter-spacing:.04em} #top{gap:6px} .seg button{padding:6px 5px;min-width:30px} #menuBtn{padding:8px 10px!important} #toast{top:104px} .score{min-width:120px} }
@@ -255,7 +255,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
 <script>
 (()=>{
 "use strict";
-const C={me:"#5ee6c9",foe:"#ff7a59",foe2:"#b18cff",foe3:"#ff5fa2",neu:"#a29fc2",gold:"#f2c14e",shield:"#bfe6ff",edge:"#2a2e5a",ink:"#ecebf7",void:"#0a0c1b"};
+const C={me:"#3ee07a",foe:"#ff5a3c",foe2:"#b18cff",foe3:"#ff5fa2",neu:"#a29fc2",gold:"#f2c14e",shield:"#bfe6ff",edge:"#2a2e5a",ink:"#ecebf7",void:"#0a0c1b"};
 const OWN_COL=[C.neu,C.me,C.foe,C.foe2,C.foe3];
 const W0=1600,H0=900,FLEET_SPEED=95,SPECIAL_COST=5,WALL_MAX=5,WALL_TIME=6; // mur : +1 toutes les 6 s de possession, jusqu'à 5
 const NAMES=["Aldra","Vesk","Tirun","Moba","Kael","Ysor","Pherin","Duna","Oriel","Saph","Neral","Quill","Hesk","Lumo","Brann","Ithe","Zorae","Calix","Tem","Varo","Nyx","Elar","Opa","Rhen","Sel","Ganth","Iru","Pell","Xan","Meru"];
@@ -640,12 +640,19 @@ function resize(){
   s.globalAlpha=1;
   const W=cv.width,H=cv.height,M=Math.max(W,H);
   // nébuleuse : grands nuages bleus et magenta, puis petites volutes pour la texture
-  for(const[x,y,rr,c,a]of[[.28,.42,.55,"40,110,220",.22],[.72,.28,.45,"190,40,150",.13],[.82,.82,.4,"220,70,50",.09],[.12,.85,.35,"40,170,190",.1]]){
+  s.fillStyle="#12141d";s.fillRect(0,0,W,H);
+  // fumée : bande diagonale bleu-cyan, bords violets, faite de nuages flous superposés
+  s.save();s.globalCompositeOperation="lighter";
+  for(let i=0;i<260;i++){const t=rnd(),cy0=H*(.95-t*.9),bx=W*(.15+t*.75),by=cy0+(rnd()-.5)*H*.6,rr=(.02+rnd()*.08)*M,d=Math.abs((by-cy0)/(H*.3));
+    const c=d<.45?(rnd()<.5?"40,150,230":"30,90,200"):(rnd()<.6?"130,40,170":"90,30,140"),al=(.03+rnd()*.05).toFixed(3);
+    const q=s.createRadialGradient(bx,by,0,bx,by,rr);q.addColorStop(0,`rgba(${c},${al})`);q.addColorStop(.6,`rgba(${c},${(al*.4).toFixed(3)})`);q.addColorStop(1,`rgba(${c},0)`);s.fillStyle=q;s.fillRect(bx-rr,by-rr,2*rr,2*rr);}
+  s.filter="none";s.restore();
+  for(const[x,y,rr,c,a]of[]){
     const q=s.createRadialGradient(x*W,y*H,0,x*W,y*H,rr*M);q.addColorStop(0,`rgba(${c},${a})`);q.addColorStop(.55,`rgba(${c},${a*.35})`);q.addColorStop(1,`rgba(${c},0)`);s.fillStyle=q;s.fillRect(0,0,W,H);}
   for(let i=0;i<60;i++){const x=rnd()*W,y=rnd()*H,rr=(.04+rnd()*.12)*M,c=rnd()<.6?"60,130,230":"180,50,150";
     const q=s.createRadialGradient(x,y,0,x,y,rr);q.addColorStop(0,`rgba(${c},.05)`);q.addColorStop(1,`rgba(${c},0)`);s.fillStyle=q;s.fillRect(x-rr,y-rr,2*rr,2*rr);}
   // grille holographique discrète
-  s.strokeStyle="rgba(140,180,255,.045)";s.lineWidth=1;const step=46*dpr;
+  s.strokeStyle="rgba(140,180,255,0)";s.lineWidth=1;const step=46*dpr;
   for(let x=(W%step)/2;x<W;x+=step){s.beginPath();s.moveTo(x,0);s.lineTo(x,H);s.stroke();}
   for(let y=(H%step)/2;y<H;y+=step){s.beginPath();s.moveTo(0,y);s.lineTo(W,y);s.stroke();}
   const v=s.createRadialGradient(W/2,H/2,M*.3,W/2,H/2,M*.75);v.addColorStop(0,"rgba(0,0,0,0)");v.addColorStop(1,"rgba(3,4,12,.55)");s.fillStyle=v;s.fillRect(0,0,W,H);
@@ -671,9 +678,8 @@ function draw(){
   if(!G)return;
   const nodes=G.nodes;nodes.forEach(n=>{[n.sx,n.sy]=P(n.x,n.y);n.r=R(n);});
   for(const[a,b]of G.edges){const A=nodes[a],B=nodes[b];
-    const own=A.owner&&A.owner===B.owner;
-    ctx.strokeStyle=own?OWN_COL[A.owner]+"b0":"rgba(150,160,220,.32)";ctx.lineWidth=own?2:1.6;ctx.setLineDash(own?[7,5]:[4,6]);ctx.lineDashOffset=0;
-    ctx.beginPath();ctx.moveTo(A.sx,A.sy);ctx.lineTo(B.sx,B.sy);ctx.stroke();}
+    const mx=(A.sx+B.sx)/2,my=(A.sy+B.sy)/2;ctx.lineWidth=2.6;ctx.setLineDash([9,6]);
+    for(const[N,x0,y0]of[[A,A.sx,A.sy],[B,B.sx,B.sy]]){ctx.strokeStyle=N.owner?OWN_COL[N.owner]+"c8":"rgba(170,175,200,.35)";ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(mx,my);ctx.stroke();}}
   ctx.setLineDash([]);
   const tdash=(G.time*30)%16;
   for(const n of nodes){if(n.rally===null||n.owner!==1)continue;const p=path(n.id,n.rally,n.owner);if(!p)continue;
@@ -685,10 +691,10 @@ function draw(){
     const g=ctx.createRadialGradient(n.sx,n.sy,r*.5,n.sx,n.sy,r*2.5);g.addColorStop(0,col+(n.owner?"66":"1c"));g.addColorStop(1,col+"00");
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(n.sx,n.sy,r*2.5,0,7);ctx.fill();
     const core=r*.68;
-    if(n.owner){const body=ctx.createRadialGradient(n.sx-r*.3,n.sy-r*.35,r*.1,n.sx,n.sy,r);body.addColorStop(0,"#ffffff55");body.addColorStop(.35,col);body.addColorStop(1,col+"cc");
-      ctx.fillStyle=body;ctx.beginPath();ctx.arc(n.sx,n.sy,r,0,7);ctx.fill();}
-    else{ctx.fillStyle="#191c3c";ctx.beginPath();ctx.arc(n.sx,n.sy,r,0,7);ctx.fill();ctx.strokeStyle="rgba(170,175,220,.55)";ctx.lineWidth=1.5;ctx.stroke();}
-    ctx.fillStyle="#0b0d22";ctx.beginPath();ctx.arc(n.sx,n.sy,core,0,7);ctx.fill();
+    if(n.owner){ctx.fillStyle="#0e1018";ctx.beginPath();ctx.arc(n.sx,n.sy,r,0,7);ctx.fill();
+      const inn=ctx.createRadialGradient(n.sx,n.sy,0,n.sx,n.sy,r);inn.addColorStop(0,col+"10");inn.addColorStop(1,col+"55");ctx.fillStyle=inn;ctx.fill();
+      ctx.strokeStyle=col;ctx.lineWidth=Math.max(3,r*.16);ctx.beginPath();ctx.arc(n.sx,n.sy,r-ctx.lineWidth/2,0,7);ctx.stroke();}
+    else{ctx.fillStyle="#3a3e4c";ctx.beginPath();ctx.arc(n.sx,n.sy,r,0,7);ctx.fill();ctx.strokeStyle="#8d92a8";ctx.lineWidth=Math.max(2,r*.1);ctx.stroke();}
     ctx.strokeStyle=n.owner?"rgba(0,0,0,.35)":"rgba(170,175,220,.25)";ctx.lineWidth=1;ctx.stroke();
     // mur de protection : 5 segments qui se construisent avec le temps (trace fantôme = emplacement vide)
     if(n.owner){const WM=wallMax(n),ra=r+4.5,span=6.283/WM,gapA=.16,full=Math.floor(n.wall+1e-6),part=n.wall-full;
@@ -708,7 +714,7 @@ function draw(){
     // catégorie de l'étoile : 2 ou 3 points sous l'étoile ; niveaux de production en petits traits dorés au-dessus
     if(n.size>1){const dy=n.sy+r+11+(n.kind?6:0);ctx.fillStyle=n.owner?"#ffffff":"#c9c7e6";for(let p=0;p<n.size;p++){ctx.beginPath();ctx.arc(n.sx-(n.size-1)*5+p*10,dy,2.7,0,7);ctx.fill();}}
     for(let p=0;p<n.prod;p++){ctx.strokeStyle=C.gold;ctx.lineWidth=2.4;const x=n.sx-(n.prod-1)*6+p*12,y=n.sy-r-10-(n.kind?6:0);ctx.beginPath();ctx.moveTo(x-3.5,y+2);ctx.lineTo(x,y-2);ctx.lineTo(x+3.5,y+2);ctx.stroke();}
-    ctx.fillStyle=n.owner?"#ffffff":C.ink;ctx.font=font(Math.max(11,r*.66));ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillStyle=n.owner?col:"#d9dbe6";ctx.font=font(Math.max(11,r*.62));ctx.textAlign="center";ctx.textBaseline="middle";
     ctx.shadowColor="rgba(0,0,0,.6)";ctx.shadowBlur=4;ctx.fillText(Math.floor(n.ships),n.sx,n.sy+1);ctx.shadowBlur=0;
   }
   if(G.sel!==null){const n=nodes[G.sel];const k=1+Math.sin(performance.now()/220)*.08;
