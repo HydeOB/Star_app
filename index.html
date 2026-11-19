@@ -6,16 +6,20 @@
 <title>Constella</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;600;700&display=swap">
 <style>
 /* Mise en page : carte plein écran sur canvas, HUD flottant en haut (score, vitesse) et en bas (envoi, étoile) */
 :root{
   --void:#0a0c1b; --void2:#12153a; --ink:#ecebf7; --muted:#8f8db0; --panel:rgba(18,20,44,.88); --edge:#2a2e5a;
   --me:#3ee07a; --foe:#ff5a3c; --foe2:#b18cff; --foe3:#ff5fa2; --neutral:#a29fc2; --gold:#f2c14e; --shield:#bfe6ff;
-  --display:"Chakra Petch",ui-sans-serif,system-ui,sans-serif; --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --display:"Chakra Petch","Noto Sans Arabic",ui-sans-serif,system-ui,sans-serif; --body:"IBM Plex Sans","Noto Sans Arabic",ui-sans-serif,system-ui,sans-serif;
   color-scheme:dark;
 }
 [hidden]{display:none!important}
+[dir="rtl"] .rules{padding-left:0;padding-right:18px}
+[dir="rtl"] #top,[dir="rtl"] #bottom,[dir="rtl"] .seg{direction:ltr}
+[dir="rtl"] #fitBtn{right:auto;left:max(12px,env(safe-area-inset-left,0px))}
+#lang button{min-width:38px}
 html,body{height:100%;margin:0}
 body{background:var(--void);color:var(--ink);font-family:var(--body);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 #app{position:relative;height:100%;overflow:hidden}
@@ -134,7 +138,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
 <body>
 
 <div id="app">
-  <canvas id="cv" aria-label="Carte de la galaxie"></canvas>
+  <canvas id="cv" data-i18n-aria="map_aria" aria-label="Carte de la galaxie"></canvas>
 
   <div class="hud" id="top">
     <div class="chip brand" id="brand">CONSTELLA</div>
@@ -143,8 +147,8 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
       <div class="bar" id="bar"></div>
       <span class="foe" id="sFoe">0</span>
     </div>
-    <div class="chip seg" id="speed" role="group" aria-label="Vitesse du jeu">
-      <button data-s="0" title="Pause">II</button>
+    <div class="chip seg" id="speed" role="group" data-i18n-aria="speed_aria" aria-label="Vitesse du jeu">
+      <button data-s="0" data-i18n-aria="pause" title="Pause">II</button>
       <button data-s="0.5" aria-pressed="true">½×</button>
       <button data-s="1">1×</button>
       <button data-s="1.5">1,5×</button>
@@ -152,26 +156,26 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
       <button data-s="3">3×</button>
     </div>
     <button class="chip icon" id="sndBtn" aria-label="Son" aria-pressed="true" title="Couper ou remettre le son"></button>
-    <button class="chip" id="menuBtn" style="padding:8px 12px;font-family:var(--display);font-weight:600">Menu</button>
+    <button class="chip" id="menuBtn" data-i18n="menu" style="padding:8px 12px;font-family:var(--display);font-weight:600">Menu</button>
   </div>
 
   <div class="chip" id="toast" hidden></div>
   <div class="chip" id="tuto" hidden role="status"><span id="tutoN"></span><p id="tutoT"></p>
-    <div class="tb"><button id="tutoSkip">Passer le tutoriel</button><button id="tutoOk" hidden>OK</button></div></div>
+    <div class="tb"><button id="tutoSkip" data-i18n="tuto_skip">Passer le tutoriel</button><button id="tutoOk" hidden>OK</button></div></div>
 
   <div class="hud" id="bottom">
     <div class="row">
-      <div class="chip seg" id="ratio" role="group" aria-label="Part de la flotte envoyée">
-        <span class="lbl">Envoi</span>
+      <div class="chip seg" id="ratio" role="group" data-i18n-aria="ratio_aria" aria-label="Part de la flotte envoyée">
+        <span class="lbl" data-i18n="send">Envoi</span>
         <button data-r="0.25">25%</button>
         <button data-r="0.5">50%</button>
         <button data-r="1" aria-pressed="true">100%</button>
       </div>
     </div>
   </div>
-  <button class="chip icon" id="fitBtn" hidden aria-label="Recentrer la carte" title="Recentrer la carte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  <button class="chip icon" id="fitBtn" hidden data-i18n-aria="fit" aria-label="Recentrer la carte" title="Recentrer la carte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
   <div id="ring" hidden></div>
-  <div class="chip" id="news" hidden role="dialog" aria-label="Nouveauté"><span id="newsH">Nouveau</span><div id="newsL" style="display:flex;flex-direction:column;gap:10px"></div><button id="newsOk">Compris</button></div>
+  <div class="chip" id="news" hidden role="dialog" data-i18n-aria="news_aria" aria-label="Nouveauté"><span id="newsH" data-i18n="news_h">Nouveau</span><div id="newsL" style="display:flex;flex-direction:column;gap:10px"></div><button id="newsOk" data-i18n="news_ok">Compris</button></div>
 
     </div>
   </div>
@@ -179,64 +183,62 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
   <div class="screen" id="menu">
     <div class="card">
       <h1 class="logo">CONST<span>E</span>LLA</h1>
-      <p class="tag">Relie les étoiles, fais tourner tes chantiers, et reprends chaque système à l'adversaire.</p>
-      <div class="btns"><button class="go" id="campaign">Campagne<small id="campNext"></small></button><button class="ghost" id="resume" hidden>Reprendre</button></div>
-      <details class="free"><summary>Partie libre</summary>
+      <p class="tag" data-i18n="tag"></p>
+      <div class="chip seg" id="lang" role="group" aria-label="Langue" style="align-self:flex-start"><button data-l="fr">FR</button><button data-l="en">EN</button><button data-l="es">ES</button><button data-l="nl">NL</button><button data-l="ar">ع</button></div>
+      <div class="btns"><button class="go" id="campaign"><span data-i18n="campaign">Campagne</span><small id="campNext"></small></button><button class="ghost" id="resume" hidden data-i18n="resume">Reprendre</button></div>
+      <details class="free"><summary data-i18n="free">Partie libre</summary>
         <div>
-          <div><h2>Carte</h2><div class="maps" id="maps"></div></div>
-          <div><h2>Adversaire</h2>
-            <div class="chip seg" id="diff" role="group" aria-label="Difficulté" style="display:inline-flex">
-              <button data-d="facile">Facile</button>
-              <button data-d="normal" aria-pressed="true">Normal</button>
-              <button data-d="difficile">Difficile</button>
+          <div><h2 data-i18n="map">Carte</h2><div class="maps" id="maps"></div></div>
+          <div><h2 data-i18n="opponent">Adversaire</h2>
+            <div class="chip seg" id="diff" role="group" data-i18n-aria="diff_aria" aria-label="Difficulté" style="display:inline-flex">
+              <button data-d="facile" data-i18n="diff_facile">Facile</button>
+              <button data-d="normal" aria-pressed="true" data-i18n="diff_normal">Normal</button>
+              <button data-d="difficile" data-i18n="diff_difficile">Difficile</button>
             </div>
           </div>
-          <button class="ghost" id="start">Lancer la partie libre</button>
+          <button class="ghost" id="start" data-i18n="start_free">Lancer la partie libre</button>
         </div>
       </details>
-      <div><h2>Munitions · envoi automatique</h2>
-        <div class="setrow"><span>Après le premier envoi, envoyer par paquets de</span>
-          <div class="chip seg" id="qty" role="group" aria-label="Vaisseaux par envoi">
+      <div><h2 data-i18n="mun_h">Munitions · envoi automatique</h2>
+        <div class="setrow"><span data-i18n="mun_t">Après le premier envoi, envoyer par paquets de</span>
+          <div class="chip seg" id="qty" role="group" data-i18n-aria="qty_aria" aria-label="Vaisseaux par envoi">
             <button data-q="3">3</button><button data-q="5" aria-pressed="true">5</button><button data-q="10">10</button>
           </div></div>
       </div>
-      <div><h2>Son et vibration</h2>
-        <div class="setrow"><span>Bruitages</span>
-          <div class="chip seg" id="optSnd" role="group" aria-label="Bruitages"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
-        <div class="setrow"><span>Vibration (mobile)</span>
-          <div class="chip seg" id="optVib" role="group" aria-label="Vibration"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+      <div><h2 data-i18n="snd_h">Son et vibration</h2>
+        <div class="setrow"><span data-i18n="sfx">Bruitages</span>
+          <div class="chip seg" id="optSnd" role="group" aria-label="Bruitages"><button data-v="1" data-i18n="yes">Oui</button><button data-v="0" data-i18n="no">Non</button></div></div>
+        <div class="setrow"><span data-i18n="vib">Vibration (mobile)</span>
+          <div class="chip seg" id="optVib" role="group" aria-label="Vibration"><button data-v="1" data-i18n="yes">Oui</button><button data-v="0" data-i18n="no">Non</button></div></div>
       </div>
-      <div><h2>Mode test</h2>
-        <div class="setrow"><span>Ouvrir tous les niveaux de la campagne</span>
-          <div class="chip seg" id="optTest" role="group" aria-label="Mode test"><button data-v="1">Oui</button><button data-v="0">Non</button></div></div>
+      <div><h2 data-i18n="test_h">Mode test</h2>
+        <div class="setrow"><span data-i18n="test_t">Ouvrir tous les niveaux de la campagne</span>
+          <div class="chip seg" id="optTest" role="group" aria-label="Mode test"><button data-v="1" data-i18n="yes">Oui</button><button data-v="0" data-i18n="no">Non</button></div></div>
       </div>
-      <div><h2>Comment jouer</h2>
+      <div><h2 data-i18n="how_h">Comment jouer</h2>
         <ul class="rules">
-          <li>Chaque étoile à toi <b>produit des vaisseaux</b> en continu. Les grosses produisent plus.</li>
-          <li><b>Touche</b> ton étoile puis une cible : elle envoie ses vaisseaux une fois (25, 50 ou 100 %).</li>
-          <li><b>Reste appuyé et glisse</b> vers une étoile : elle envoie d'abord tous ses vaisseaux, puis un paquet (3, 5 ou 10) dès qu'elle l'a produit. Glisse à nouveau vers la même cible pour arrêter.</li>
-          <li>Une attaque réussit si tu envoies <b>plus de vaisseaux que la défense</b>.</li>
-          <li>Plus tu gardes une étoile longtemps, plus un <b>mur</b> se construit autour d'elle : un segment toutes les 6 secondes, jusqu'à 5. Chaque segment arrête 1 vaisseau ennemi avant les défenseurs. Le mur repart de zéro si l'étoile est prise.</li>
-          <li>Dès 5 vaisseaux, transforme une étoile (coût 5) :
-            <b>Rapide</b> produit et envoie 40 % plus vite, sans défense ;
-            <b>Bouclier</b> produit 25 % de moins, mais son mur se construit 2 fois plus vite et monte jusqu'à 10 ;
-            <b>Phare</b> produit 25 % de moins, mais les flottes qui partent de lui ou de tes étoiles voisines volent 25 % plus vite et frappent 25 % plus fort.</li>
-          <li>Chaque niveau de campagne rapporte <b>1 à 3 étoiles</b> : 1 pour la victoire, 2 sous le temps cible, 3 sous le temps record (temps de jeu, affiché en haut).</li>
-          <li>Trois catégories d'étoiles : <b>normale</b>, <b>2 points</b> et <b>3 points</b> (les points sont sous l'étoile). Plus elle a de points, plus elle est grande, produit vite et coûte cher à prendre. Elles apparaissent au fil des mondes.</li>
-          <li>Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux). Les types d'étoiles montent aussi jusqu'au niveau 3. Touche ton étoile : les icônes apparaissent autour d'elle.</li>
-          <li>En campagne, les améliorations se <b>débloquent petit à petit</b>, niveau après niveau.</li>
-          <li><b>Zoom</b> : pince l'écran ou utilise la molette, glisse dans le vide pour déplacer la carte.</li>
-          <li>Tu gagnes quand plus aucun ennemi n'a de système ni de flotte.</li>
-          <li>Les ennemis ont un caractère : <b>agressif</b> (il te vise en priorité et attaque vite), <b>prudent</b> (il se protège et prend d'abord les neutres) ou <b>équilibré</b>.</li>
+          <li data-i18n-html="r1"></li>
+          <li data-i18n-html="r2"></li>
+          <li data-i18n-html="r3"></li>
+          <li data-i18n-html="r4"></li>
+          <li data-i18n-html="r5"></li>
+          <li data-i18n-html="r6"></li>
+          <li data-i18n-html="r7"></li>
+          <li data-i18n-html="r8"></li>
+          <li data-i18n-html="r9"></li>
+          <li data-i18n-html="r10"></li>
+          <li data-i18n-html="r11"></li>
+          <li data-i18n-html="r12"></li>
+          <li data-i18n-html="r13"></li>
         </ul>
-        <button class="ghost" id="tutoAgain" style="margin-top:10px;width:100%">Revoir le tutoriel</button>
+        <button class="ghost" id="tutoAgain" data-i18n="tuto_again" style="margin-top:10px;width:100%">Revoir le tutoriel</button>
       </div>
     </div>
   </div>
 
   <div class="screen" id="worlds" hidden>
     <div class="card">
-      <div class="wh"><h1 class="logo" style="font-size:clamp(30px,8vw,44px)">CAMPAGNE</h1><button class="ghost" id="wBack" style="flex:0 0 auto;padding:8px 14px">Retour</button></div>
+      <div class="wh"><h1 class="logo" style="font-size:clamp(30px,8vw,44px)" data-i18n="camp_title">CAMPAGNE</h1><button class="ghost" id="wBack" data-i18n="back" style="flex:0 0 auto;padding:8px 14px">Retour</button></div>
       <div id="wList" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
   </div>
@@ -255,6 +257,243 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
 <script>
 (()=>{
 "use strict";
+// Textes du jeu en 5 langues ({0}, {1} = valeurs insérées)
+const I18N={
+fr:{
+map_aria:"Carte de la galaxie",speed_aria:"Vitesse du jeu",pause:"Pause",snd_title:"Couper ou remettre le son",menu:"Menu",tuto_skip:"Passer le tutoriel",
+ratio_aria:"Part de la flotte envoyée",send:"Envoi",fit:"Recentrer la carte",news_aria:"Nouveauté",news_h:"Nouveau",news_ok:"Compris",
+tag:"Relie les étoiles, fais tourner tes chantiers, et reprends chaque système à l’adversaire.",
+campaign:"Campagne",resume:"Reprendre",free:"Partie libre",map:"Carte",opponent:"Adversaire",diff_aria:"Difficulté",diff_facile:"Facile",diff_normal:"Normal",diff_difficile:"Difficile",start_free:"Lancer la partie libre",
+mun_h:"Munitions · envoi automatique",mun_t:"Après le premier envoi, envoyer par paquets de",qty_aria:"Vaisseaux par envoi",
+snd_h:"Son et vibration",sfx:"Bruitages",vib:"Vibration (mobile)",yes:"Oui",no:"Non",test_h:"Mode test",test_t:"Ouvrir tous les niveaux de la campagne",lang_h:"Langue",
+how_h:"Comment jouer",tuto_again:"Revoir le tutoriel",camp_title:"CAMPAGNE",back:"Retour",
+win:"Victoire",lose:"Défaite",replay:"Rejouer",next_lvl:"Niveau suivant",worlds_btn:"Mondes",
+r1:"Chaque étoile à toi <b>produit des vaisseaux</b> en continu. Les grosses produisent plus.",
+r2:"<b>Touche</b> ton étoile puis une cible : elle envoie ses vaisseaux une fois (25, 50 ou 100 %).",
+r3:"<b>Reste appuyé et glisse</b> vers une étoile : elle envoie d’abord tous ses vaisseaux, puis un paquet (3, 5 ou 10) dès qu’elle l’a produit. Glisse à nouveau vers la même cible pour arrêter.",
+r4:"Une attaque réussit si tu envoies <b>plus de vaisseaux que la défense</b>.",
+r5:"Plus tu gardes une étoile longtemps, plus un <b>mur</b> se construit autour d’elle : un segment toutes les 6 secondes, jusqu’à 5. Chaque segment arrête 1 vaisseau ennemi. Le mur repart de zéro si l’étoile est prise.",
+r6:"Dès 5 vaisseaux, transforme une étoile (coût 5) : <b>Rapide</b> produit et envoie 40 % plus vite, sans défense ; <b>Bouclier</b> produit 25 % de moins, mais son mur se construit 2 fois plus vite et monte jusqu’à 10 ; <b>Phare</b> produit 25 % de moins, mais les flottes qui partent de lui ou de tes étoiles voisines volent 25 % plus vite et frappent 25 % plus fort.",
+r7:"Chaque niveau de campagne rapporte <b>1 à 3 étoiles</b> : 1 pour la victoire, 2 sous le temps cible, 3 sous le temps record (temps de jeu, affiché en haut).",
+r8:"Trois catégories d’étoiles : <b>normale</b>, <b>2 points</b> et <b>3 points</b> (les points sont sous l’étoile). Plus elle a de points, plus elle est grande, produit vite et coûte cher à prendre.",
+r9:"Dépense des vaisseaux pour améliorer <b>Production</b> et <b>Défense</b> (3 niveaux). Les types d’étoiles montent aussi jusqu’au niveau 3. Touche ton étoile : les icônes apparaissent autour d’elle.",
+r10:"En campagne, les améliorations se <b>débloquent petit à petit</b>, niveau après niveau.",
+r11:"<b>Zoom</b> : pince l’écran ou utilise la molette, glisse dans le vide pour déplacer la carte.",
+r12:"Tu gagnes quand plus aucun ennemi n’a de système ni de flotte.",
+r13:"Les ennemis ont un caractère : <b>agressif</b> (il te vise en priorité), <b>prudent</b> (il se protège et prend d’abord les neutres) ou <b>équilibré</b>.",
+style_equilibre:"équilibré",style_agressif:"agressif",style_prudent:"prudent",kind_rapide:"Rapide",kind_bouclier:"Bouclier",kind_phare:"Phare",
+pick_target:"choisis la cible",stop_auto:"arrêter l’envoi auto",auto_hint:"auto · tout, puis par {0}",
+rb_prod:"Production",rb_def:"Défense",rb_rapide:"Étoile Rapide",rb_bouclier:"Étoile Bouclier",rb_phare:"Phare",rb_klv:"Monter le type d’étoile",rb_auto:"Envoi automatique",kind_level:"{0} niveau {1}",
+brand_world:"MONDE {0} · {1}",free_toast:"Partie libre · {0}",
+n_prod1_t:"Production",n_prod1_d:"Touche ton étoile : les icônes apparaissent autour. Celle-ci fait produire ton étoile plus vite.",n_prodv_t:"Production niveau {0}",n_prodv_d:"Ta production peut maintenant monter jusqu’au niveau {0}.",
+n_def1_t:"Défense",n_def1_d:"Tes vaisseaux défendent 40 % mieux à chaque niveau.",n_defv_t:"Défense niveau {0}",n_defv_d:"Ta défense peut maintenant monter jusqu’au niveau {0}.",
+n_rapide_t:"Étoile Rapide",n_rapide_d:"Dès 5 vaisseaux : produit et envoie 40 % plus vite, mais sans défense.",
+n_bouclier_t:"Étoile Bouclier",n_bouclier_d:"Son mur se construit 2 fois plus vite et monte jusqu’à 10.",
+n_phare_t:"Phare",n_phare_d:"Les flottes qui partent de lui et de tes étoiles voisines vont plus vite et frappent plus fort.",
+n_klv_t:"Types niveau {0}",n_klv_d:"Rapide, Bouclier et Phare peuvent monter jusqu’au niveau {0}.",
+n_t2_t:"Étoiles à 2 points",n_t2_d:"Plus grandes, elles produisent plus vite, mais il faut plus de vaisseaux pour les prendre.",
+n_t3_t:"Étoiles à 3 points",n_t3_d:"Les plus grandes : production encore plus rapide, défense encore plus forte.",
+n_zoom_t:"Zoom",n_zoom_d:"Pince l’écran ou utilise la molette. Glisse dans le vide pour déplacer la carte.",
+lvl_toast_1:"{0} · ennemi {1}",lvl_toast_n:"{0} · {1} ennemis : {2}",
+world_num:"Monde {0}",foes_1:"1 ennemi",foes_n:"{0} ennemis",lv_vs:"{0} contre {0}",lv_play:"à jouer",lv_locked:"verrouillé",lv_aria:"Monde {0}, niveau {1}",
+camp_done:"Tous les niveaux sont terminés",camp_next:"Prochain : monde {0}, niveau {1}",
+end_goals:"★★ en moins de {0} · ★★★ en moins de {1} (temps de jeu)",end_lvl:"Monde {0} · niveau {1}",end_stats:" · {0} de jeu · {1} systèmes pris aux ennemis",end_unlock:" · Monde {0} débloqué : {1}",end_all:" · Campagne terminée, bravo !",
+tuto_n:"Tutoriel · {0}/{1}",tuto1:"Ton étoile produit des vaisseaux. Touche-la.",tuto2:"Touche l’étoile grise pour l’attaquer.",tuto3:"Il faut plus de vaisseaux qu’elle pour la prendre.",
+tuto_bravo:"Bravo ! ",tuto_miss:"Raté, il en fallait plus. ",tuto4:"Glisse d’une étoile à une autre : envoi automatique.",tuto5:"Le mur autour de tes étoiles grandit avec le temps. Prends toutes les étoiles rouges pour gagner.",tuto_go:"C’est parti",your_turn:"À toi de jouer !",
+snd_off:"Couper le son",snd_on:"Remettre le son",
+w0n:"Ceinture d’Aldra",w0d:"Un seul adversaire, prudent. Le temps d’apprendre.",w1n:"Nébuleuse de Vesk",w1d:"Un adversaire plus vif, des cartes plus grandes.",
+w2n:"Triangle de Kael",w2d:"Deux ennemis en même temps. Ils se battent aussi entre eux.",w3n:"Couronne d’Ysor",w3d:"Trois ennemis. Survivre d’abord, conquérir ensuite.",
+map_vega_n:"Anneau de Véga",map_vega_d:"13 systèmes, un cœur géant disputé au milieu.",map_cygne_n:"Delta du Cygne",map_cygne_d:"15 systèmes en zigzag, des flancs exposés."
+},
+en:{
+map_aria:"Galaxy map",speed_aria:"Game speed",pause:"Pause",snd_title:"Mute or unmute",menu:"Menu",tuto_skip:"Skip tutorial",
+ratio_aria:"Share of the fleet sent",send:"Send",fit:"Recenter the map",news_aria:"New",news_h:"New",news_ok:"Got it",
+tag:"Link the stars, keep your shipyards busy, and take every system back from your rivals.",
+campaign:"Campaign",resume:"Resume",free:"Free play",map:"Map",opponent:"Opponent",diff_aria:"Difficulty",diff_facile:"Easy",diff_normal:"Normal",diff_difficile:"Hard",start_free:"Start free play",
+mun_h:"Ammo · auto-send",mun_t:"After the first send, send in packs of",qty_aria:"Ships per send",
+snd_h:"Sound and vibration",sfx:"Sound effects",vib:"Vibration (mobile)",yes:"Yes",no:"No",test_h:"Test mode",test_t:"Unlock every campaign level",lang_h:"Language",
+how_h:"How to play",tuto_again:"Replay the tutorial",camp_title:"CAMPAIGN",back:"Back",
+win:"Victory",lose:"Defeat",replay:"Play again",next_lvl:"Next level",worlds_btn:"Worlds",
+r1:"Each star you own <b>builds ships</b> nonstop. Bigger stars build more.",
+r2:"<b>Tap</b> your star, then a target: it sends its ships once (25, 50 or 100%).",
+r3:"<b>Press and drag</b> to a star: it first sends all its ships, then a pack (3, 5 or 10) as soon as it has built one. Drag to the same target again to stop.",
+r4:"An attack succeeds if you send <b>more ships than the defense</b>.",
+r5:"The longer you hold a star, the more a <b>wall</b> grows around it: one segment every 6 seconds, up to 5. Each segment stops 1 enemy ship. The wall resets if the star is taken.",
+r6:"From 5 ships, transform a star (cost 5): <b>Rapid</b> builds and sends 40% faster, with no defense; <b>Shield</b> builds 25% less, but its wall grows twice as fast, up to 10; <b>Beacon</b> builds 25% less, but fleets leaving it or your neighbouring stars fly 25% faster and hit 25% harder.",
+r7:"Each campaign level earns <b>1 to 3 stars</b>: 1 for winning, 2 under the target time, 3 under the record time (game time, shown at the top).",
+r8:"Three kinds of stars: <b>normal</b>, <b>2 dots</b> and <b>3 dots</b> (the dots are under the star). More dots means bigger, faster production and harder to capture.",
+r9:"Spend ships to upgrade <b>Production</b> and <b>Defense</b> (3 levels). Star types also go up to level 3. Tap your star: the icons appear around it.",
+r10:"In the campaign, upgrades <b>unlock little by little</b>, level after level.",
+r11:"<b>Zoom</b>: pinch the screen or use the mouse wheel, drag on empty space to move the map.",
+r12:"You win when no enemy has any system or fleet left.",
+r13:"Enemies have a personality: <b>aggressive</b> (targets you first), <b>cautious</b> (protects itself and takes neutrals first) or <b>balanced</b>.",
+style_equilibre:"balanced",style_agressif:"aggressive",style_prudent:"cautious",kind_rapide:"Rapid",kind_bouclier:"Shield",kind_phare:"Beacon",
+pick_target:"pick a target",stop_auto:"stop auto-send",auto_hint:"auto · all, then by {0}",
+rb_prod:"Production",rb_def:"Defense",rb_rapide:"Rapid star",rb_bouclier:"Shield star",rb_phare:"Beacon",rb_klv:"Level up the star type",rb_auto:"Auto-send",kind_level:"{0} level {1}",
+brand_world:"WORLD {0} · {1}",free_toast:"Free play · {0}",
+n_prod1_t:"Production",n_prod1_d:"Tap your star: the icons appear around it. This one makes your star build faster.",n_prodv_t:"Production level {0}",n_prodv_d:"Your production can now go up to level {0}.",
+n_def1_t:"Defense",n_def1_d:"Your ships defend 40% better at each level.",n_defv_t:"Defense level {0}",n_defv_d:"Your defense can now go up to level {0}.",
+n_rapide_t:"Rapid star",n_rapide_d:"From 5 ships: builds and sends 40% faster, but has no defense.",
+n_bouclier_t:"Shield star",n_bouclier_d:"Its wall grows twice as fast and goes up to 10.",
+n_phare_t:"Beacon",n_phare_d:"Fleets leaving it and your neighbouring stars fly faster and hit harder.",
+n_klv_t:"Types level {0}",n_klv_d:"Rapid, Shield and Beacon can now go up to level {0}.",
+n_t2_t:"2-dot stars",n_t2_d:"Bigger: they build faster, but you need more ships to capture them.",
+n_t3_t:"3-dot stars",n_t3_d:"The biggest: even faster production, even stronger defense.",
+n_zoom_t:"Zoom",n_zoom_d:"Pinch the screen or use the mouse wheel. Drag on empty space to move the map.",
+lvl_toast_1:"{0} · {1} enemy",lvl_toast_n:"{0} · {1} enemies: {2}",
+world_num:"World {0}",foes_1:"1 enemy",foes_n:"{0} enemies",lv_vs:"{0} vs {0}",lv_play:"to play",lv_locked:"locked",lv_aria:"World {0}, level {1}",
+camp_done:"All levels completed",camp_next:"Next: world {0}, level {1}",
+end_goals:"★★ under {0} · ★★★ under {1} (game time)",end_lvl:"World {0} · level {1}",end_stats:" · {0} played · {1} systems taken from enemies",end_unlock:" · World {0} unlocked: {1}",end_all:" · Campaign complete, well done!",
+tuto_n:"Tutorial · {0}/{1}",tuto1:"Your star builds ships. Tap it.",tuto2:"Tap the grey star to attack it.",tuto3:"You need more ships than it has to take it.",
+tuto_bravo:"Well done! ",tuto_miss:"Missed, you needed more. ",tuto4:"Drag from one star to another: auto-send.",tuto5:"The wall around your stars grows over time. Take all the red stars to win.",tuto_go:"Let’s go",your_turn:"Your turn!",
+snd_off:"Mute",snd_on:"Unmute",
+w0n:"Aldra Belt",w0d:"A single cautious opponent. Time to learn.",w1n:"Vesk Nebula",w1d:"A sharper opponent, bigger maps.",
+w2n:"Kael Triangle",w2d:"Two enemies at once. They also fight each other.",w3n:"Ysor Crown",w3d:"Three enemies. Survive first, conquer next.",
+map_vega_n:"Vega Ring",map_vega_d:"13 systems, a giant contested core in the middle.",map_cygne_n:"Cygnus Delta",map_cygne_d:"15 zigzag systems, exposed flanks."
+},
+es:{
+map_aria:"Mapa de la galaxia",speed_aria:"Velocidad del juego",pause:"Pausa",snd_title:"Silenciar o activar el sonido",menu:"Menú",tuto_skip:"Saltar el tutorial",
+ratio_aria:"Parte de la flota enviada",send:"Envío",fit:"Centrar el mapa",news_aria:"Novedad",news_h:"Nuevo",news_ok:"Entendido",
+tag:"Une las estrellas, mantén tus astilleros en marcha y recupera cada sistema del adversario.",
+campaign:"Campaña",resume:"Continuar",free:"Partida libre",map:"Mapa",opponent:"Adversario",diff_aria:"Dificultad",diff_facile:"Fácil",diff_normal:"Normal",diff_difficile:"Difícil",start_free:"Empezar partida libre",
+mun_h:"Munición · envío automático",mun_t:"Tras el primer envío, enviar en grupos de",qty_aria:"Naves por envío",
+snd_h:"Sonido y vibración",sfx:"Efectos de sonido",vib:"Vibración (móvil)",yes:"Sí",no:"No",test_h:"Modo prueba",test_t:"Abrir todos los niveles de la campaña",lang_h:"Idioma",
+how_h:"Cómo jugar",tuto_again:"Volver a ver el tutorial",camp_title:"CAMPAÑA",back:"Volver",
+win:"Victoria",lose:"Derrota",replay:"Jugar otra vez",next_lvl:"Siguiente nivel",worlds_btn:"Mundos",
+r1:"Cada estrella tuya <b>produce naves</b> sin parar. Las grandes producen más.",
+r2:"<b>Toca</b> tu estrella y luego un objetivo: envía sus naves una vez (25, 50 o 100 %).",
+r3:"<b>Mantén pulsado y arrastra</b> hasta una estrella: primero envía todas sus naves y luego un grupo (3, 5 o 10) en cuanto lo produce. Arrastra otra vez al mismo objetivo para parar.",
+r4:"Un ataque tiene éxito si envías <b>más naves que la defensa</b>.",
+r5:"Cuanto más tiempo conservas una estrella, más crece un <b>muro</b> a su alrededor: un segmento cada 6 segundos, hasta 5. Cada segmento detiene 1 nave enemiga. El muro vuelve a cero si la estrella es capturada.",
+r6:"Desde 5 naves, transforma una estrella (coste 5): <b>Rápida</b> produce y envía un 40 % más rápido, sin defensa; <b>Escudo</b> produce un 25 % menos, pero su muro crece el doble de rápido y llega a 10; <b>Faro</b> produce un 25 % menos, pero las flotas que salen de él o de tus estrellas vecinas vuelan un 25 % más rápido y golpean un 25 % más fuerte.",
+r7:"Cada nivel de la campaña da <b>de 1 a 3 estrellas</b>: 1 por ganar, 2 por debajo del tiempo objetivo, 3 por debajo del tiempo récord (tiempo de juego, arriba).",
+r8:"Tres tipos de estrellas: <b>normal</b>, <b>2 puntos</b> y <b>3 puntos</b> (los puntos están debajo). Cuantos más puntos, más grande, más produce y más cuesta capturarla.",
+r9:"Gasta naves para mejorar <b>Producción</b> y <b>Defensa</b> (3 niveles). Los tipos de estrella también suben hasta el nivel 3. Toca tu estrella: los iconos aparecen a su alrededor.",
+r10:"En la campaña, las mejoras se <b>desbloquean poco a poco</b>, nivel tras nivel.",
+r11:"<b>Zoom</b>: pellizca la pantalla o usa la rueda del ratón, arrastra en el vacío para mover el mapa.",
+r12:"Ganas cuando ningún enemigo tiene sistemas ni flotas.",
+r13:"Los enemigos tienen carácter: <b>agresivo</b> (te ataca primero), <b>prudente</b> (se protege y toma primero las neutrales) o <b>equilibrado</b>.",
+style_equilibre:"equilibrado",style_agressif:"agresivo",style_prudent:"prudente",kind_rapide:"Rápida",kind_bouclier:"Escudo",kind_phare:"Faro",
+pick_target:"elige el objetivo",stop_auto:"parar el envío auto",auto_hint:"auto · todo, luego de {0} en {0}",
+rb_prod:"Producción",rb_def:"Defensa",rb_rapide:"Estrella Rápida",rb_bouclier:"Estrella Escudo",rb_phare:"Faro",rb_klv:"Subir el tipo de estrella",rb_auto:"Envío automático",kind_level:"{0} nivel {1}",
+brand_world:"MUNDO {0} · {1}",free_toast:"Partida libre · {0}",
+n_prod1_t:"Producción",n_prod1_d:"Toca tu estrella: los iconos aparecen alrededor. Este hace que produzca más rápido.",n_prodv_t:"Producción nivel {0}",n_prodv_d:"Tu producción ya puede subir hasta el nivel {0}.",
+n_def1_t:"Defensa",n_def1_d:"Tus naves defienden un 40 % mejor en cada nivel.",n_defv_t:"Defensa nivel {0}",n_defv_d:"Tu defensa ya puede subir hasta el nivel {0}.",
+n_rapide_t:"Estrella Rápida",n_rapide_d:"Desde 5 naves: produce y envía un 40 % más rápido, pero sin defensa.",
+n_bouclier_t:"Estrella Escudo",n_bouclier_d:"Su muro crece el doble de rápido y llega hasta 10.",
+n_phare_t:"Faro",n_phare_d:"Las flotas que salen de él y de tus estrellas vecinas van más rápido y golpean más fuerte.",
+n_klv_t:"Tipos nivel {0}",n_klv_d:"Rápida, Escudo y Faro ya pueden subir hasta el nivel {0}.",
+n_t2_t:"Estrellas de 2 puntos",n_t2_d:"Más grandes: producen más rápido, pero hacen falta más naves para capturarlas.",
+n_t3_t:"Estrellas de 3 puntos",n_t3_d:"Las más grandes: producción aún más rápida, defensa aún más fuerte.",
+n_zoom_t:"Zoom",n_zoom_d:"Pellizca la pantalla o usa la rueda. Arrastra en el vacío para mover el mapa.",
+lvl_toast_1:"{0} · enemigo {1}",lvl_toast_n:"{0} · {1} enemigos: {2}",
+world_num:"Mundo {0}",foes_1:"1 enemigo",foes_n:"{0} enemigos",lv_vs:"{0} contra {0}",lv_play:"por jugar",lv_locked:"bloqueado",lv_aria:"Mundo {0}, nivel {1}",
+camp_done:"Todos los niveles completados",camp_next:"Siguiente: mundo {0}, nivel {1}",
+end_goals:"★★ en menos de {0} · ★★★ en menos de {1} (tiempo de juego)",end_lvl:"Mundo {0} · nivel {1}",end_stats:" · {0} de juego · {1} sistemas quitados al enemigo",end_unlock:" · Mundo {0} desbloqueado: {1}",end_all:" · ¡Campaña terminada, enhorabuena!",
+tuto_n:"Tutorial · {0}/{1}",tuto1:"Tu estrella produce naves. Tócala.",tuto2:"Toca la estrella gris para atacarla.",tuto3:"Necesitas más naves que ella para capturarla.",
+tuto_bravo:"¡Bien hecho! ",tuto_miss:"Fallaste, hacían falta más. ",tuto4:"Arrastra de una estrella a otra: envío automático.",tuto5:"El muro alrededor de tus estrellas crece con el tiempo. Captura todas las estrellas rojas para ganar.",tuto_go:"¡Vamos!",your_turn:"¡Te toca!",
+snd_off:"Silenciar",snd_on:"Activar el sonido",
+w0n:"Cinturón de Aldra",w0d:"Un solo adversario, prudente. Tiempo para aprender.",w1n:"Nebulosa de Vesk",w1d:"Un adversario más rápido, mapas más grandes.",
+w2n:"Triángulo de Kael",w2d:"Dos enemigos a la vez. También luchan entre ellos.",w3n:"Corona de Ysor",w3d:"Tres enemigos. Primero sobrevivir, luego conquistar.",
+map_vega_n:"Anillo de Vega",map_vega_d:"13 sistemas, un núcleo gigante disputado en el centro.",map_cygne_n:"Delta del Cisne",map_cygne_d:"15 sistemas en zigzag, flancos expuestos."
+},
+nl:{
+map_aria:"Kaart van de melkweg",speed_aria:"Spelsnelheid",pause:"Pauze",snd_title:"Geluid uit of aan",menu:"Menu",tuto_skip:"Tutorial overslaan",
+ratio_aria:"Deel van de vloot dat vertrekt",send:"Sturen",fit:"Kaart centreren",news_aria:"Nieuw",news_h:"Nieuw",news_ok:"Begrepen",
+tag:"Verbind de sterren, laat je werven draaien en herover elk systeem op je tegenstander.",
+campaign:"Campagne",resume:"Hervatten",free:"Vrij spel",map:"Kaart",opponent:"Tegenstander",diff_aria:"Moeilijkheid",diff_facile:"Makkelijk",diff_normal:"Normaal",diff_difficile:"Moeilijk",start_free:"Vrij spel starten",
+mun_h:"Munitie · automatisch sturen",mun_t:"Na de eerste zending, sturen in groepen van",qty_aria:"Schepen per zending",
+snd_h:"Geluid en trillen",sfx:"Geluidseffecten",vib:"Trillen (mobiel)",yes:"Ja",no:"Nee",test_h:"Testmodus",test_t:"Alle campagneniveaus openen",lang_h:"Taal",
+how_h:"Hoe speel je",tuto_again:"Tutorial opnieuw bekijken",camp_title:"CAMPAGNE",back:"Terug",
+win:"Overwinning",lose:"Nederlaag",replay:"Opnieuw spelen",next_lvl:"Volgend niveau",worlds_btn:"Werelden",
+r1:"Elke ster van jou <b>bouwt continu schepen</b>. Grote sterren bouwen meer.",
+r2:"<b>Tik</b> op je ster en dan op een doel: ze stuurt haar schepen één keer (25, 50 of 100%).",
+r3:"<b>Houd ingedrukt en sleep</b> naar een ster: eerst gaan alle schepen, daarna een groep (3, 5 of 10) zodra die klaar is. Sleep opnieuw naar hetzelfde doel om te stoppen.",
+r4:"Een aanval lukt als je <b>meer schepen stuurt dan de verdediging</b>.",
+r5:"Hoe langer je een ster houdt, hoe meer er een <b>muur</b> rond groeit: elke 6 seconden een stuk, tot 5. Elk stuk houdt 1 vijandelijk schip tegen. De muur begint opnieuw als de ster wordt veroverd.",
+r6:"Vanaf 5 schepen kun je een ster omvormen (kost 5): <b>Snel</b> bouwt en stuurt 40% sneller, zonder verdediging; <b>Schild</b> bouwt 25% minder, maar de muur groeit twee keer zo snel, tot 10; <b>Baken</b> bouwt 25% minder, maar vloten die van hem of je buursterren vertrekken vliegen 25% sneller en slaan 25% harder.",
+r7:"Elk campagneniveau levert <b>1 tot 3 sterren</b> op: 1 voor de overwinning, 2 onder de doeltijd, 3 onder de recordtijd (speltijd, bovenaan).",
+r8:"Drie soorten sterren: <b>normaal</b>, <b>2 stippen</b> en <b>3 stippen</b> (de stippen staan onder de ster). Meer stippen betekent groter, sneller bouwen en moeilijker te veroveren.",
+r9:"Gebruik schepen om <b>Productie</b> en <b>Verdediging</b> te verbeteren (3 niveaus). Stertypes gaan ook tot niveau 3. Tik op je ster: de iconen verschijnen eromheen.",
+r10:"In de campagne worden verbeteringen <b>stap voor stap ontgrendeld</b>, niveau na niveau.",
+r11:"<b>Zoom</b>: knijp in het scherm of gebruik het muiswiel, sleep in de leegte om de kaart te verplaatsen.",
+r12:"Je wint als geen enkele vijand nog een systeem of vloot heeft.",
+r13:"Vijanden hebben een karakter: <b>agressief</b> (valt jou eerst aan), <b>voorzichtig</b> (beschermt zich en neemt eerst neutrale sterren) of <b>evenwichtig</b>.",
+style_equilibre:"evenwichtig",style_agressif:"agressief",style_prudent:"voorzichtig",kind_rapide:"Snel",kind_bouclier:"Schild",kind_phare:"Baken",
+pick_target:"kies een doel",stop_auto:"automatisch sturen stoppen",auto_hint:"auto · alles, dan per {0}",
+rb_prod:"Productie",rb_def:"Verdediging",rb_rapide:"Snelle ster",rb_bouclier:"Schildster",rb_phare:"Baken",rb_klv:"Stertype verbeteren",rb_auto:"Automatisch sturen",kind_level:"{0} niveau {1}",
+brand_world:"WERELD {0} · {1}",free_toast:"Vrij spel · {0}",
+n_prod1_t:"Productie",n_prod1_d:"Tik op je ster: de iconen verschijnen eromheen. Dit icoon laat je ster sneller bouwen.",n_prodv_t:"Productie niveau {0}",n_prodv_d:"Je productie kan nu tot niveau {0}.",
+n_def1_t:"Verdediging",n_def1_d:"Je schepen verdedigen per niveau 40% beter.",n_defv_t:"Verdediging niveau {0}",n_defv_d:"Je verdediging kan nu tot niveau {0}.",
+n_rapide_t:"Snelle ster",n_rapide_d:"Vanaf 5 schepen: bouwt en stuurt 40% sneller, maar zonder verdediging.",
+n_bouclier_t:"Schildster",n_bouclier_d:"De muur groeit twee keer zo snel en gaat tot 10.",
+n_phare_t:"Baken",n_phare_d:"Vloten die van hem en je buursterren vertrekken gaan sneller en slaan harder.",
+n_klv_t:"Types niveau {0}",n_klv_d:"Snel, Schild en Baken kunnen nu tot niveau {0}.",
+n_t2_t:"Sterren met 2 stippen",n_t2_d:"Groter: ze bouwen sneller, maar je hebt meer schepen nodig om ze te veroveren.",
+n_t3_t:"Sterren met 3 stippen",n_t3_d:"De grootste: nog snellere productie, nog sterkere verdediging.",
+n_zoom_t:"Zoom",n_zoom_d:"Knijp in het scherm of gebruik het muiswiel. Sleep in de leegte om de kaart te verplaatsen.",
+lvl_toast_1:"{0} · {1} vijand",lvl_toast_n:"{0} · {1} vijanden: {2}",
+world_num:"Wereld {0}",foes_1:"1 vijand",foes_n:"{0} vijanden",lv_vs:"{0} tegen {0}",lv_play:"te spelen",lv_locked:"vergrendeld",lv_aria:"Wereld {0}, niveau {1}",
+camp_done:"Alle niveaus voltooid",camp_next:"Volgende: wereld {0}, niveau {1}",
+end_goals:"★★ onder {0} · ★★★ onder {1} (speltijd)",end_lvl:"Wereld {0} · niveau {1}",end_stats:" · {0} gespeeld · {1} systemen op de vijand veroverd",end_unlock:" · Wereld {0} ontgrendeld: {1}",end_all:" · Campagne voltooid, goed gedaan!",
+tuto_n:"Tutorial · {0}/{1}",tuto1:"Je ster bouwt schepen. Tik erop.",tuto2:"Tik op de grijze ster om aan te vallen.",tuto3:"Je hebt meer schepen nodig dan zij om haar te veroveren.",
+tuto_bravo:"Goed zo! ",tuto_miss:"Mis, je had er meer nodig. ",tuto4:"Sleep van de ene ster naar de andere: automatisch sturen.",tuto5:"De muur rond je sterren groeit met de tijd. Verover alle rode sterren om te winnen.",tuto_go:"Daar gaan we",your_turn:"Jouw beurt!",
+snd_off:"Geluid uit",snd_on:"Geluid aan",
+w0n:"Gordel van Aldra",w0d:"Eén voorzichtige tegenstander. Tijd om te leren.",w1n:"Nevel van Vesk",w1d:"Een snellere tegenstander, grotere kaarten.",
+w2n:"Driehoek van Kael",w2d:"Twee vijanden tegelijk. Ze vechten ook onderling.",w3n:"Kroon van Ysor",w3d:"Drie vijanden. Eerst overleven, dan veroveren.",
+map_vega_n:"Ring van Vega",map_vega_d:"13 systemen, een reusachtig betwist hart in het midden.",map_cygne_n:"Delta van de Zwaan",map_cygne_d:"15 systemen in zigzag, open flanken."
+},
+ar:{
+map_aria:"خريطة المجرة",speed_aria:"سرعة اللعبة",pause:"إيقاف مؤقت",snd_title:"كتم الصوت أو تشغيله",menu:"القائمة",tuto_skip:"تخطي الدرس",
+ratio_aria:"نسبة الأسطول المرسل",send:"إرسال",fit:"توسيط الخريطة",news_aria:"جديد",news_h:"جديد",news_ok:"فهمت",
+tag:"اربط النجوم، وشغّل أحواض سفنك، واستعد كل نظام من خصمك.",
+campaign:"الحملة",resume:"متابعة",free:"لعب حر",map:"الخريطة",opponent:"الخصم",diff_aria:"الصعوبة",diff_facile:"سهل",diff_normal:"عادي",diff_difficile:"صعب",start_free:"ابدأ اللعب الحر",
+mun_h:"الذخيرة · الإرسال التلقائي",mun_t:"بعد الإرسال الأول، أرسل على دفعات من",qty_aria:"عدد السفن في كل إرسال",
+snd_h:"الصوت والاهتزاز",sfx:"المؤثرات الصوتية",vib:"الاهتزاز (الهاتف)",yes:"نعم",no:"لا",test_h:"وضع التجربة",test_t:"فتح كل مستويات الحملة",lang_h:"اللغة",
+how_h:"طريقة اللعب",tuto_again:"إعادة الدرس",camp_title:"الحملة",back:"رجوع",
+win:"انتصار",lose:"هزيمة",replay:"العب مجددًا",next_lvl:"المستوى التالي",worlds_btn:"العوالم",
+r1:"كل نجم تملكه <b>ينتج سفنًا</b> باستمرار. النجوم الكبيرة تنتج أكثر.",
+r2:"<b>المس</b> نجمك ثم هدفًا: يرسل سفنه مرة واحدة (25 أو 50 أو 100٪).",
+r3:"<b>اضغط مطولًا واسحب</b> نحو نجم: يرسل أولًا كل سفنه، ثم دفعة (3 أو 5 أو 10) كلما أنتجها. اسحب مجددًا نحو الهدف نفسه للإيقاف.",
+r4:"ينجح الهجوم إذا أرسلت <b>سفنًا أكثر من الدفاع</b>.",
+r5:"كلما احتفظت بنجم مدة أطول، يُبنى حوله <b>سور</b>: قطعة كل 6 ثوانٍ، حتى 5. كل قطعة توقف سفينة معادية واحدة. يعود السور إلى الصفر إذا سقط النجم.",
+r6:"ابتداءً من 5 سفن، حوّل نجمًا (التكلفة 5): <b>السريع</b> ينتج ويرسل أسرع بـ40٪ بلا دفاع؛ <b>الدرع</b> ينتج أقل بـ25٪ لكن سوره يُبنى أسرع بمرتين ويصل إلى 10؛ <b>المنارة</b> تنتج أقل بـ25٪ لكن الأساطيل الخارجة منها أو من نجومك المجاورة تطير أسرع بـ25٪ وتضرب أقوى بـ25٪.",
+r7:"كل مستوى في الحملة يمنح <b>من 1 إلى 3 نجوم</b>: 1 للفوز، 2 تحت الوقت المستهدف، 3 تحت الوقت القياسي (وقت اللعب، في الأعلى).",
+r8:"ثلاثة أنواع من النجوم: <b>عادي</b> و<b>نقطتان</b> و<b>ثلاث نقاط</b> (النقاط تحت النجم). كلما زادت النقاط، كان النجم أكبر وأسرع إنتاجًا وأصعب احتلالًا.",
+r9:"أنفق السفن لتحسين <b>الإنتاج</b> و<b>الدفاع</b> (3 مستويات). أنواع النجوم تصل أيضًا إلى المستوى 3. المس نجمك: تظهر الأيقونات حوله.",
+r10:"في الحملة، تُفتح التحسينات <b>شيئًا فشيئًا</b>، مستوى بعد مستوى.",
+r11:"<b>التكبير</b>: باعد بإصبعين على الشاشة أو استعمل عجلة الفأرة، واسحب في الفراغ لتحريك الخريطة.",
+r12:"تفوز عندما لا يبقى لأي عدو نظام أو أسطول.",
+r13:"للأعداء طباع: <b>عدواني</b> (يستهدفك أولًا)، <b>حذر</b> (يحمي نفسه ويأخذ النجوم المحايدة أولًا) أو <b>متوازن</b>.",
+style_equilibre:"متوازن",style_agressif:"عدواني",style_prudent:"حذر",kind_rapide:"سريع",kind_bouclier:"درع",kind_phare:"منارة",
+pick_target:"اختر الهدف",stop_auto:"إيقاف الإرسال التلقائي",auto_hint:"تلقائي · الكل، ثم {0} في كل مرة",
+rb_prod:"الإنتاج",rb_def:"الدفاع",rb_rapide:"نجم سريع",rb_bouclier:"نجم الدرع",rb_phare:"منارة",rb_klv:"ترقية نوع النجم",rb_auto:"إرسال تلقائي",kind_level:"{0} المستوى {1}",
+brand_world:"العالم {0} · {1}",free_toast:"لعب حر · {0}",
+n_prod1_t:"الإنتاج",n_prod1_d:"المس نجمك: تظهر الأيقونات حوله. هذه تجعل نجمك ينتج أسرع.",n_prodv_t:"الإنتاج المستوى {0}",n_prodv_d:"يمكن لإنتاجك الآن أن يصل إلى المستوى {0}.",
+n_def1_t:"الدفاع",n_def1_d:"سفنك تدافع أفضل بـ40٪ في كل مستوى.",n_defv_t:"الدفاع المستوى {0}",n_defv_d:"يمكن لدفاعك الآن أن يصل إلى المستوى {0}.",
+n_rapide_t:"نجم سريع",n_rapide_d:"ابتداءً من 5 سفن: ينتج ويرسل أسرع بـ40٪، لكن بلا دفاع.",
+n_bouclier_t:"نجم الدرع",n_bouclier_d:"سوره يُبنى أسرع بمرتين ويصل إلى 10.",
+n_phare_t:"منارة",n_phare_d:"الأساطيل الخارجة منها ومن نجومك المجاورة أسرع وأقوى.",
+n_klv_t:"الأنواع المستوى {0}",n_klv_d:"يمكن للسريع والدرع والمنارة الآن الوصول إلى المستوى {0}.",
+n_t2_t:"نجوم بنقطتين",n_t2_d:"أكبر: تنتج أسرع، لكن تحتاج سفنًا أكثر لاحتلالها.",
+n_t3_t:"نجوم بثلاث نقاط",n_t3_d:"الأكبر: إنتاج أسرع ودفاع أقوى.",
+n_zoom_t:"التكبير",n_zoom_d:"باعد بإصبعين أو استعمل عجلة الفأرة. اسحب في الفراغ لتحريك الخريطة.",
+lvl_toast_1:"{0} · عدو {1}",lvl_toast_n:"{0} · {1} أعداء: {2}",
+world_num:"العالم {0}",foes_1:"عدو واحد",foes_n:"{0} أعداء",lv_vs:"{0} ضد {0}",lv_play:"للعب",lv_locked:"مقفل",lv_aria:"العالم {0}، المستوى {1}",
+camp_done:"اكتملت كل المستويات",camp_next:"التالي: العالم {0}، المستوى {1}",
+end_goals:"★★ في أقل من {0} · ★★★ في أقل من {1} (وقت اللعب)",end_lvl:"العالم {0} · المستوى {1}",end_stats:" · {0} من اللعب · {1} أنظمة أُخذت من الأعداء",end_unlock:" · فُتح العالم {0}: {1}",end_all:" · اكتملت الحملة، أحسنت!",
+tuto_n:"الدرس · {0}/{1}",tuto1:"نجمك ينتج سفنًا. المسه.",tuto2:"المس النجم الرمادي لتهاجمه.",tuto3:"تحتاج سفنًا أكثر منه لتحتله.",
+tuto_bravo:"أحسنت! ",tuto_miss:"فاتتك، كنت تحتاج أكثر. ",tuto4:"اسحب من نجم إلى آخر: إرسال تلقائي.",tuto5:"السور حول نجومك يكبر مع الوقت. احتل كل النجوم الحمراء لتفوز.",tuto_go:"هيا بنا",your_turn:"دورك الآن!",
+snd_off:"كتم الصوت",snd_on:"تشغيل الصوت",
+w0n:"حزام ألدرا",w0d:"خصم واحد حذر. وقت للتعلم.",w1n:"سديم فيسك",w1d:"خصم أسرع، وخرائط أكبر.",
+w2n:"مثلث كايل",w2d:"عدوّان في الوقت نفسه. يتقاتلان أيضًا فيما بينهما.",w3n:"تاج يسور",w3d:"ثلاثة أعداء. انجُ أولًا، ثم انتصر.",
+map_vega_n:"حلقة فيغا",map_vega_d:"13 نظامًا، وقلب عملاق متنازع عليه في الوسط.",map_cygne_n:"دلتا الدجاجة",map_cygne_d:"15 نظامًا متعرجًا، وأجنحة مكشوفة."
+}};
+const LANGS=["fr","en","es","nl","ar"];
+let lang=(()=>{try{const v=JSON.parse(localStorage.getItem("constella-lang")||"null");if(LANGS.includes(v))return v;}catch(e){}
+  const n=((navigator.languages&&navigator.languages[0])||navigator.language||"fr").slice(0,2).toLowerCase();return LANGS.includes(n)?n:"en";})();
+const t=(k,...a)=>{let s=(I18N[lang]&&I18N[lang][k]!=null)?I18N[lang][k]:(I18N.fr[k]!=null?I18N.fr[k]:k);a.forEach((v,i)=>{s=s.split("{"+i+"}").join(v);});return s;};
+
 const C={me:"#3ee07a",foe:"#ff5a3c",foe2:"#b18cff",foe3:"#ff5fa2",neu:"#a29fc2",gold:"#f2c14e",shield:"#bfe6ff",edge:"#2a2e5a",ink:"#ecebf7",void:"#0a0c1b"};
 const OWN_COL=[C.neu,C.me,C.foe,C.foe2,C.foe3];
 const W0=1600,H0=900,FLEET_SPEED=95,SPECIAL_COST=5,WALL_MAX=5,WALL_TIME=6; // mur : +1 toutes les 6 s de possession, jusqu'à 5
@@ -282,7 +521,7 @@ const STYLE={
   agressif:{aggr:1.12,safety:.5,hunt:1.7,neutral:.85,shield:.5,margin:.8},
   prudent:{aggr:.85,safety:1.7,hunt:.8,neutral:1.4,shield:2,margin:1.4}
 };
-const STYLE_NAME={equilibre:"équilibré",agressif:"agressif",prudent:"prudent"};
+const STYLE_NAME=new Proxy({},{get:(o,k)=>t("style_"+String(k))});
 
 // Campagne : 4 mondes, de plus en plus durs. k = nombre de joueurs (toi + ennemis), n = étoiles par secteur
 const WORLDS=[
@@ -420,7 +659,7 @@ const rate=n=>SIZE_RATE[n.size]*(1+0.4*n.prod)*(isAI(n.owner)?G.cfg.bonus:1)*(n.
 const cap=n=>30+n.size*25+n.prod*20;
 const defMult=n=>n.kind==="rapide"?1:1+0.4*n.def;
 const wallMax=n=>n.kind==="bouclier"?BOU_MAX[KL(n)]:WALL_MAX, wallTime=n=>n.kind==="bouclier"?BOU_T[KL(n)]:WALL_TIME;
-const KIND_NAME={rapide:"Rapide",bouclier:"Bouclier",phare:"Phare"};
+const KIND_NAME=new Proxy({rapide:1,bouclier:1,phare:1},{get:(o,k)=>o[k]?t("kind_"+String(k)):undefined});
 const boostOf=n=>{let b=n.kind==="phare"?PHA[KL(n)]:1;for(const e of G.adj[n.id]){const o=G.nodes[e.to];if(o.owner===n.owner&&o.kind==="phare")b=Math.max(b,PHA[KL(o)]);}return b;};
 const boosted=n=>boostOf(n)>1;
 const prodCost=n=>5+10*n.prod, defCost=n=>5+10*n.def;
@@ -708,7 +947,7 @@ function resetView(){VZ=1;VX=0;VY=0;}
 function clampView(){if(VZ<=1.001){resetView();return;}
   const cx=vw/2,cy=vh/2;VX=Math.max(cx-mapBox.x1*VZ,Math.min(cx-mapBox.x0*VZ,VX));VY=Math.max(cy-mapBox.y1*VZ,Math.min(cy-mapBox.y0*VZ,VY));}
 function zoomAt(fx,fy,nz){nz=Math.max(1,Math.min(3.5,nz));const bx=(fx-VX)/VZ,by=(fy-VY)/VZ;VZ=nz;VX=fx-bx*nz;VY=fy-by*nz;clampView();}
-const font=(px,w=700)=>`${w} ${px}px "Chakra Petch",ui-sans-serif,system-ui,sans-serif`;
+const font=(px,w=700)=>`${w} ${px}px "Chakra Petch","Noto Sans Arabic",ui-sans-serif,system-ui,sans-serif`;
 
 let drag=null;
 function draw(){
@@ -761,7 +1000,7 @@ function draw(){
   }
   if(G.sel!==null){const n=nodes[G.sel];const k=1+Math.sin(performance.now()/220)*.08;
     ctx.strokeStyle=C.ink;ctx.lineWidth=2;ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(n.sx,n.sy,(n.r+18)*k,0,7);ctx.stroke();ctx.setLineDash([]);
-    if(G.relayMode){ctx.fillStyle=C.gold;ctx.font=font(12,600);ctx.fillText("choisis la cible",n.sx,n.sy-n.r-24);}}
+    if(G.relayMode){ctx.fillStyle=C.gold;ctx.font=font(12,600);ctx.fillText(t("pick_target"),n.sx,n.sy-n.r-24);}}
   for(const f of G.fleets){const A=nodes[f.path[f.seg]],B=nodes[f.path[f.seg+1]],col=OWN_COL[f.owner];
     const x=A.sx+(B.sx-A.sx)*f.t,y=A.sy+(B.sy-A.sy)*f.t,dx=(B.sx-A.sx),dy=(B.sy-A.sy),L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L;
     const cnt=Math.min(9,Math.max(2,Math.ceil(Math.log2(f.ships+1)*1.6))),gap=f.spd>1?8:6.5,done=f.t*L;
@@ -796,7 +1035,7 @@ function draw(){
     ctx.strokeStyle=C.gold;ctx.lineWidth=2.5;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(n.sx,n.sy);
     if(over!==null&&over!==drag.from){const p=path(drag.from,over,1)||[];p.slice(1).forEach(i=>ctx.lineTo(nodes[i].sx,nodes[i].sy));}else ctx.lineTo(drag.x,drag.y);
     ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=C.gold;ctx.font=font(13,700);ctx.textAlign="center";ctx.fillText((n.rally===over&&over!==null)?"arrêter l'envoi auto":`auto · tout, puis par ${autoQty}`,drag.x,drag.y-24);}
+    ctx.fillStyle=C.gold;ctx.font=font(13,700);ctx.textAlign="center";ctx.fillText((n.rally===over&&over!==null)?t("stop_auto"):t("auto_hint",autoQty),drag.x,drag.y-24);}
 }
 
 // Saisie
@@ -842,10 +1081,10 @@ const ICON={prod:'<path d="M5 19v-6M12 19V9M19 19V5"/>',def:'<path d="M5 20V8h3v
   t3:'<circle cx="12" cy="10" r="6.5"/><circle cx="6.5" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="20" r="1.4" fill="currentColor" stroke="none"/>',
   zoom:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M10.5 8v5M8 10.5h5"/>'};
 const svgI=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
-const RB_LABEL={prod:"Production",def:"Défense",rapide:"Étoile Rapide",bouclier:"Étoile Bouclier",phare:"Phare",klv:"Monter le type d'étoile",auto:"Envoi automatique"};
+const RB_LABEL={prod:1,def:1,rapide:1,bouclier:1,phare:1,klv:1,auto:1};
 const RB={};
 Object.keys(RB_LABEL).forEach(k=>{const b=document.createElement("button");b.className="rb k-"+k;b.innerHTML=svgI(k)+'<i class="c"></i><i class="lv" hidden></i>';
-  b.title=RB_LABEL[k];b.setAttribute("aria-label",RB_LABEL[k]);b.hidden=true;
+  b.dataset.i18nAria="rb_"+k;b.title=t("rb_"+k);b.setAttribute("aria-label",t("rb_"+k));b.hidden=true;
   b.addEventListener("pointerdown",e=>e.stopPropagation());
   b.onclick=()=>{const n=G&&G.sel!==null?G.nodes[G.sel]:null;if(!n)return;
     if(k==="auto"){if(n.rally!==null||G.relayMode){n.rally=null;G.relayMode=false;}else G.relayMode=true;}else upgrade(n,k);refreshPanel();};
@@ -859,7 +1098,7 @@ function refreshPanel(){
   set("def",u.def>0&&n.kind!=="rapide",n.def<u.def?defCost(n):null,n.def<u.def&&n.ships>=defCost(n),n.def);
   for(const k of["rapide","bouclier","phare"])set(k,!n.kind&&!!u[k],SPECIAL_COST,n.ships>=SPECIAL_COST,0);
   set("klv",!!n.kind&&u.klv>1,KL(n)<u.klv?klvCost(n):null,KL(n)<u.klv&&n.ships>=klvCost(n),n.kind?KL(n):0);
-  RB.klv.className="rb k-klv"+(n.kind?" kk-"+n.kind:"");RB.klv.title=n.kind?KIND_NAME[n.kind]+" niveau "+KL(n):"";
+  RB.klv.className="rb k-klv"+(n.kind?" kk-"+n.kind:"");RB.klv.title=n.kind?t("kind_level",KIND_NAME[n.kind],KL(n)):"";
   set("auto",true,null,true,0);RB.auto.setAttribute("aria-pressed",String(n.rally!==null||G.relayMode));
 }
 function placeRing(){
@@ -897,26 +1136,21 @@ function toast(title,text){const el=$("toast");el.innerHTML="";if(title){const b
 // Menu, mondes, fin de partie
 const mapsEl=$("maps");
 Object.entries(MAPS).forEach(([k,m])=>{const b=document.createElement("button");b.className="map";b.setAttribute("aria-pressed",String(k===mapKey));
-  b.innerHTML=`<b>${m.name}</b><small>${m.desc}</small>`;b.onclick=()=>{mapKey=k;mapsEl.querySelectorAll(".map").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");};mapsEl.appendChild(b);});
+  b.dataset.map=k;b.innerHTML=`<b></b><small></small>`;b.onclick=()=>{mapKey=k;mapsEl.querySelectorAll(".map").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");};mapsEl.appendChild(b);});
 let menuOpen=true;
 const show=id=>["menu","worlds","end"].forEach(s=>$(s).hidden=s!==id);
 function begin(g){if(String(curBg())!==String(bgKey))setTimeout(resize,0);if(tuto)tutoEnd(true);$("news").hidden=true;newsOpen=false;resetView();G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
-  $("brand").textContent=cur?`MONDE ${cur.wi+1} · ${cur.li+1}`:"CONSTELLA";}
-function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast(null,"Partie libre · "+MAPS[mapKey].name);}
+  $("brand").textContent=cur?t("brand_world",cur.wi+1,cur.li+1):"CONSTELLA";}
+function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast(null,t("free_toast",t("map_"+mapKey+"_n")));}
 // Déblocage progressif : chaque entrée devient disponible à partir du niveau n° i de la campagne (0 = monde 1 niveau 1)
 const UNL=[{i:2,k:"prod",v:1},{i:3,k:"rapide",v:1},{i:3,k:"prod",v:2},{i:4,k:"def",v:1},{i:5,k:"bouclier",v:1},{i:5,k:"zoom",v:1},{i:5,k:"t2",v:1},{i:10,k:"t3",v:1},
   {i:6,k:"def",v:2},{i:7,k:"phare",v:1},{i:8,k:"klv",v:2},{i:9,k:"prod",v:3},{i:10,k:"def",v:3},{i:12,k:"klv",v:3}];
 function unlockAt(idx){const u={prod:0,def:0,rapide:0,bouclier:0,phare:0,klv:1};UNL.forEach(x=>{if(x.i<=idx&&x.k in u)u[x.k]=Math.max(u[x.k],x.v);});return u;}
 const NEWS={
-  prod:v=>v===1?["Production","Touche ton étoile : les icônes apparaissent autour. Celle-ci fait produire ton étoile plus vite."]:["Production niveau "+v,"Ta production peut maintenant monter jusqu'au niveau "+v+"."],
-  def:v=>v===1?["Défense","Tes vaisseaux défendent 40 % mieux à chaque niveau."]:["Défense niveau "+v,"Ta défense peut maintenant monter jusqu'au niveau "+v+"."],
-  rapide:()=>["Étoile Rapide","Dès 5 vaisseaux : produit et envoie 40 % plus vite, mais sans défense."],
-  bouclier:()=>["Étoile Bouclier","Son mur se construit 2 fois plus vite et monte jusqu'à 10."],
-  phare:()=>["Phare","Les flottes qui partent de lui et de tes étoiles voisines vont plus vite et frappent plus fort."],
-  klv:v=>["Types niveau "+v,"Rapide, Bouclier et Phare peuvent monter jusqu'au niveau "+v+"."],
-  t2:()=>["Étoiles à 2 points","Plus grandes, elles produisent plus vite, mais il faut plus de vaisseaux pour les prendre."],
-  t3:()=>["Étoiles à 3 points","Les plus grandes : production encore plus rapide, défense encore plus forte."],
-  zoom:()=>["Zoom","Pince l'écran ou utilise la molette. Glisse dans le vide pour déplacer la carte."]
+  prod:v=>v===1?[t("n_prod1_t"),t("n_prod1_d")]:[t("n_prodv_t",v),t("n_prodv_d",v)],
+  def:v=>v===1?[t("n_def1_t"),t("n_def1_d")]:[t("n_defv_t",v),t("n_defv_d",v)],
+  rapide:()=>[t("n_rapide_t"),t("n_rapide_d")],bouclier:()=>[t("n_bouclier_t"),t("n_bouclier_d")],phare:()=>[t("n_phare_t"),t("n_phare_d")],
+  klv:v=>[t("n_klv_t",v),t("n_klv_d",v)],t2:()=>[t("n_t2_t"),t("n_t2_d")],t3:()=>[t("n_t3_t"),t("n_t3_d")],zoom:()=>[t("n_zoom_t"),t("n_zoom_d")]
 };
 let newsOpen=false;
 function showNews(idx){
@@ -933,7 +1167,7 @@ function startLevel(wi,li,forceTuto){cur={wi,li};const L=WORLDS[wi].levels[li];b
   const idx=FLAT.findIndex(f=>f.wi===wi&&f.li===li);G.unlock=unlockAt(idx);
   if(wi===0&&li===0&&(forceTuto||!store.get("constella-tuto",false))){tutoStart();return;}
   const foes=L.k-1,chars=Object.values(G.style).map(x=>STYLE_NAME[x]);
-  toast(null,`${wi+1}-${li+1} · `+(foes===1?"ennemi "+chars[0]:foes+" ennemis : "+chars.join(", ")));
+  toast(null,foes===1?t("lvl_toast_1",`${wi+1}-${li+1}`,chars[0]):t("lvl_toast_n",`${wi+1}-${li+1}`,foes,chars.join(", ")));
   if(!isDone(wi,li))showNews(idx);}
 function nextIndex(){for(let i=0;i<FLAT.length;i++)if(!isDone(FLAT[i].wi,FLAT[i].li))return i;return -1;}
 function fmtT(s){const m=Math.floor(s/60);return m+":"+String(Math.floor(s%60)).padStart(2,"0");}
@@ -942,23 +1176,23 @@ function renderWorlds(){
   WORLDS.forEach((w,wi)=>{
     const sec=document.createElement("section");sec.className="world";const firstIdx=idx;
     const foes=w.levels[0].k-1;
-    sec.innerHTML=`<div class="wh"><div><span class="num">Monde ${wi+1}</span><b></b></div><span class="foes"></span></div><p></p><div class="lv"></div>`;
-    sec.querySelector("b").textContent=w.name;sec.querySelector("p").textContent=w.desc;
+    sec.innerHTML=`<div class="wh"><div><span class="num">${t("world_num",wi+1)}</span><b></b></div><span class="foes"></span></div><p></p><div class="lv"></div>`;
+    sec.querySelector("b").textContent=t("w"+wi+"n");sec.querySelector("p").textContent=t("w"+wi+"d");
     const fs=sec.querySelector(".foes");for(let o=2;o<=foes+1;o++){const i=document.createElement("i");i.style.background=OWN_COL[o];fs.appendChild(i);}
     let ws=0;w.levels.forEach((L,li)=>{const r=rec(wi,li);if(r)ws+=r.s;});
-    fs.appendChild(document.createTextNode((foes===1?"1 ennemi":foes+" ennemis")+` · ${ws}/${w.levels.length*3} ★`));
+    fs.appendChild(document.createTextNode((foes===1?t("foes_1"):t("foes_n",foes))+` · ${ws}/${w.levels.length*3} ★`));
     const lv=sec.querySelector(".lv");
     w.levels.forEach((L,li)=>{const b=document.createElement("button"),i=idx++,open=isOpen(i),done=isDone(wi,li);
       const r=rec(wi,li);b.innerHTML=`<b>${li+1}</b><span class="st"></span><small></small>`;
       b.querySelector(".st").textContent=done?starStr(r.s):"";
-      b.querySelector("small").textContent=done?fmtT(r.t):open?(L.start>1?L.start+" contre "+L.start:"à jouer"):"verrouillé";
+      b.querySelector("small").textContent=done?fmtT(r.t):open?(L.start>1?t("lv_vs",L.start):t("lv_play")):t("lv_locked");
       if(done)b.classList.add("done");if(i===nx)b.classList.add("next");
-      b.disabled=!open;b.setAttribute("aria-label",`Monde ${wi+1}, niveau ${li+1}`);
+      b.disabled=!open;b.setAttribute("aria-label",t("lv_aria",wi+1,li+1));
       b.onclick=()=>startLevel(wi,li);lv.appendChild(b);});
     if(!isOpen(firstIdx))sec.classList.add("locked");
     list.appendChild(sec);});
 }
-function campLabel(){const nx=nextIndex();$("campNext").textContent=(nx<0?"Tous les niveaux sont terminés":`Prochain : monde ${FLAT[nx].wi+1}, niveau ${FLAT[nx].li+1}`)+` · ${totalStars()}/${FLAT.length*3} ★`;}
+function campLabel(){const nx=nextIndex();$("campNext").textContent=(nx<0?t("camp_done"):t("camp_next",FLAT[nx].wi+1,FLAT[nx].li+1))+` · ${totalStars()}/${FLAT.length*3} ★`;}
 $("campaign").onclick=()=>{renderWorlds();show("worlds");};
 $("wBack").onclick=()=>{campLabel();show("menu");};
 $("start").onclick=startFree;
@@ -966,41 +1200,41 @@ $("menuBtn").onclick=openMenu;
 $("resume").onclick=()=>{show(null);menuOpen=false;refreshPanel();};
 function openMenu(){menuOpen=true;campLabel();show("menu");$("resume").hidden=!(G&&!G.over&&!G.demo);}
 function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;refreshPanel();
-  const t=fmtT(playTime(G));let next=null;if(tuto)tutoEnd(true);sfx(win?"win":"lose");buzz(win?[30,40,30,40,90]:[220]);
+  const tm=fmtT(playTime(G));let next=null;if(tuto)tutoEnd(true);sfx(win?"win":"lose");buzz(win?[30,40,30,40,90]:[220]);
   let got=0;
   if(cur&&win){const k=lkey(cur.wi,cur.li),old=progress.done[k],tt=Math.round(playTime(G));got=starsFor(G,tt);
     progress.done[k]=old?{t:Math.min(old.t,tt),s:Math.max(old.s,got)}:{t:tt,s:got};store.set("constella-progress",progress);
     const i=FLAT.findIndex(f=>f.wi===cur.wi&&f.li===cur.li);next=FLAT[i+1]||null;}
   $("endStars").hidden=!(cur&&win);$("endStars").textContent=starStr(got);
-  $("endGoals").hidden=!cur;if(cur)$("endGoals").textContent=`★★ en moins de ${fmtT(parTime(G))} · ★★★ en moins de ${fmtT(recordTime(G))} (temps de jeu)`;
-  $("endTitle").textContent=win?"Victoire":"Défaite";$("endTitle").style.color=win?C.me:C.foe;
-  $("endStats").textContent=(cur?`Monde ${cur.wi+1} · niveau ${cur.li+1}`:`${MAPS[mapKey].name} · ${diffKey}`)+` · ${t} de jeu · ${G.captured} systèmes pris aux ennemis`+
-    (cur&&win&&next&&next.wi!==cur.wi?` · Monde ${next.wi+1} débloqué : ${WORLDS[next.wi].name}`:"")+(cur&&win&&!next?" · Campagne terminée, bravo !":"");
+  $("endGoals").hidden=!cur;if(cur)$("endGoals").textContent=t("end_goals",fmtT(parTime(G)),fmtT(recordTime(G)));
+  $("endTitle").textContent=win?t("win"):t("lose");$("endTitle").style.color=win?C.me:C.foe;
+  $("endStats").textContent=(cur?t("end_lvl",cur.wi+1,cur.li+1):`${t("map_"+mapKey+"_n")} · ${t("diff_"+diffKey)}`)+t("end_stats",tm,G.captured)+
+    (cur&&win&&next&&next.wi!==cur.wi?t("end_unlock",next.wi+1,t("w"+next.wi+"n")):"")+(cur&&win&&!next?t("end_all"):"");
   const again=$("again"),other=$("toMenu");
-  if(cur&&win&&next){again.textContent="Niveau suivant";again.onclick=()=>startLevel(next.wi,next.li);}
-  else if(cur){again.textContent="Rejouer";again.onclick=()=>startLevel(cur.wi,cur.li);}
-  else{again.textContent="Rejouer";again.onclick=startFree;}
-  if(cur){other.textContent="Mondes";other.onclick=()=>{renderWorlds();show("worlds");menuOpen=true;};}
-  else{other.textContent="Menu";other.onclick=openMenu;}
+  if(cur&&win&&next){again.textContent=t("next_lvl");again.onclick=()=>startLevel(next.wi,next.li);}
+  else if(cur){again.textContent=t("replay");again.onclick=()=>startLevel(cur.wi,cur.li);}
+  else{again.textContent=t("replay");again.onclick=startFree;}
+  if(cur){other.textContent=t("worlds_btn");other.onclick=()=>{renderWorlds();show("worlds");menuOpen=true;};}
+  else{other.textContent=t("menu");other.onclick=openMenu;}
   const g0=G;setTimeout(()=>{if(G!==g0)return;show("end");menuOpen=true;},700);}
 
 // Tutoriel de la première partie (monde 1, niveau 1)
 let tuto=null;
 const playTime=g=>Math.max(0,g.time-(g.tutoT||0));
 const TUTO=[
-  {txt:()=>"Ton étoile produit des vaisseaux. Touche-la.",
+  {txt:()=>t("tuto1"),
     hl:()=>[tuto.a],pause:1,only:()=>[tuto.a],done:()=>G.sel===tuto.a},
-  {txt:()=>"Touche l'étoile grise pour l'attaquer.",
+  {txt:()=>t("tuto2"),
     hl:()=>[tuto.b],line:()=>[tuto.a,tuto.b],pause:1,only:()=>[tuto.a,tuto.b],done:()=>G.fleets.some(f=>f.owner===1)},
-  {txt:()=>"Il faut plus de vaisseaux qu'elle pour la prendre.",
+  {txt:()=>t("tuto3"),
     hl:()=>[tuto.b],done:()=>!G.fleets.some(f=>f.owner===1)},
   {enter:()=>{let best=null;for(const n of G.nodes){if(n.owner!==1)continue;for(const e of G.adj[n.id]){const m=G.nodes[e.to];if(m.owner===1)continue;
       const sc=(m.owner?50:0)+m.ships;if(!best||sc<best.sc)best={sc,s:n.id,c:m.id};}}
       if(best){tuto.s=best.s;tuto.c=best.c;}else{tuto.s=tuto.a;tuto.c=tuto.b;}},
-    txt:()=>(G.nodes[tuto.b].owner===1?"Bravo ! ":"Raté, il en fallait plus. ")+"Glisse d'une étoile à une autre : envoi automatique.",
+    txt:()=>(G.nodes[tuto.b].owner===1?t("tuto_bravo"):t("tuto_miss"))+t("tuto4"),
     hl:()=>[tuto.c],drag:()=>[tuto.s,tuto.c],done:()=>G.nodes.some(n=>n.owner===1&&n.rally!==null)},
-  {txt:()=>"Le mur autour de tes étoiles grandit avec le temps. Prends toutes les étoiles orange pour gagner.",
-    ok:"C'est parti",pause:1,only:()=>[]}
+  {txt:()=>t("tuto5"),
+    ok:"tuto_go",pause:1,only:()=>[]}
 ];
 function tutoStart(){
   const mine=G.nodes.filter(n=>n.owner===1).sort((x,y)=>y.ships-x.ships),a=mine[0];let b=null;
@@ -1010,12 +1244,12 @@ function tutoStart(){
   tuto={step:0,a:a.id,b:b.id};$("toast").hidden=true;$("tuto").hidden=false;layout();tutoShow();
 }
 function tutoShow(){const s=TUTO[tuto.step];if(s.enter)s.enter();
-  $("tutoN").textContent=`Tutoriel · ${tuto.step+1}/${TUTO.length}`;$("tutoT").textContent=s.txt();
-  $("tutoOk").hidden=!s.ok;if(s.ok)$("tutoOk").textContent=s.ok;$("tutoSkip").hidden=!!s.ok;}
+  $("tutoN").textContent=t("tuto_n",tuto.step+1,TUTO.length);$("tutoT").textContent=s.txt();
+  $("tutoOk").hidden=!s.ok;if(s.ok)$("tutoOk").textContent=t(s.ok);$("tutoSkip").hidden=!!s.ok;}
 function tutoTick(){const s=TUTO[tuto.step];if(s.done&&s.done())tutoNext();}
 function tutoNext(){tuto.step++;sfx("tick");if(tuto.step>=TUTO.length)tutoEnd();else tutoShow();}
 function tutoEnd(silent){tuto=null;store.set("constella-tuto",true);$("tuto").hidden=true;layout();
-  if(!silent&&G&&cur)toast(null,"À toi de jouer !");}
+  if(!silent&&G&&cur)toast(null,t("your_turn"));}
 $("tutoOk").onclick=()=>{if(tuto)tutoNext();};
 $("tutoSkip").onclick=()=>{if(tuto)tutoEnd();};
 $("tutoAgain").onclick=()=>startLevel(0,0,true);
@@ -1023,7 +1257,7 @@ $("tutoAgain").onclick=()=>startLevel(0,0,true);
 // Son et vibration
 const SVG_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" stroke="none"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
 const SVG_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" stroke="none"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>';
-function soundUi(){$("sndBtn").innerHTML=snd.on?SVG_ON:SVG_OFF;$("sndBtn").setAttribute("aria-pressed",String(snd.on));$("sndBtn").setAttribute("aria-label",snd.on?"Couper le son":"Remettre le son");
+function soundUi(){$("sndBtn").innerHTML=snd.on?SVG_ON:SVG_OFF;$("sndBtn").setAttribute("aria-pressed",String(snd.on));$("sndBtn").setAttribute("aria-label",snd.on?t("snd_off"):t("snd_on"));$("sndBtn").title=snd.on?t("snd_off"):t("snd_on");
   mark("optSnd","v",snd.on?1:0);mark("optVib","v",snd.vib?1:0);}
 function setSound(v){snd.on=v;store.set("constella-son",v);if(v){audio();setTimeout(()=>{const d=G&&G.demo;if(d)G.demo=false;sfx("tick");if(d)G.demo=true;},30);}soundUi();}
 $("sndBtn").onclick=()=>setSound(!snd.on);
@@ -1034,9 +1268,22 @@ soundUi();
 segGroup("optTest","v",v=>{testMode=v==="1";store.set("constella-test",testMode);});
 mark("optTest","v",testMode?1:0);
 
+// Langue : textes de l'interface, sens d'écriture (arabe de droite à gauche)
+function applyLang(){
+  document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>{el.setAttribute("aria-label",t(el.dataset.i18nAria));if(el.hasAttribute("title"))el.title=t(el.dataset.i18nAria);});
+  document.querySelectorAll("#maps .map").forEach(b=>{b.querySelector("b").textContent=t("map_"+b.dataset.map+"_n");b.querySelector("small").textContent=t("map_"+b.dataset.map+"_d");});
+  document.querySelectorAll("#lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.l===lang)));
+  $("lang").setAttribute("aria-label",t("lang_h"));
+  campLabel();soundUi();if(!$("worlds").hidden)renderWorlds();if(tuto)tutoShow();if(G)refreshPanel();
+}
+document.querySelectorAll("#lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;store.set("constella-lang",lang);applyLang();});
+
 // Démo en fond du menu : l'IA joue contre elle-même
 function demo(){cur=null;G=buildFree("vega",DIFF.normal);G.demo=true;layout();}
-demo();campLabel();
+demo();applyLang();
 
 let last=performance.now(),hudT=0;
 function loop(now){
