@@ -41,6 +41,8 @@ Chaque niveau de campagne rapporte 1 à 3 étoiles : 1 pour la victoire, 2 si tu
 - Caractère des ennemis selon le niveau : agressif (te vise en priorité), prudent (se protège, prend d'abord les neutres) ou équilibré
 - Sons synthétisés (captures, explosions quand les flottes se percutent, améliorations, victoire), vibration sur mobile, bouton pour couper le son
 - Tutoriel guidé au premier niveau (revoir depuis le menu)
+- Mini tutoriel guidé à chaque nouvelle icône (Production, Rapide, Défense, Phare), avec l’icône qui brille
+- Bouton ? toujours disponible en jeu : explique les gestes et toutes les icônes débloquées (met la partie en pause)
 - Icônes autour de l'étoile sélectionnée (Production, Défense, Rapide, Bouclier, Phare, niveau du type, envoi auto), sans panneau de texte
 - Déblocage progressif en campagne : Production (1-3), Rapide (1-4), Défense (1-5), Bouclier (2-1), Phare (2-3), types niveau 2 (2-4) puis 3 (3-3) ; une petite carte « Nouveau » présente chaque déblocage
 - Trois catégories d'étoiles : normale, 2 points, 3 points (points sous l'étoile). Plus grandes, production plus rapide, plus dures à prendre. Monde 1 : normales seulement ; monde 2 : + 2 points ; mondes 3-4 : + 3 points

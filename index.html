@@ -80,6 +80,12 @@ button:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 .k-bouclier,.kk-bouclier{color:var(--shield)!important;border-color:rgba(191,230,255,.6)!important}
 .k-phare,.kk-phare{color:var(--gold)!important;border-color:rgba(242,193,78,.6)!important}
 .k-prod{color:var(--gold)}
+#help{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,calc(100% - 24px));max-height:calc(100% - 40px);overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;border-color:rgba(242,193,78,.55)}
+#help .ni .rb{width:36px;height:36px}
+#helpOk{background:var(--gold);color:#241a02;font-family:var(--display);font-weight:700;padding:9px;border-radius:10px;position:sticky;bottom:0}
+#helpH{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.rb.pulse{border-color:var(--gold)!important;box-shadow:0 0 0 3px rgba(242,193,78,.45),0 0 18px rgba(242,193,78,.7);animation:pl 1s ease-in-out infinite}
+@keyframes pl{50%{box-shadow:0 0 0 7px rgba(242,193,78,.25),0 0 26px rgba(242,193,78,.9)}}
 #news{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,calc(100% - 32px));padding:14px;display:flex;flex-direction:column;gap:10px;border-color:rgba(242,193,78,.55)}
 #newsH{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
 .ni{display:flex;gap:12px;align-items:center}
@@ -155,6 +161,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
       <button data-s="2">2×</button>
       <button data-s="3">3×</button>
     </div>
+    <button class="chip icon" id="helpBtn" data-i18n-aria="help_h" aria-label="Aide" title="Aide"><b style="font-family:var(--display);font-size:16px;width:20px;line-height:20px;text-align:center">?</b></button>
     <button class="chip icon" id="sndBtn" aria-label="Son" aria-pressed="true" title="Couper ou remettre le son"></button>
     <button class="chip" id="menuBtn" data-i18n="menu" style="padding:8px 12px;font-family:var(--display);font-weight:600">Menu</button>
   </div>
@@ -175,6 +182,7 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
   </div>
   <button class="chip icon" id="fitBtn" hidden data-i18n-aria="fit" aria-label="Recentrer la carte" title="Recentrer la carte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
   <div id="ring" hidden></div>
+  <div class="chip" id="help" hidden role="dialog"><span id="helpH" data-i18n="help_h">Aide</span><div id="helpL" style="display:flex;flex-direction:column;gap:12px"></div><button id="helpOk" data-i18n="help_close">Fermer</button></div>
   <div class="chip" id="news" hidden role="dialog" data-i18n-aria="news_aria" aria-label="Nouveauté"><span id="newsH" data-i18n="news_h">Nouveau</span><div id="newsL" style="display:flex;flex-direction:column;gap:10px"></div><button id="newsOk" data-i18n="news_ok">Compris</button></div>
 
     </div>
@@ -303,7 +311,7 @@ tuto_bravo:"Bravo ! ",tuto_miss:"Raté, il en fallait plus. ",tuto4:"Glisse d’
 snd_off:"Couper le son",snd_on:"Remettre le son",
 w0n:"Ceinture d’Aldra",w0d:"Un seul adversaire, prudent. Le temps d’apprendre.",w1n:"Nébuleuse de Vesk",w1d:"Un adversaire plus vif, des cartes plus grandes.",
 w2n:"Triangle de Kael",w2d:"Deux ennemis en même temps. Ils se battent aussi entre eux.",w3n:"Couronne d’Ysor",w3d:"Trois ennemis. Survivre d’abord, conquérir ensuite.",
-map_vega_n:"Anneau de Véga",map_vega_d:"13 systèmes, un cœur géant disputé au milieu.",map_cygne_n:"Delta du Cygne",map_cygne_d:"15 systèmes en zigzag, des flancs exposés."
+map_vega_n:"Anneau de Véga",map_vega_d:"13 systèmes, un cœur géant disputé au milieu.",map_cygne_n:"Delta du Cygne",map_cygne_d:"15 systèmes en zigzag, des flancs exposés.",help_h:"Aide",help_close:"Fermer",help_tap_t:"Envoi unique",help_tap_d:"Touche ton étoile, puis une cible : elle y envoie ses vaisseaux une fois (25, 50 ou 100 %, en bas).",help_drag_t:"Envoi automatique",help_drag_d:"Glisse d’une étoile à une autre : tous les vaisseaux partent, puis un paquet dès qu’il est prêt. Glisse à nouveau pour arrêter.",help_wall_t:"Mur",help_wall_d:"Les traits autour de tes étoiles. Il grandit avec le temps et chaque segment arrête 1 vaisseau ennemi.",help_prod_d:"+40 % de production par niveau (3 niveaux), sans inconvénient.",help_auto_d:"Touche cette icône puis une cible : même effet que glisser d’une étoile à l’autre.",ft_tap:"Nouvelle icône ! Touche ton étoile pour la voir.",ft_prod:"Touche l’icône qui brille, Production : ton étoile produira 40 % plus vite.",ft_def:"Touche l’icône qui brille, Défense : tes vaisseaux résistent mieux et ton mur grandit plus vite.",ft_rapide:"Touche l’éclair qui brille, Rapide : les flottes de cette étoile voleront 60 % plus vite.",ft_phare:"Touche le soleil qui brille, Phare : les flottes de cette étoile et de ses voisines iront plus vite et frapperont plus fort.",ft_after:"Bravo ! Le bouton ? en haut explique toutes les icônes, à tout moment."
 },
 en:{
 map_aria:"Galaxy map",speed_aria:"Game speed",pause:"Pause",snd_title:"Mute or unmute",menu:"Menu",tuto_skip:"Skip tutorial",
@@ -349,7 +357,7 @@ tuto_bravo:"Well done! ",tuto_miss:"Missed, you needed more. ",tuto4:"Drag from 
 snd_off:"Mute",snd_on:"Unmute",
 w0n:"Aldra Belt",w0d:"A single cautious opponent. Time to learn.",w1n:"Vesk Nebula",w1d:"A sharper opponent, bigger maps.",
 w2n:"Kael Triangle",w2d:"Two enemies at once. They also fight each other.",w3n:"Ysor Crown",w3d:"Three enemies. Survive first, conquer next.",
-map_vega_n:"Vega Ring",map_vega_d:"13 systems, a giant contested core in the middle.",map_cygne_n:"Cygnus Delta",map_cygne_d:"15 zigzag systems, exposed flanks."
+map_vega_n:"Vega Ring",map_vega_d:"13 systems, a giant contested core in the middle.",map_cygne_n:"Cygnus Delta",map_cygne_d:"15 zigzag systems, exposed flanks.",help_h:"Help",help_close:"Close",help_tap_t:"Single send",help_tap_d:"Tap your star, then a target: it sends its ships there once (25, 50 or 100%, at the bottom).",help_drag_t:"Auto-send",help_drag_d:"Drag from one star to another: all ships leave, then a pack as soon as it is ready. Drag again to stop.",help_wall_t:"Wall",help_wall_d:"The marks around your stars. It grows over time and each segment stops 1 enemy ship.",help_prod_d:"+40% production per level (3 levels), with no downside.",help_auto_d:"Tap this icon, then a target: same as dragging from one star to another.",ft_tap:"New icon! Tap your star to see it.",ft_prod:"Tap the glowing icon, Production: your star will build 40% faster.",ft_def:"Tap the glowing icon, Defense: your ships resist better and your wall grows faster.",ft_rapide:"Tap the glowing bolt, Rapid: fleets from this star will fly 60% faster.",ft_phare:"Tap the glowing sun, Beacon: fleets from this star and its neighbours will fly faster and hit harder.",ft_after:"Well done! The ? button at the top explains every icon, anytime."
 },
 es:{
 map_aria:"Mapa de la galaxia",speed_aria:"Velocidad del juego",pause:"Pausa",snd_title:"Silenciar o activar el sonido",menu:"Menú",tuto_skip:"Saltar el tutorial",
@@ -395,7 +403,7 @@ tuto_bravo:"¡Bien hecho! ",tuto_miss:"Fallaste, hacían falta más. ",tuto4:"Ar
 snd_off:"Silenciar",snd_on:"Activar el sonido",
 w0n:"Cinturón de Aldra",w0d:"Un solo adversario, prudente. Tiempo para aprender.",w1n:"Nebulosa de Vesk",w1d:"Un adversario más rápido, mapas más grandes.",
 w2n:"Triángulo de Kael",w2d:"Dos enemigos a la vez. También luchan entre ellos.",w3n:"Corona de Ysor",w3d:"Tres enemigos. Primero sobrevivir, luego conquistar.",
-map_vega_n:"Anillo de Vega",map_vega_d:"13 sistemas, un núcleo gigante disputado en el centro.",map_cygne_n:"Delta del Cisne",map_cygne_d:"15 sistemas en zigzag, flancos expuestos."
+map_vega_n:"Anillo de Vega",map_vega_d:"13 sistemas, un núcleo gigante disputado en el centro.",map_cygne_n:"Delta del Cisne",map_cygne_d:"15 sistemas en zigzag, flancos expuestos.",help_h:"Ayuda",help_close:"Cerrar",help_tap_t:"Envío único",help_tap_d:"Toca tu estrella y luego un objetivo: envía sus naves una vez (25, 50 o 100 %, abajo).",help_drag_t:"Envío automático",help_drag_d:"Arrastra de una estrella a otra: salen todas las naves y luego un grupo en cuanto está listo. Arrastra otra vez para parar.",help_wall_t:"Muro",help_wall_d:"Las marcas alrededor de tus estrellas. Crece con el tiempo y cada segmento detiene 1 nave enemiga.",help_prod_d:"+40 % de producción por nivel (3 niveles), sin desventaja.",help_auto_d:"Toca este icono y luego un objetivo: igual que arrastrar de una estrella a otra.",ft_tap:"¡Nuevo icono! Toca tu estrella para verlo.",ft_prod:"Toca el icono que brilla, Producción: tu estrella producirá un 40 % más rápido.",ft_def:"Toca el icono que brilla, Defensa: tus naves resisten mejor y tu muro crece más rápido.",ft_rapide:"Toca el rayo que brilla, Rápida: las flotas de esta estrella volarán un 60 % más rápido.",ft_phare:"Toca el sol que brilla, Faro: las flotas de esta estrella y de sus vecinas irán más rápido y golpearán más fuerte.",ft_after:"¡Bien hecho! El botón ? de arriba explica todos los iconos, en cualquier momento."
 },
 nl:{
 map_aria:"Kaart van de melkweg",speed_aria:"Spelsnelheid",pause:"Pauze",snd_title:"Geluid uit of aan",menu:"Menu",tuto_skip:"Tutorial overslaan",
@@ -441,7 +449,7 @@ tuto_bravo:"Goed zo! ",tuto_miss:"Mis, je had er meer nodig. ",tuto4:"Sleep van 
 snd_off:"Geluid uit",snd_on:"Geluid aan",
 w0n:"Gordel van Aldra",w0d:"Eén voorzichtige tegenstander. Tijd om te leren.",w1n:"Nevel van Vesk",w1d:"Een snellere tegenstander, grotere kaarten.",
 w2n:"Driehoek van Kael",w2d:"Twee vijanden tegelijk. Ze vechten ook onderling.",w3n:"Kroon van Ysor",w3d:"Drie vijanden. Eerst overleven, dan veroveren.",
-map_vega_n:"Ring van Vega",map_vega_d:"13 systemen, een reusachtig betwist hart in het midden.",map_cygne_n:"Delta van de Zwaan",map_cygne_d:"15 systemen in zigzag, open flanken."
+map_vega_n:"Ring van Vega",map_vega_d:"13 systemen, een reusachtig betwist hart in het midden.",map_cygne_n:"Delta van de Zwaan",map_cygne_d:"15 systemen in zigzag, open flanken.",help_h:"Hulp",help_close:"Sluiten",help_tap_t:"Eenmalig sturen",help_tap_d:"Tik op je ster en dan op een doel: ze stuurt haar schepen er één keer heen (25, 50 of 100%, onderaan).",help_drag_t:"Automatisch sturen",help_drag_d:"Sleep van de ene ster naar de andere: alle schepen vertrekken, daarna een groep zodra die klaar is. Sleep opnieuw om te stoppen.",help_wall_t:"Muur",help_wall_d:"De streepjes rond je sterren. Hij groeit met de tijd en elk stuk houdt 1 vijandelijk schip tegen.",help_prod_d:"+40% productie per niveau (3 niveaus), zonder nadeel.",help_auto_d:"Tik op dit icoon en dan op een doel: hetzelfde als slepen van ster naar ster.",ft_tap:"Nieuw icoon! Tik op je ster om het te zien.",ft_prod:"Tik op het oplichtende icoon, Productie: je ster bouwt 40% sneller.",ft_def:"Tik op het oplichtende icoon, Verdediging: je schepen houden beter stand en je muur groeit sneller.",ft_rapide:"Tik op de oplichtende bliksem, Snel: vloten van deze ster vliegen 60% sneller.",ft_phare:"Tik op de oplichtende zon, Baken: vloten van deze ster en haar buren gaan sneller en slaan harder.",ft_after:"Goed zo! De knop ? bovenaan legt alle iconen uit, op elk moment."
 },
 ar:{
 map_aria:"خريطة المجرة",speed_aria:"سرعة اللعبة",pause:"إيقاف مؤقت",snd_title:"كتم الصوت أو تشغيله",menu:"القائمة",tuto_skip:"تخطي الدرس",
@@ -487,7 +495,7 @@ tuto_bravo:"أحسنت! ",tuto_miss:"فاتتك، كنت تحتاج أكثر. ",
 snd_off:"كتم الصوت",snd_on:"تشغيل الصوت",
 w0n:"حزام ألدرا",w0d:"خصم واحد حذر. وقت للتعلم.",w1n:"سديم فيسك",w1d:"خصم أسرع، وخرائط أكبر.",
 w2n:"مثلث كايل",w2d:"عدوّان في الوقت نفسه. يتقاتلان أيضًا فيما بينهما.",w3n:"تاج يسور",w3d:"ثلاثة أعداء. انجُ أولًا، ثم انتصر.",
-map_vega_n:"حلقة فيغا",map_vega_d:"13 نظامًا، وقلب عملاق متنازع عليه في الوسط.",map_cygne_n:"دلتا الدجاجة",map_cygne_d:"15 نظامًا متعرجًا، وأجنحة مكشوفة."
+map_vega_n:"حلقة فيغا",map_vega_d:"13 نظامًا، وقلب عملاق متنازع عليه في الوسط.",map_cygne_n:"دلتا الدجاجة",map_cygne_d:"15 نظامًا متعرجًا، وأجنحة مكشوفة.",help_h:"مساعدة",help_close:"إغلاق",help_tap_t:"إرسال واحد",help_tap_d:"المس نجمك ثم هدفًا: يرسل سفنه إليه مرة واحدة (25 أو 50 أو 100٪، في الأسفل).",help_drag_t:"إرسال تلقائي",help_drag_d:"اسحب من نجم إلى آخر: تنطلق كل السفن، ثم دفعة كلما جهزت. اسحب مجددًا للإيقاف.",help_wall_t:"السور",help_wall_d:"الخطوط حول نجومك. يكبر مع الوقت وكل قطعة توقف سفينة معادية واحدة.",help_prod_d:"+40٪ إنتاج في كل مستوى (3 مستويات)، بلا عيب.",help_auto_d:"المس هذه الأيقونة ثم هدفًا: مثل السحب من نجم إلى آخر.",ft_tap:"أيقونة جديدة! المس نجمك لتراها.",ft_prod:"المس الأيقونة المضيئة، الإنتاج: سينتج نجمك أسرع بـ40٪.",ft_def:"المس الأيقونة المضيئة، الدفاع: تصمد سفنك أكثر ويكبر سورك أسرع.",ft_rapide:"المس البرق المضيء، السريع: أساطيل هذا النجم ستطير أسرع بـ60٪.",ft_phare:"المس الشمس المضيئة، المنارة: أساطيل هذا النجم وجيرانه ستكون أسرع وأقوى.",ft_after:"أحسنت! زر ؟ في الأعلى يشرح كل الأيقونات في أي وقت."
 }};
 const LANGS=["fr","en","es","nl","ar"];
 let lang=(()=>{try{const v=JSON.parse(localStorage.getItem("constella-lang")||"null");if(LANGS.includes(v))return v;}catch(e){}
@@ -1079,6 +1087,7 @@ const ICON={prod:'<path d="M5 19v-6M12 19V9M19 19V5"/>',def:'<path d="M12 3l7 3v
   klv:'<path d="M7 13l5-5 5 5M7 18l5-5 5 5"/>',auto:'<path d="M4 12a8 8 0 0 1 13.7-5.6L20 9M20 12a8 8 0 0 1-13.7 5.6L4 15"/><path d="M20 4v5h-5M4 20v-5h5"/>',
   t2:'<circle cx="12" cy="10" r="5.5"/><circle cx="9" cy="19.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="19.5" r="1.4" fill="currentColor" stroke="none"/>',
   t3:'<circle cx="12" cy="10" r="6.5"/><circle cx="6.5" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="20" r="1.4" fill="currentColor" stroke="none"/>',
+  tap:'<circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="8"/>',drag:'<circle cx="6" cy="18" r="2.5" fill="currentColor" stroke="none"/><path d="M9 15l9-9M13 6h5v5"/>',wall:'<circle cx="12" cy="12" r="8.5" stroke-dasharray="7 3"/><circle cx="12" cy="12" r="3.5"/>',
   zoom:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M10.5 8v5M8 10.5h5"/>'};
 const svgI=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
 const RB_LABEL={prod:1,def:1,rapide:1,bouclier:1,phare:1,klv:1,auto:1};
@@ -1086,7 +1095,7 @@ const RB={};
 Object.keys(RB_LABEL).forEach(k=>{const b=document.createElement("button");b.className="rb k-"+k;b.innerHTML=svgI(k)+'<i class="c"></i><i class="lv" hidden></i>';
   b.dataset.i18nAria="rb_"+k;b.title=t("rb_"+k);b.setAttribute("aria-label",t("rb_"+k));b.hidden=true;
   b.addEventListener("pointerdown",e=>e.stopPropagation());
-  b.onclick=()=>{const n=G&&G.sel!==null?G.nodes[G.sel]:null;if(!n)return;
+  b.onclick=()=>{if(tuto&&TUTO[tuto.step].btn&&TUTO[tuto.step].btn!==k)return;const n=G&&G.sel!==null?G.nodes[G.sel]:null;if(!n)return;
     if(k==="auto"){if(n.rally!==null||G.relayMode){n.rally=null;G.relayMode=false;}else G.relayMode=true;}else upgrade(n,k);refreshPanel();};
   $("ring").appendChild(b);RB[k]=b;});
 function refreshPanel(){
@@ -1139,7 +1148,7 @@ Object.entries(MAPS).forEach(([k,m])=>{const b=document.createElement("button");
   b.dataset.map=k;b.innerHTML=`<b></b><small></small>`;b.onclick=()=>{mapKey=k;mapsEl.querySelectorAll(".map").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");};mapsEl.appendChild(b);});
 let menuOpen=true;
 const show=id=>["menu","worlds","end"].forEach(s=>$(s).hidden=s!==id);
-function begin(g){if(String(curBg())!==String(bgKey))setTimeout(resize,0);if(tuto)tutoEnd(true);$("news").hidden=true;newsOpen=false;resetView();G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
+function begin(g){$("help").hidden=true;helpOpen=false;pendingFeat=null;if(String(curBg())!==String(bgKey))setTimeout(resize,0);if(tuto)tutoEnd(true);$("news").hidden=true;newsOpen=false;resetView();G=g;layout();show(null);menuOpen=false;refreshPanel();$("bar").innerHTML="";
   $("brand").textContent=cur?t("brand_world",cur.wi+1,cur.li+1):"CONSTELLA";}
 function startFree(){cur=null;begin(buildFree(mapKey,DIFF[diffKey]));toast(null,t("free_toast",t("map_"+mapKey+"_n")));}
 // Déblocage progressif : chaque entrée devient disponible à partir du niveau n° i de la campagne (0 = monde 1 niveau 1)
@@ -1160,9 +1169,10 @@ function showNews(idx){
     const ic=document.createElement("span");ic.className="rb k-"+(x.k==="klv"?"klv":x.k);ic.innerHTML=svgI(x.k);
     const tx=document.createElement("div");const b=document.createElement("b");b.textContent=t;const sm=document.createElement("small");sm.textContent=d;tx.append(b,sm);
     row.append(ic,tx);L.appendChild(row);});
+  const f=items.find(x=>FEAT_TUTO[x.k]&&x.v===1);pendingFeat=f?f.k:null;
   $("news").hidden=false;newsOpen=true;return true;
 }
-$("newsOk").onclick=()=>{$("news").hidden=true;newsOpen=false;};
+$("newsOk").onclick=()=>{$("news").hidden=true;newsOpen=false;if(pendingFeat&&G&&!G.over&&!G.demo){const k=pendingFeat;pendingFeat=null;featTutoStart(k);}};
 function startLevel(wi,li,forceTuto){cur={wi,li};const L=WORLDS[wi].levels[li];begin(buildLevel(wi,li));
   const idx=FLAT.findIndex(f=>f.wi===wi&&f.li===li);G.unlock=unlockAt(idx);
   if(wi===0&&li===0&&(forceTuto||!store.get("constella-tuto",false))){tutoStart();return;}
@@ -1221,7 +1231,7 @@ function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;re
 // Tutoriel de la première partie (monde 1, niveau 1)
 let tuto=null;
 const playTime=g=>Math.max(0,g.time-(g.tutoT||0));
-const TUTO=[
+const TUTO_MAIN=[
   {txt:()=>t("tuto1"),
     hl:()=>[tuto.a],pause:1,only:()=>[tuto.a],done:()=>G.sel===tuto.a},
   {txt:()=>t("tuto2"),
@@ -1236,20 +1246,53 @@ const TUTO=[
   {txt:()=>t("tuto5"),
     ok:"tuto_go",pause:1,only:()=>[]}
 ];
-function tutoStart(){
+let TUTO=TUTO_MAIN;
+function tutoStart(){TUTO=TUTO_MAIN;
   const mine=G.nodes.filter(n=>n.owner===1).sort((x,y)=>y.ships-x.ships),a=mine[0];let b=null;
   for(const n of G.nodes){if(n.owner!==0)continue;const p=path(a.id,n.id,1);if(!p||p.slice(1,-1).some(i=>G.nodes[i].owner!==1))continue;if(!b||n.ships<b.ships)b=n;}
   if(!b)return;
   if(b.ships>=a.ships*.8)b.ships=Math.floor(a.ships*.5);
-  tuto={step:0,a:a.id,b:b.id};$("toast").hidden=true;$("tuto").hidden=false;layout();tutoShow();
+  tuto={step:0,a:a.id,b:b.id,main:1};$("toast").hidden=true;$("tuto").hidden=false;layout();tutoShow();
 }
 function tutoShow(){const s=TUTO[tuto.step];if(s.enter)s.enter();
+  document.querySelectorAll(".rb.pulse").forEach(b=>b.classList.remove("pulse"));if(s.btn)RB[s.btn].classList.add("pulse");
   $("tutoN").textContent=t("tuto_n",tuto.step+1,TUTO.length);$("tutoT").textContent=s.txt();
   $("tutoOk").hidden=!s.ok;if(s.ok)$("tutoOk").textContent=t(s.ok);$("tutoSkip").hidden=!!s.ok;}
 function tutoTick(){const s=TUTO[tuto.step];if(s.done&&s.done())tutoNext();}
 function tutoNext(){tuto.step++;sfx("tick");if(tuto.step>=TUTO.length)tutoEnd();else tutoShow();}
-function tutoEnd(silent){tuto=null;store.set("constella-tuto",true);$("tuto").hidden=true;layout();
-  if(!silent&&G&&cur)toast(null,t("your_turn"));}
+function tutoEnd(silent){const main=tuto&&tuto.main;tuto=null;if(main)store.set("constella-tuto",true);$("tuto").hidden=true;layout();
+  document.querySelectorAll(".rb.pulse").forEach(b=>b.classList.remove("pulse"));
+  if(!silent&&G&&cur&&main)toast(null,t("your_turn"));}
+// mini tutoriel guidé quand une nouvelle icône se débloque
+const FEAT_TUTO={prod:1,def:1,rapide:1,phare:1};let pendingFeat=null;
+function featTutoStart(k){
+  const a=G.nodes.filter(n=>n.owner===1&&(k==="prod"||(k==="def"?n.kind!=="rapide":!n.kind))).sort((x,y)=>y.ships-x.ships)[0];if(!a)return;
+  const cost=k==="prod"?prodCost(a):k==="def"?defCost(a):SPECIAL_COST;if(a.ships<cost+3)a.ships=cost+3;
+  const snap=()=>[a.prod,a.def,a.kind].join(),s0=snap();
+  TUTO=[{txt:()=>t("ft_tap"),hl:()=>[a.id],pause:1,only:()=>[a.id],done:()=>G.sel===a.id},
+    {txt:()=>t("ft_"+k),pause:1,only:()=>[],btn:k,done:()=>snap()!==s0},
+    {txt:()=>t("ft_after"),ok:"tuto_go",pause:1,only:()=>[]}];
+  tuto={step:0,feat:k};$("toast").hidden=true;$("tuto").hidden=false;layout();tutoShow();
+}
+// aide toujours disponible : explication de chaque geste et de chaque icône débloquée
+let helpOpen=false;
+function openHelp(){
+  const u=G&&!G.demo?U():FULL,rows=[["tap",t("help_tap_t"),t("help_tap_d")],["drag",t("help_drag_t"),t("help_drag_d")+" "+t("help_auto_d")],["wall",t("help_wall_t"),t("help_wall_d")]];
+  if(u.prod)rows.push(["prod",t("rb_prod"),t("help_prod_d")]);
+  if(u.def)rows.push(["def",t("rb_def"),t("n_def1_d")]);
+  if(u.rapide)rows.push(["rapide",t("n_rapide_t"),t("n_rapide_d")]);
+  if(u.phare)rows.push(["phare",t("n_phare_t"),t("n_phare_d")]);
+  if(u.klv>1)rows.push(["klv",t("rb_klv"),t("n_klv_d",u.klv)]);
+  if(!G||G.demo||G.nodes.some(n=>n.size===2))rows.push(["t2",t("n_t2_t"),t("n_t2_d")]);
+  if(!G||G.demo||G.nodes.some(n=>n.size===3))rows.push(["t3",t("n_t3_t"),t("n_t3_d")]);
+  rows.push(["zoom",t("n_zoom_t"),t("n_zoom_d")]);
+  const L=$("helpL");L.innerHTML="";
+  rows.forEach(([k,ti,d])=>{const row=document.createElement("div");row.className="ni";const ic=document.createElement("span");ic.className="rb k-"+k;ic.innerHTML=svgI(k);
+    const tx=document.createElement("div");const b=document.createElement("b");b.textContent=ti;const sm=document.createElement("small");sm.textContent=d;tx.append(b,sm);row.append(ic,tx);L.appendChild(row);});
+  $("help").hidden=false;helpOpen=true;$("helpL").scrollTop=0;
+}
+$("helpBtn").onclick=()=>{if(helpOpen){$("help").hidden=true;helpOpen=false;}else openHelp();};
+$("helpOk").onclick=()=>{$("help").hidden=true;helpOpen=false;};
 $("tutoOk").onclick=()=>{if(tuto)tutoNext();};
 $("tutoSkip").onclick=()=>{if(tuto)tutoEnd();};
 $("tutoAgain").onclick=()=>startLevel(0,0,true);
@@ -1289,7 +1332,7 @@ let last=performance.now(),hudT=0;
 function loop(now){
   let dt=Math.min(.1,(now-last)/1000);last=now;
   if(G&&!G.over){
-    let sim=G.demo?dt:(menuOpen||newsOpen||(tuto&&TUTO[tuto.step].pause)?0:dt*speed*PACE);
+    let sim=G.demo?dt:(menuOpen||newsOpen||helpOpen||(tuto&&TUTO[tuto.step].pause)?0:dt*speed*PACE);
     if(tuto&&!G.demo)G.tutoT=(G.tutoT||0)+sim;
     while(sim>0){const s=Math.min(.05,sim);step(s);sim-=s;}
     if(tuto&&!menuOpen)tutoTick();
