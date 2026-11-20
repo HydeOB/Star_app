@@ -45,7 +45,7 @@ Chaque niveau de campagne rapporte 1 à 3 étoiles : 1 pour la victoire, 2 si tu
 - Déblocage progressif en campagne : Production (1-3), Rapide (1-4), Défense (1-5), Bouclier (2-1), Phare (2-3), types niveau 2 (2-4) puis 3 (3-3) ; une petite carte « Nouveau » présente chaque déblocage
 - Trois catégories d'étoiles : normale, 2 points, 3 points (points sous l'étoile). Plus grandes, production plus rapide, plus dures à prendre. Monde 1 : normales seulement ; monde 2 : + 2 points ; mondes 3-4 : + 3 points
 - Améliorations moins chères : Production et Défense niveau 1 à 5 vaisseaux (puis 15, 25) ; types à 5 vaisseaux
-- Bouclier fusionné dans la Défense : chaque niveau de Défense donne +40 % en défense et un mur plus grand et plus rapide (max 7, 9, 11 ; un segment toutes les 5, 4, 3 s). Types d'étoiles : Rapide et Phare
+- Bouclier fusionné dans la Défense : chaque niveau de Défense donne +40 % en défense et un mur plus grand et plus rapide (max 7, 9, 11 ; un segment toutes les 5, 4, 3 s). Types d'étoiles : Rapide (flottes +60 %, puis +80 %, +100 % ; sans Défense, sans bonus de production) et Phare
 - 5 langues : français, anglais, espagnol, néerlandais, arabe (de droite à gauche). Choix dans le menu, langue du téléphone par défaut
 - Zoom : pincer ou molette, glisser dans le vide pour déplacer, bouton pour recentrer
 - Contrôles tactiles et souris, affichage portrait et paysage
