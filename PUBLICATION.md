@@ -8,7 +8,7 @@ Ce qu'il te reste à faire, ce sont les étapes qui demandent ton identité et u
 
 1. Sur GitHub, ouvre l'onglet **Actions**, puis la dernière exécution **Android** (pastille verte).
 2. En bas, télécharge **constella-test-apk**, dézippe et envoie le fichier `.apk` sur ton téléphone.
-3. Ouvre-le et accepte « installer des applis inconnues ». Cette version de test garde le **mode test** (tous les niveaux ouverts) ; la version store ne l'a pas.
+3. Ouvre-le et accepte « installer des applis inconnues ».
 
 ## 1. Politique de confidentialité (5 minutes, obligatoire pour les deux stores)
 
@@ -58,7 +58,7 @@ Chaque modification poussée sur `main` recompile les applis. Le numéro de vers
 
 ```
 npm install
-npm run build            # construit www/ depuis index.html (polices intégrées, mode test masqué)
+npm run build            # construit www/ depuis index.html (polices intégrées)
 npx cap sync             # copie dans android/ et ios/
 npx cap open android     # ou ios (nécessite Android Studio / Xcode)
 node scripts/make-icons.js && npx capacitor-assets generate   # icônes et écran de démarrage
