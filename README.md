@@ -55,3 +55,7 @@ Chaque niveau de campagne rapporte 1 à 3 étoiles : 1 pour la victoire, 2 si tu
 ## Prochaines étapes possibles
 
 Campagne de niveaux, plus de types de planètes, sons et musique, sauvegarde, puis emballage en application Android/iOS (par exemple avec Capacitor).
+
+## Applications mobiles (Android et iPhone)
+
+Le jeu est emballé avec Capacitor (dossiers `android/` et `ios/`). GitHub Actions compile un APK de test et, une fois les clés configurées, le fichier pour le Play Store et l'envoi vers TestFlight. Tout est expliqué pas à pas dans [PUBLICATION.md](PUBLICATION.md). Fiche des stores, icône, bannière et captures : dossier `store/`.

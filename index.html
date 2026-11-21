@@ -1266,6 +1266,7 @@ function tutoEnd(silent){const main=tuto&&tuto.main;tuto=null;if(main)store.set(
 // mini tutoriel guidé quand une nouvelle icône se débloque
 const FEAT_TUTO={prod:1,def:1,rapide:1,phare:1};let pendingFeat=null;
 function featTutoStart(k){
+  const seen=store.get("constella-ftuto",{});if(seen[k])return;seen[k]=1;store.set("constella-ftuto",seen);
   const a=G.nodes.filter(n=>n.owner===1&&(k==="prod"||(k==="def"?n.kind!=="rapide":!n.kind))).sort((x,y)=>y.ships-x.ships)[0];if(!a)return;
   const cost=k==="prod"?prodCost(a):k==="def"?defCost(a):SPECIAL_COST;if(a.ships<cost+3)a.ships=cost+3;
   const snap=()=>[a.prod,a.def,a.kind].join(),s0=snap();

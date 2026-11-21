@@ -1,0 +1,11 @@
+{
+  "appId": "com.hydeob.constella",
+  "appName": "Constella",
+  "webDir": "www",
+  "backgroundColor": "#0a0c1b",
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 800, "backgroundColor": "#0a0c1b", "showSpinner": false }
+  },
+  "android": { "backgroundColor": "#0a0c1b" },
+  "ios": { "backgroundColor": "#0a0c1b", "contentInset": "never" }
+}
