@@ -40,7 +40,8 @@ Chaque niveau de campagne rapporte 1 à 3 étoiles : 1 pour la victoire, 2 si tu
 - IA à 3 niveaux : Facile, Normal, Difficile. Elle défend ses étoiles menacées (renforts des voisines), vise les étoiles faibles et combine plusieurs étoiles pour attaquer
 - Caractère des ennemis selon le niveau : agressif (te vise en priorité), prudent (se protège, prend d'abord les neutres) ou équilibré
 - Sons synthétisés (captures, explosions quand les flottes se percutent, améliorations, victoire), vibration sur mobile, bouton pour couper le son
-- Tutoriel guidé au premier niveau (revoir depuis le menu)
+- Accueil épuré : logo, gros bouton Jouer (reprend au prochain niveau), tuiles Partie libre / Comment jouer / Réglages qui ouvrent un panneau
+- Tutoriel guidé au premier niveau (revoir depuis Comment jouer)
 - Mini tutoriel guidé à chaque nouvelle icône (Production, Rapide, Défense, Phare), avec l’icône qui brille
 - Bouton ? toujours disponible en jeu : explique les gestes et toutes les icônes débloquées (met la partie en pause)
 - Icônes autour de l'étoile sélectionnée (Production, Défense, Rapide, Bouclier, Phare, niveau du type, envoi auto), sans panneau de texte

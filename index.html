@@ -116,6 +116,26 @@ h2{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform
 #endTitle{font-family:var(--display);font-size:clamp(34px,9vw,54px);margin:0;letter-spacing:.08em}
 #endStats{color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
 .setrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:14px}
+#menu{background:rgba(8,9,22,.55)}
+.home{align-items:center;text-align:center;max-width:420px;gap:14px}
+.home .tag{margin:-6px 0 0}
+.hlogo{width:88px;height:88px;filter:drop-shadow(0 0 14px rgba(62,224,122,.35))}
+.home .btns{width:100%;margin-top:18px;flex-direction:column}
+.go.play{padding:18px;border-radius:18px;font-size:26px;display:flex;flex-direction:column;gap:4px;box-shadow:0 0 36px rgba(62,224,122,.4)}
+.go.play>span{text-transform:uppercase;letter-spacing:.1em}
+.go.play small{font-family:var(--body,inherit);font-size:13px;font-weight:500;letter-spacing:0;opacity:.8}
+.lvl{color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px;padding:2px 8px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-top:4px}
+.tile{background:rgba(16,19,43,.78);border:1px solid var(--edge);border-radius:16px;padding:16px 6px;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--display);font-weight:600;font-size:13px}
+.tile svg{width:28px;height:28px}
+.mtop{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:14px;display:flex;gap:8px;z-index:2}
+[dir="rtl"] .mtop{right:auto;left:14px}
+.mi{height:40px;min-width:40px;padding:0 10px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--display);font-weight:600;font-size:14px}
+.mi svg{width:20px;height:20px}
+.sheetbg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3}
+.sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:82%;overflow:auto;z-index:4;background:rgba(14,17,38,.98);border-top:1px solid rgba(242,193,78,.5);border-radius:22px 22px 0 0;padding:18px 18px max(22px,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;animation:up .22s ease-out}
+.sheet h3{margin:0;font-family:var(--display);color:var(--gold);letter-spacing:.16em;font-size:13px;text-transform:uppercase}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
 .btns{display:flex;gap:10px;flex-wrap:wrap}.btns>*{flex:1}
 details.free{border:1px solid var(--edge);border-radius:12px;padding:10px 12px}
 details.free summary{cursor:pointer;font-family:var(--display);font-weight:600;letter-spacing:.06em}
@@ -189,54 +209,42 @@ details.free>div{display:flex;flex-direction:column;gap:14px}
   </div>
 
   <div class="screen" id="menu">
-    <div class="card">
+    <div class="mtop"><button class="chip mi" id="mLang" data-i18n-aria="lang_h" aria-label="Langue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg><span id="mLangL">FR</span></button><button class="chip mi" id="mSnd"></button></div>
+    <div class="card home">
+      <svg class="hlogo" viewBox="0 0 100 100" aria-hidden="true"><path d="M27 70L50 30M50 30L75 62M27 70L75 62" stroke="var(--me)" stroke-width="3" stroke-dasharray="6 4" fill="none"/><g fill="#10132b" stroke-width="4"><circle cx="27" cy="70" r="11" stroke="var(--me)"/><circle cx="75" cy="62" r="9" stroke="#ff5a3c"/><circle cx="50" cy="30" r="14" stroke="var(--me)"/></g></svg>
       <h1 class="logo">CONST<span>E</span>LLA</h1>
       <p class="tag" data-i18n="tag"></p>
-      <div class="chip seg" id="lang" role="group" aria-label="Langue" style="align-self:flex-start"><button data-l="fr">FR</button><button data-l="en">EN</button><button data-l="es">ES</button><button data-l="nl">NL</button><button data-l="ar">ع</button></div>
-      <div class="btns"><button class="go" id="campaign"><span data-i18n="campaign">Campagne</span><small id="campNext"></small></button><button class="ghost" id="resume" hidden data-i18n="resume">Reprendre</button></div>
-      <details class="free"><summary data-i18n="free">Partie libre</summary>
-        <div>
-          <div><h2 data-i18n="map">Carte</h2><div class="maps" id="maps"></div></div>
-          <div><h2 data-i18n="opponent">Adversaire</h2>
+      <div class="btns"><button class="go play" id="campaign"><span data-i18n="play">Jouer</span><small id="campNext"></small></button><button class="ghost" id="resume" hidden data-i18n="resume">Reprendre</button></div>
+      <button class="lvl" id="levels" data-i18n="levels">Choisir un niveau</button>
+      <div class="tiles">
+        <button class="tile" data-sheet="sFree"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="7" r="3"/><circle cx="17" cy="18" r="2"/><path d="M8.5 15l7-6M9 17.5h6"/></svg><span data-i18n="free">Partie libre</span></button>
+        <button class="tile" data-sheet="sHow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg><span data-i18n="how_h">Comment jouer</span></button>
+        <button class="tile" data-sheet="sSet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span data-i18n="settings">Réglages</span></button>
+      </div>
+    </div>
+    <div class="sheetbg" id="sheetBg" hidden></div>
+    <div class="sheet" id="sFree" hidden><h3 data-i18n="free">Partie libre</h3>
+      <div><h2 data-i18n="map">Carte</h2><div class="maps" id="maps"></div></div>
+      <div><h2 data-i18n="opponent">Adversaire</h2>
             <div class="chip seg" id="diff" role="group" data-i18n-aria="diff_aria" aria-label="Difficulté" style="display:inline-flex">
               <button data-d="facile" data-i18n="diff_facile">Facile</button>
               <button data-d="normal" aria-pressed="true" data-i18n="diff_normal">Normal</button>
               <button data-d="difficile" data-i18n="diff_difficile">Difficile</button>
             </div>
           </div>
-          <button class="ghost" id="start" data-i18n="start_free">Lancer la partie libre</button>
-        </div>
-      </details>
-      <div><h2 data-i18n="mun_h">Munitions · envoi automatique</h2>
-        <div class="setrow"><span data-i18n="mun_t">Après le premier envoi, envoyer par paquets de</span>
-          <div class="chip seg" id="qty" role="group" data-i18n-aria="qty_aria" aria-label="Vaisseaux par envoi">
+      <button class="ghost" id="start" data-i18n="start_free">Lancer la partie libre</button>
+    </div>
+    <div class="sheet" id="sHow" hidden><h3 data-i18n="how_h">Comment jouer</h3>
+      <div id="howL" style="display:flex;flex-direction:column;gap:12px"></div>
+      <button class="ghost" id="tutoAgain" data-i18n="tuto_again" style="margin-top:10px;width:100%">Revoir le tutoriel</button>
+    </div>
+    <div class="sheet" id="sSet" hidden><h3 data-i18n="settings">Réglages</h3>
+      <div class="setrow"><span data-i18n="lang_h">Langue</span><div class="chip seg" id="lang" role="group" aria-label="Langue"><button data-l="fr">FR</button><button data-l="en">EN</button><button data-l="es">ES</button><button data-l="nl">NL</button><button data-l="ar">ع</button></div></div>
+      <div class="setrow"><span data-i18n="sfx">Bruitages</span><div class="chip seg" id="optSnd" role="group" aria-label="Bruitages"><button data-v="1" data-i18n="yes">Oui</button><button data-v="0" data-i18n="no">Non</button></div></div>
+      <div class="setrow"><span data-i18n="vib">Vibration</span><div class="chip seg" id="optVib" role="group" aria-label="Vibration"><button data-v="1" data-i18n="yes">Oui</button><button data-v="0" data-i18n="no">Non</button></div></div>
+      <div class="setrow"><span data-i18n="auto_by">Envoi auto par</span><div class="chip seg" id="qty" role="group" data-i18n-aria="qty_aria" aria-label="Vaisseaux par envoi">
             <button data-q="3">3</button><button data-q="5" aria-pressed="true">5</button><button data-q="10">10</button>
           </div></div>
-      </div>
-      <div><h2 data-i18n="snd_h">Son et vibration</h2>
-        <div class="setrow"><span data-i18n="sfx">Bruitages</span>
-          <div class="chip seg" id="optSnd" role="group" aria-label="Bruitages"><button data-v="1" data-i18n="yes">Oui</button><button data-v="0" data-i18n="no">Non</button></div></div>
-        <div class="setrow"><span data-i18n="vib">Vibration (mobile)</span>
-          <div class="chip seg" id="optVib" role="group" aria-label="Vibration"><button data-v="1" data-i18n="yes">Oui</button><button data-v="0" data-i18n="no">Non</button></div></div>
-      </div>
-      <div><h2 data-i18n="how_h">Comment jouer</h2>
-        <ul class="rules">
-          <li data-i18n-html="r1"></li>
-          <li data-i18n-html="r2"></li>
-          <li data-i18n-html="r3"></li>
-          <li data-i18n-html="r4"></li>
-          <li data-i18n-html="r5"></li>
-          <li data-i18n-html="r6"></li>
-          <li data-i18n-html="r7"></li>
-          <li data-i18n-html="r8"></li>
-          <li data-i18n-html="r9"></li>
-          <li data-i18n-html="r10"></li>
-          <li data-i18n-html="r11"></li>
-          <li data-i18n-html="r12"></li>
-          <li data-i18n-html="r13"></li>
-        </ul>
-        <button class="ghost" id="tutoAgain" data-i18n="tuto_again" style="margin-top:10px;width:100%">Revoir le tutoriel</button>
-      </div>
     </div>
   </div>
 
@@ -266,7 +274,7 @@ const I18N={
 fr:{
 map_aria:"Carte de la galaxie",speed_aria:"Vitesse du jeu",pause:"Pause",snd_title:"Couper ou remettre le son",menu:"Menu",tuto_skip:"Passer le tutoriel",
 ratio_aria:"Part de la flotte envoyée",send:"Envoi",fit:"Recentrer la carte",news_aria:"Nouveauté",news_h:"Nouveau",news_ok:"Compris",
-tag:"Relie les étoiles, fais tourner tes chantiers, et reprends chaque système à l’adversaire.",
+tag:"Relie les étoiles, conquiers la galaxie.",
 campaign:"Campagne",resume:"Reprendre",free:"Partie libre",map:"Carte",opponent:"Adversaire",diff_aria:"Difficulté",diff_facile:"Facile",diff_normal:"Normal",diff_difficile:"Difficile",start_free:"Lancer la partie libre",
 mun_h:"Munitions · envoi automatique",mun_t:"Après le premier envoi, envoyer par paquets de",qty_aria:"Vaisseaux par envoi",
 snd_h:"Son et vibration",sfx:"Bruitages",vib:"Vibration (mobile)",yes:"Oui",no:"Non",test_h:"Mode test",test_t:"Ouvrir tous les niveaux de la campagne",lang_h:"Langue",
@@ -307,12 +315,12 @@ tuto_bravo:"Bravo ! ",tuto_miss:"Raté, il en fallait plus. ",tuto4:"Glisse d’
 snd_off:"Couper le son",snd_on:"Remettre le son",
 w0n:"Ceinture d’Aldra",w0d:"Un seul adversaire, prudent. Le temps d’apprendre.",w1n:"Nébuleuse de Vesk",w1d:"Un adversaire plus vif, des cartes plus grandes.",
 w2n:"Triangle de Kael",w2d:"Deux ennemis en même temps. Ils se battent aussi entre eux.",w3n:"Couronne d’Ysor",w3d:"Trois ennemis. Survivre d’abord, conquérir ensuite.",
-map_vega_n:"Anneau de Véga",map_vega_d:"13 systèmes, un cœur géant disputé au milieu.",map_cygne_n:"Delta du Cygne",map_cygne_d:"15 systèmes en zigzag, des flancs exposés.",help_h:"Aide",help_close:"Fermer",help_tap_t:"Envoi unique",help_tap_d:"Touche ton étoile, puis une cible : elle y envoie ses vaisseaux une fois (25, 50 ou 100 %, en bas).",help_drag_t:"Envoi automatique",help_drag_d:"Glisse d’une étoile à une autre : tous les vaisseaux partent, puis un paquet dès qu’il est prêt. Glisse à nouveau pour arrêter.",help_wall_t:"Mur",help_wall_d:"Les traits autour de tes étoiles. Il grandit avec le temps et chaque segment arrête 1 vaisseau ennemi.",help_prod_d:"+40 % de production par niveau (3 niveaux), sans inconvénient.",help_auto_d:"Touche cette icône puis une cible : même effet que glisser d’une étoile à l’autre.",ft_tap:"Nouvelle icône ! Touche ton étoile pour la voir.",ft_prod:"Touche l’icône qui brille, Production : ton étoile produira 40 % plus vite.",ft_def:"Touche l’icône qui brille, Défense : tes vaisseaux résistent mieux et ton mur grandit plus vite.",ft_rapide:"Touche l’éclair qui brille, Rapide : les flottes de cette étoile voleront 60 % plus vite.",ft_phare:"Touche le soleil qui brille, Phare : les flottes de cette étoile et de ses voisines iront plus vite et frapperont plus fort.",ft_after:"Bravo ! Le bouton ? en haut explique toutes les icônes, à tout moment."
+map_vega_n:"Anneau de Véga",map_vega_d:"13 systèmes, un cœur géant disputé au milieu.",map_cygne_n:"Delta du Cygne",map_cygne_d:"15 systèmes en zigzag, des flancs exposés.",play:"Jouer",settings:"Réglages",levels:"Choisir un niveau",auto_by:"Envoi auto par",help_h:"Aide",help_close:"Fermer",help_tap_t:"Envoi unique",help_tap_d:"Touche ton étoile, puis une cible : elle y envoie ses vaisseaux une fois (25, 50 ou 100 %, en bas).",help_drag_t:"Envoi automatique",help_drag_d:"Glisse d’une étoile à une autre : tous les vaisseaux partent, puis un paquet dès qu’il est prêt. Glisse à nouveau pour arrêter.",help_wall_t:"Mur",help_wall_d:"Les traits autour de tes étoiles. Il grandit avec le temps et chaque segment arrête 1 vaisseau ennemi.",help_prod_d:"+40 % de production par niveau (3 niveaux), sans inconvénient.",help_auto_d:"Touche cette icône puis une cible : même effet que glisser d’une étoile à l’autre.",ft_tap:"Nouvelle icône ! Touche ton étoile pour la voir.",ft_prod:"Touche l’icône qui brille, Production : ton étoile produira 40 % plus vite.",ft_def:"Touche l’icône qui brille, Défense : tes vaisseaux résistent mieux et ton mur grandit plus vite.",ft_rapide:"Touche l’éclair qui brille, Rapide : les flottes de cette étoile voleront 60 % plus vite.",ft_phare:"Touche le soleil qui brille, Phare : les flottes de cette étoile et de ses voisines iront plus vite et frapperont plus fort.",ft_after:"Bravo ! Le bouton ? en haut explique toutes les icônes, à tout moment."
 },
 en:{
 map_aria:"Galaxy map",speed_aria:"Game speed",pause:"Pause",snd_title:"Mute or unmute",menu:"Menu",tuto_skip:"Skip tutorial",
 ratio_aria:"Share of the fleet sent",send:"Send",fit:"Recenter the map",news_aria:"New",news_h:"New",news_ok:"Got it",
-tag:"Link the stars, keep your shipyards busy, and take every system back from your rivals.",
+tag:"Link the stars, conquer the galaxy.",
 campaign:"Campaign",resume:"Resume",free:"Free play",map:"Map",opponent:"Opponent",diff_aria:"Difficulty",diff_facile:"Easy",diff_normal:"Normal",diff_difficile:"Hard",start_free:"Start free play",
 mun_h:"Ammo · auto-send",mun_t:"After the first send, send in packs of",qty_aria:"Ships per send",
 snd_h:"Sound and vibration",sfx:"Sound effects",vib:"Vibration (mobile)",yes:"Yes",no:"No",test_h:"Test mode",test_t:"Unlock every campaign level",lang_h:"Language",
@@ -353,12 +361,12 @@ tuto_bravo:"Well done! ",tuto_miss:"Missed, you needed more. ",tuto4:"Drag from 
 snd_off:"Mute",snd_on:"Unmute",
 w0n:"Aldra Belt",w0d:"A single cautious opponent. Time to learn.",w1n:"Vesk Nebula",w1d:"A sharper opponent, bigger maps.",
 w2n:"Kael Triangle",w2d:"Two enemies at once. They also fight each other.",w3n:"Ysor Crown",w3d:"Three enemies. Survive first, conquer next.",
-map_vega_n:"Vega Ring",map_vega_d:"13 systems, a giant contested core in the middle.",map_cygne_n:"Cygnus Delta",map_cygne_d:"15 zigzag systems, exposed flanks.",help_h:"Help",help_close:"Close",help_tap_t:"Single send",help_tap_d:"Tap your star, then a target: it sends its ships there once (25, 50 or 100%, at the bottom).",help_drag_t:"Auto-send",help_drag_d:"Drag from one star to another: all ships leave, then a pack as soon as it is ready. Drag again to stop.",help_wall_t:"Wall",help_wall_d:"The marks around your stars. It grows over time and each segment stops 1 enemy ship.",help_prod_d:"+40% production per level (3 levels), with no downside.",help_auto_d:"Tap this icon, then a target: same as dragging from one star to another.",ft_tap:"New icon! Tap your star to see it.",ft_prod:"Tap the glowing icon, Production: your star will build 40% faster.",ft_def:"Tap the glowing icon, Defense: your ships resist better and your wall grows faster.",ft_rapide:"Tap the glowing bolt, Rapid: fleets from this star will fly 60% faster.",ft_phare:"Tap the glowing sun, Beacon: fleets from this star and its neighbours will fly faster and hit harder.",ft_after:"Well done! The ? button at the top explains every icon, anytime."
+map_vega_n:"Vega Ring",map_vega_d:"13 systems, a giant contested core in the middle.",map_cygne_n:"Cygnus Delta",map_cygne_d:"15 zigzag systems, exposed flanks.",play:"Play",settings:"Settings",levels:"Choose a level",auto_by:"Auto-send packs of",help_h:"Help",help_close:"Close",help_tap_t:"Single send",help_tap_d:"Tap your star, then a target: it sends its ships there once (25, 50 or 100%, at the bottom).",help_drag_t:"Auto-send",help_drag_d:"Drag from one star to another: all ships leave, then a pack as soon as it is ready. Drag again to stop.",help_wall_t:"Wall",help_wall_d:"The marks around your stars. It grows over time and each segment stops 1 enemy ship.",help_prod_d:"+40% production per level (3 levels), with no downside.",help_auto_d:"Tap this icon, then a target: same as dragging from one star to another.",ft_tap:"New icon! Tap your star to see it.",ft_prod:"Tap the glowing icon, Production: your star will build 40% faster.",ft_def:"Tap the glowing icon, Defense: your ships resist better and your wall grows faster.",ft_rapide:"Tap the glowing bolt, Rapid: fleets from this star will fly 60% faster.",ft_phare:"Tap the glowing sun, Beacon: fleets from this star and its neighbours will fly faster and hit harder.",ft_after:"Well done! The ? button at the top explains every icon, anytime."
 },
 es:{
 map_aria:"Mapa de la galaxia",speed_aria:"Velocidad del juego",pause:"Pausa",snd_title:"Silenciar o activar el sonido",menu:"Menú",tuto_skip:"Saltar el tutorial",
 ratio_aria:"Parte de la flota enviada",send:"Envío",fit:"Centrar el mapa",news_aria:"Novedad",news_h:"Nuevo",news_ok:"Entendido",
-tag:"Une las estrellas, mantén tus astilleros en marcha y recupera cada sistema del adversario.",
+tag:"Une las estrellas, conquista la galaxia.",
 campaign:"Campaña",resume:"Continuar",free:"Partida libre",map:"Mapa",opponent:"Adversario",diff_aria:"Dificultad",diff_facile:"Fácil",diff_normal:"Normal",diff_difficile:"Difícil",start_free:"Empezar partida libre",
 mun_h:"Munición · envío automático",mun_t:"Tras el primer envío, enviar en grupos de",qty_aria:"Naves por envío",
 snd_h:"Sonido y vibración",sfx:"Efectos de sonido",vib:"Vibración (móvil)",yes:"Sí",no:"No",test_h:"Modo prueba",test_t:"Abrir todos los niveles de la campaña",lang_h:"Idioma",
@@ -399,12 +407,12 @@ tuto_bravo:"¡Bien hecho! ",tuto_miss:"Fallaste, hacían falta más. ",tuto4:"Ar
 snd_off:"Silenciar",snd_on:"Activar el sonido",
 w0n:"Cinturón de Aldra",w0d:"Un solo adversario, prudente. Tiempo para aprender.",w1n:"Nebulosa de Vesk",w1d:"Un adversario más rápido, mapas más grandes.",
 w2n:"Triángulo de Kael",w2d:"Dos enemigos a la vez. También luchan entre ellos.",w3n:"Corona de Ysor",w3d:"Tres enemigos. Primero sobrevivir, luego conquistar.",
-map_vega_n:"Anillo de Vega",map_vega_d:"13 sistemas, un núcleo gigante disputado en el centro.",map_cygne_n:"Delta del Cisne",map_cygne_d:"15 sistemas en zigzag, flancos expuestos.",help_h:"Ayuda",help_close:"Cerrar",help_tap_t:"Envío único",help_tap_d:"Toca tu estrella y luego un objetivo: envía sus naves una vez (25, 50 o 100 %, abajo).",help_drag_t:"Envío automático",help_drag_d:"Arrastra de una estrella a otra: salen todas las naves y luego un grupo en cuanto está listo. Arrastra otra vez para parar.",help_wall_t:"Muro",help_wall_d:"Las marcas alrededor de tus estrellas. Crece con el tiempo y cada segmento detiene 1 nave enemiga.",help_prod_d:"+40 % de producción por nivel (3 niveles), sin desventaja.",help_auto_d:"Toca este icono y luego un objetivo: igual que arrastrar de una estrella a otra.",ft_tap:"¡Nuevo icono! Toca tu estrella para verlo.",ft_prod:"Toca el icono que brilla, Producción: tu estrella producirá un 40 % más rápido.",ft_def:"Toca el icono que brilla, Defensa: tus naves resisten mejor y tu muro crece más rápido.",ft_rapide:"Toca el rayo que brilla, Rápida: las flotas de esta estrella volarán un 60 % más rápido.",ft_phare:"Toca el sol que brilla, Faro: las flotas de esta estrella y de sus vecinas irán más rápido y golpearán más fuerte.",ft_after:"¡Bien hecho! El botón ? de arriba explica todos los iconos, en cualquier momento."
+map_vega_n:"Anillo de Vega",map_vega_d:"13 sistemas, un núcleo gigante disputado en el centro.",map_cygne_n:"Delta del Cisne",map_cygne_d:"15 sistemas en zigzag, flancos expuestos.",play:"Jugar",settings:"Ajustes",levels:"Elegir un nivel",auto_by:"Envío auto de",help_h:"Ayuda",help_close:"Cerrar",help_tap_t:"Envío único",help_tap_d:"Toca tu estrella y luego un objetivo: envía sus naves una vez (25, 50 o 100 %, abajo).",help_drag_t:"Envío automático",help_drag_d:"Arrastra de una estrella a otra: salen todas las naves y luego un grupo en cuanto está listo. Arrastra otra vez para parar.",help_wall_t:"Muro",help_wall_d:"Las marcas alrededor de tus estrellas. Crece con el tiempo y cada segmento detiene 1 nave enemiga.",help_prod_d:"+40 % de producción por nivel (3 niveles), sin desventaja.",help_auto_d:"Toca este icono y luego un objetivo: igual que arrastrar de una estrella a otra.",ft_tap:"¡Nuevo icono! Toca tu estrella para verlo.",ft_prod:"Toca el icono que brilla, Producción: tu estrella producirá un 40 % más rápido.",ft_def:"Toca el icono que brilla, Defensa: tus naves resisten mejor y tu muro crece más rápido.",ft_rapide:"Toca el rayo que brilla, Rápida: las flotas de esta estrella volarán un 60 % más rápido.",ft_phare:"Toca el sol que brilla, Faro: las flotas de esta estrella y de sus vecinas irán más rápido y golpearán más fuerte.",ft_after:"¡Bien hecho! El botón ? de arriba explica todos los iconos, en cualquier momento."
 },
 nl:{
 map_aria:"Kaart van de melkweg",speed_aria:"Spelsnelheid",pause:"Pauze",snd_title:"Geluid uit of aan",menu:"Menu",tuto_skip:"Tutorial overslaan",
 ratio_aria:"Deel van de vloot dat vertrekt",send:"Sturen",fit:"Kaart centreren",news_aria:"Nieuw",news_h:"Nieuw",news_ok:"Begrepen",
-tag:"Verbind de sterren, laat je werven draaien en herover elk systeem op je tegenstander.",
+tag:"Verbind de sterren, verover de melkweg.",
 campaign:"Campagne",resume:"Hervatten",free:"Vrij spel",map:"Kaart",opponent:"Tegenstander",diff_aria:"Moeilijkheid",diff_facile:"Makkelijk",diff_normal:"Normaal",diff_difficile:"Moeilijk",start_free:"Vrij spel starten",
 mun_h:"Munitie · automatisch sturen",mun_t:"Na de eerste zending, sturen in groepen van",qty_aria:"Schepen per zending",
 snd_h:"Geluid en trillen",sfx:"Geluidseffecten",vib:"Trillen (mobiel)",yes:"Ja",no:"Nee",test_h:"Testmodus",test_t:"Alle campagneniveaus openen",lang_h:"Taal",
@@ -445,12 +453,12 @@ tuto_bravo:"Goed zo! ",tuto_miss:"Mis, je had er meer nodig. ",tuto4:"Sleep van 
 snd_off:"Geluid uit",snd_on:"Geluid aan",
 w0n:"Gordel van Aldra",w0d:"Eén voorzichtige tegenstander. Tijd om te leren.",w1n:"Nevel van Vesk",w1d:"Een snellere tegenstander, grotere kaarten.",
 w2n:"Driehoek van Kael",w2d:"Twee vijanden tegelijk. Ze vechten ook onderling.",w3n:"Kroon van Ysor",w3d:"Drie vijanden. Eerst overleven, dan veroveren.",
-map_vega_n:"Ring van Vega",map_vega_d:"13 systemen, een reusachtig betwist hart in het midden.",map_cygne_n:"Delta van de Zwaan",map_cygne_d:"15 systemen in zigzag, open flanken.",help_h:"Hulp",help_close:"Sluiten",help_tap_t:"Eenmalig sturen",help_tap_d:"Tik op je ster en dan op een doel: ze stuurt haar schepen er één keer heen (25, 50 of 100%, onderaan).",help_drag_t:"Automatisch sturen",help_drag_d:"Sleep van de ene ster naar de andere: alle schepen vertrekken, daarna een groep zodra die klaar is. Sleep opnieuw om te stoppen.",help_wall_t:"Muur",help_wall_d:"De streepjes rond je sterren. Hij groeit met de tijd en elk stuk houdt 1 vijandelijk schip tegen.",help_prod_d:"+40% productie per niveau (3 niveaus), zonder nadeel.",help_auto_d:"Tik op dit icoon en dan op een doel: hetzelfde als slepen van ster naar ster.",ft_tap:"Nieuw icoon! Tik op je ster om het te zien.",ft_prod:"Tik op het oplichtende icoon, Productie: je ster bouwt 40% sneller.",ft_def:"Tik op het oplichtende icoon, Verdediging: je schepen houden beter stand en je muur groeit sneller.",ft_rapide:"Tik op de oplichtende bliksem, Snel: vloten van deze ster vliegen 60% sneller.",ft_phare:"Tik op de oplichtende zon, Baken: vloten van deze ster en haar buren gaan sneller en slaan harder.",ft_after:"Goed zo! De knop ? bovenaan legt alle iconen uit, op elk moment."
+map_vega_n:"Ring van Vega",map_vega_d:"13 systemen, een reusachtig betwist hart in het midden.",map_cygne_n:"Delta van de Zwaan",map_cygne_d:"15 systemen in zigzag, open flanken.",play:"Spelen",settings:"Instellingen",levels:"Kies een niveau",auto_by:"Auto-sturen per",help_h:"Hulp",help_close:"Sluiten",help_tap_t:"Eenmalig sturen",help_tap_d:"Tik op je ster en dan op een doel: ze stuurt haar schepen er één keer heen (25, 50 of 100%, onderaan).",help_drag_t:"Automatisch sturen",help_drag_d:"Sleep van de ene ster naar de andere: alle schepen vertrekken, daarna een groep zodra die klaar is. Sleep opnieuw om te stoppen.",help_wall_t:"Muur",help_wall_d:"De streepjes rond je sterren. Hij groeit met de tijd en elk stuk houdt 1 vijandelijk schip tegen.",help_prod_d:"+40% productie per niveau (3 niveaus), zonder nadeel.",help_auto_d:"Tik op dit icoon en dan op een doel: hetzelfde als slepen van ster naar ster.",ft_tap:"Nieuw icoon! Tik op je ster om het te zien.",ft_prod:"Tik op het oplichtende icoon, Productie: je ster bouwt 40% sneller.",ft_def:"Tik op het oplichtende icoon, Verdediging: je schepen houden beter stand en je muur groeit sneller.",ft_rapide:"Tik op de oplichtende bliksem, Snel: vloten van deze ster vliegen 60% sneller.",ft_phare:"Tik op de oplichtende zon, Baken: vloten van deze ster en haar buren gaan sneller en slaan harder.",ft_after:"Goed zo! De knop ? bovenaan legt alle iconen uit, op elk moment."
 },
 ar:{
 map_aria:"خريطة المجرة",speed_aria:"سرعة اللعبة",pause:"إيقاف مؤقت",snd_title:"كتم الصوت أو تشغيله",menu:"القائمة",tuto_skip:"تخطي الدرس",
 ratio_aria:"نسبة الأسطول المرسل",send:"إرسال",fit:"توسيط الخريطة",news_aria:"جديد",news_h:"جديد",news_ok:"فهمت",
-tag:"اربط النجوم، وشغّل أحواض سفنك، واستعد كل نظام من خصمك.",
+tag:"اربط النجوم واغزُ المجرة.",
 campaign:"الحملة",resume:"متابعة",free:"لعب حر",map:"الخريطة",opponent:"الخصم",diff_aria:"الصعوبة",diff_facile:"سهل",diff_normal:"عادي",diff_difficile:"صعب",start_free:"ابدأ اللعب الحر",
 mun_h:"الذخيرة · الإرسال التلقائي",mun_t:"بعد الإرسال الأول، أرسل على دفعات من",qty_aria:"عدد السفن في كل إرسال",
 snd_h:"الصوت والاهتزاز",sfx:"المؤثرات الصوتية",vib:"الاهتزاز (الهاتف)",yes:"نعم",no:"لا",test_h:"وضع التجربة",test_t:"فتح كل مستويات الحملة",lang_h:"اللغة",
@@ -491,7 +499,7 @@ tuto_bravo:"أحسنت! ",tuto_miss:"فاتتك، كنت تحتاج أكثر. ",
 snd_off:"كتم الصوت",snd_on:"تشغيل الصوت",
 w0n:"حزام ألدرا",w0d:"خصم واحد حذر. وقت للتعلم.",w1n:"سديم فيسك",w1d:"خصم أسرع، وخرائط أكبر.",
 w2n:"مثلث كايل",w2d:"عدوّان في الوقت نفسه. يتقاتلان أيضًا فيما بينهما.",w3n:"تاج يسور",w3d:"ثلاثة أعداء. انجُ أولًا، ثم انتصر.",
-map_vega_n:"حلقة فيغا",map_vega_d:"13 نظامًا، وقلب عملاق متنازع عليه في الوسط.",map_cygne_n:"دلتا الدجاجة",map_cygne_d:"15 نظامًا متعرجًا، وأجنحة مكشوفة.",help_h:"مساعدة",help_close:"إغلاق",help_tap_t:"إرسال واحد",help_tap_d:"المس نجمك ثم هدفًا: يرسل سفنه إليه مرة واحدة (25 أو 50 أو 100٪، في الأسفل).",help_drag_t:"إرسال تلقائي",help_drag_d:"اسحب من نجم إلى آخر: تنطلق كل السفن، ثم دفعة كلما جهزت. اسحب مجددًا للإيقاف.",help_wall_t:"السور",help_wall_d:"الخطوط حول نجومك. يكبر مع الوقت وكل قطعة توقف سفينة معادية واحدة.",help_prod_d:"+40٪ إنتاج في كل مستوى (3 مستويات)، بلا عيب.",help_auto_d:"المس هذه الأيقونة ثم هدفًا: مثل السحب من نجم إلى آخر.",ft_tap:"أيقونة جديدة! المس نجمك لتراها.",ft_prod:"المس الأيقونة المضيئة، الإنتاج: سينتج نجمك أسرع بـ40٪.",ft_def:"المس الأيقونة المضيئة، الدفاع: تصمد سفنك أكثر ويكبر سورك أسرع.",ft_rapide:"المس البرق المضيء، السريع: أساطيل هذا النجم ستطير أسرع بـ60٪.",ft_phare:"المس الشمس المضيئة، المنارة: أساطيل هذا النجم وجيرانه ستكون أسرع وأقوى.",ft_after:"أحسنت! زر ؟ في الأعلى يشرح كل الأيقونات في أي وقت."
+map_vega_n:"حلقة فيغا",map_vega_d:"13 نظامًا، وقلب عملاق متنازع عليه في الوسط.",map_cygne_n:"دلتا الدجاجة",map_cygne_d:"15 نظامًا متعرجًا، وأجنحة مكشوفة.",play:"العب",settings:"الإعدادات",levels:"اختر مستوى",auto_by:"إرسال تلقائي بدفعات من",help_h:"مساعدة",help_close:"إغلاق",help_tap_t:"إرسال واحد",help_tap_d:"المس نجمك ثم هدفًا: يرسل سفنه إليه مرة واحدة (25 أو 50 أو 100٪، في الأسفل).",help_drag_t:"إرسال تلقائي",help_drag_d:"اسحب من نجم إلى آخر: تنطلق كل السفن، ثم دفعة كلما جهزت. اسحب مجددًا للإيقاف.",help_wall_t:"السور",help_wall_d:"الخطوط حول نجومك. يكبر مع الوقت وكل قطعة توقف سفينة معادية واحدة.",help_prod_d:"+40٪ إنتاج في كل مستوى (3 مستويات)، بلا عيب.",help_auto_d:"المس هذه الأيقونة ثم هدفًا: مثل السحب من نجم إلى آخر.",ft_tap:"أيقونة جديدة! المس نجمك لتراها.",ft_prod:"المس الأيقونة المضيئة، الإنتاج: سينتج نجمك أسرع بـ40٪.",ft_def:"المس الأيقونة المضيئة، الدفاع: تصمد سفنك أكثر ويكبر سورك أسرع.",ft_rapide:"المس البرق المضيء، السريع: أساطيل هذا النجم ستطير أسرع بـ60٪.",ft_phare:"المس الشمس المضيئة، المنارة: أساطيل هذا النجم وجيرانه ستكون أسرع وأقوى.",ft_after:"أحسنت! زر ؟ في الأعلى يشرح كل الأيقونات في أي وقت."
 }};
 const LANGS=["fr","en","es","nl","ar"];
 let lang=(()=>{try{const v=JSON.parse(localStorage.getItem("constella-lang")||"null");if(LANGS.includes(v))return v;}catch(e){}
@@ -1198,12 +1206,18 @@ function renderWorlds(){
     list.appendChild(sec);});
 }
 function campLabel(){const nx=nextIndex();$("campNext").textContent=(nx<0?t("camp_done"):t("camp_next",FLAT[nx].wi+1,FLAT[nx].li+1))+` · ${totalStars()}/${FLAT.length*3} ★`;}
-$("campaign").onclick=()=>{renderWorlds();show("worlds");};
+$("campaign").onclick=()=>{const nx=nextIndex();if(nx<0){renderWorlds();show("worlds");}else{closeSheet();startLevel(FLAT[nx].wi,FLAT[nx].li);}};
+$("levels").onclick=()=>{renderWorlds();show("worlds");};
+// Accueil : tuiles qui ouvrent un panneau par le bas
+function closeSheet(){document.querySelectorAll(".sheet").forEach(x=>x.hidden=true);$("sheetBg").hidden=true;}
+function openSheet(id){closeSheet();if(id==="sHow")helpRows($("howL"),null);$(id).hidden=false;$("sheetBg").hidden=false;$(id).scrollTop=0;}
+document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>openSheet(b.dataset.sheet));
+$("sheetBg").onclick=closeSheet;$("mLang").onclick=()=>openSheet("sSet");$("mSnd").onclick=()=>setSound(!snd.on);
 $("wBack").onclick=()=>{campLabel();show("menu");};
-$("start").onclick=startFree;
+$("start").onclick=()=>{closeSheet();startFree();};
 $("menuBtn").onclick=openMenu;
 $("resume").onclick=()=>{show(null);menuOpen=false;refreshPanel();};
-function openMenu(){menuOpen=true;campLabel();show("menu");$("resume").hidden=!(G&&!G.over&&!G.demo);}
+function openMenu(){closeSheet();menuOpen=true;campLabel();show("menu");$("resume").hidden=!(G&&!G.over&&!G.demo);}
 function finish(win){if(G.over)return;G.over=true;if(G.demo)return;G.sel=null;refreshPanel();
   const tm=fmtT(playTime(G));let next=null;if(tuto)tutoEnd(true);sfx(win?"win":"lose");buzz(win?[30,40,30,40,90]:[220]);
   let got=0;
@@ -1273,31 +1287,30 @@ function featTutoStart(k){
 }
 // aide toujours disponible : explication de chaque geste et de chaque icône débloquée
 let helpOpen=false;
-function openHelp(){
-  const u=G&&!G.demo?U():FULL,rows=[["tap",t("help_tap_t"),t("help_tap_d")],["drag",t("help_drag_t"),t("help_drag_d")+" "+t("help_auto_d")],["wall",t("help_wall_t"),t("help_wall_d")]];
+function openHelp(){helpRows($("helpL"),G&&!G.demo?U():FULL);$("help").hidden=false;helpOpen=true;$("helpL").scrollTop=0;}
+function helpRows(L,u){const all=!u;u=u||FULL;const rows=[["tap",t("help_tap_t"),t("help_tap_d")],["drag",t("help_drag_t"),t("help_drag_d")+" "+t("help_auto_d")],["wall",t("help_wall_t"),t("help_wall_d")]];
   if(u.prod)rows.push(["prod",t("rb_prod"),t("help_prod_d")]);
   if(u.def)rows.push(["def",t("rb_def"),t("n_def1_d")]);
   if(u.rapide)rows.push(["rapide",t("n_rapide_t"),t("n_rapide_d")]);
   if(u.phare)rows.push(["phare",t("n_phare_t"),t("n_phare_d")]);
   if(u.klv>1)rows.push(["klv",t("rb_klv"),t("n_klv_d",u.klv)]);
-  if(!G||G.demo||G.nodes.some(n=>n.size===2))rows.push(["t2",t("n_t2_t"),t("n_t2_d")]);
-  if(!G||G.demo||G.nodes.some(n=>n.size===3))rows.push(["t3",t("n_t3_t"),t("n_t3_d")]);
+  if(all||!G||G.demo||G.nodes.some(n=>n.size===2))rows.push(["t2",t("n_t2_t"),t("n_t2_d")]);
+  if(all||!G||G.demo||G.nodes.some(n=>n.size===3))rows.push(["t3",t("n_t3_t"),t("n_t3_d")]);
   rows.push(["zoom",t("n_zoom_t"),t("n_zoom_d")]);
-  const L=$("helpL");L.innerHTML="";
+  L.innerHTML="";
   rows.forEach(([k,ti,d])=>{const row=document.createElement("div");row.className="ni";const ic=document.createElement("span");ic.className="rb k-"+k;ic.innerHTML=svgI(k);
     const tx=document.createElement("div");const b=document.createElement("b");b.textContent=ti;const sm=document.createElement("small");sm.textContent=d;tx.append(b,sm);row.append(ic,tx);L.appendChild(row);});
-  $("help").hidden=false;helpOpen=true;$("helpL").scrollTop=0;
 }
 $("helpBtn").onclick=()=>{if(helpOpen){$("help").hidden=true;helpOpen=false;}else openHelp();};
 $("helpOk").onclick=()=>{$("help").hidden=true;helpOpen=false;};
 $("tutoOk").onclick=()=>{if(tuto)tutoNext();};
 $("tutoSkip").onclick=()=>{if(tuto)tutoEnd();};
-$("tutoAgain").onclick=()=>startLevel(0,0,true);
+$("tutoAgain").onclick=()=>{closeSheet();startLevel(0,0,true);};
 
 // Son et vibration
 const SVG_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" stroke="none"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
 const SVG_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" stroke="none"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>';
-function soundUi(){$("sndBtn").innerHTML=snd.on?SVG_ON:SVG_OFF;$("sndBtn").setAttribute("aria-pressed",String(snd.on));$("sndBtn").setAttribute("aria-label",snd.on?t("snd_off"):t("snd_on"));$("sndBtn").title=snd.on?t("snd_off"):t("snd_on");
+function soundUi(){if($("mSnd"))$("mSnd").innerHTML=snd.on?SVG_ON:SVG_OFF;$("sndBtn").innerHTML=snd.on?SVG_ON:SVG_OFF;$("sndBtn").setAttribute("aria-pressed",String(snd.on));$("sndBtn").setAttribute("aria-label",snd.on?t("snd_off"):t("snd_on"));$("sndBtn").title=snd.on?t("snd_off"):t("snd_on");
   mark("optSnd","v",snd.on?1:0);mark("optVib","v",snd.vib?1:0);}
 function setSound(v){snd.on=v;store.set("constella-son",v);if(v){audio();setTimeout(()=>{const d=G&&G.demo;if(d)G.demo=false;sfx("tick");if(d)G.demo=true;},30);}soundUi();}
 $("sndBtn").onclick=()=>setSound(!snd.on);
@@ -1314,7 +1327,7 @@ function applyLang(){
   document.querySelectorAll("[data-i18n-aria]").forEach(el=>{el.setAttribute("aria-label",t(el.dataset.i18nAria));if(el.hasAttribute("title"))el.title=t(el.dataset.i18nAria);});
   document.querySelectorAll("#maps .map").forEach(b=>{b.querySelector("b").textContent=t("map_"+b.dataset.map+"_n");b.querySelector("small").textContent=t("map_"+b.dataset.map+"_d");});
   document.querySelectorAll("#lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.l===lang)));
-  $("lang").setAttribute("aria-label",t("lang_h"));
+  $("lang").setAttribute("aria-label",t("lang_h"));$("mLangL").textContent=lang==="ar"?"ع":lang.toUpperCase();
   campLabel();soundUi();if(!$("worlds").hidden)renderWorlds();if(tuto)tutoShow();if(G)refreshPanel();
 }
 document.querySelectorAll("#lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;store.set("constella-lang",lang);applyLang();});
