@@ -39,7 +39,7 @@ Chaque niveau de campagne rapporte 1 à 3 étoiles : 1 pour la victoire, 2 si tu
 - Partie libre : 2 cartes (Anneau de Véga, Delta du Cygne)
 - IA à 3 niveaux : Facile, Normal, Difficile. Elle défend ses étoiles menacées (renforts des voisines), vise les étoiles faibles et combine plusieurs étoiles pour attaquer
 - Caractère des ennemis selon le niveau : agressif (te vise en priorité), prudent (se protège, prend d'abord les neutres) ou équilibré
-- Sons synthétisés (captures, explosions quand les flottes se percutent, améliorations, victoire), vibration sur mobile, bouton pour couper le son
+- Sons synthétisés plus doux et modernes : cloches cristallines (FM), souffles, coups sourds, nappes de fin, petite réverbération spatiale
 - Accueil épuré : logo, gros bouton Jouer (ouvre le choix des niveaux), tuiles Partie libre / Comment jouer / Réglages qui ouvrent un panneau
 - 3 niveaux d'apprentissage lents avant le monde 1, ennemi passif : conquérir des étoiles, glisser pour envoyer en continu, améliorer une étoile (revoir depuis Comment jouer)
 - Mini tutoriel guidé à chaque nouvelle icône (Production, Rapide, Défense, Phare), avec l’icône qui brille
