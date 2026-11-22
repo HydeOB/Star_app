@@ -8,9 +8,9 @@
 | Identifiant (Android & iPhone) | `com.hydeob.constella` |
 | Catégorie | Jeux › Stratégie |
 | Prix | Gratuit |
-| Publicité / achats intégrés | Non / Non |
-| Classification | Tout public (PEGI 3 / 4+) – combats abstraits entre vaisseaux, sans violence réaliste |
-| Données collectées | Aucune |
+| Publicité / achats intégrés | Oui (AdMob) / Oui : « Sans publicité » 5,99 €, identifiant `constella_sans_pub`, non consommable |
+| Classification | Tout public (PEGI 3 / 4+) – combats abstraits entre vaisseaux. Public cible : 13 ans et plus (à cause des pubs) |
+| Données collectées | Identifiant publicitaire et infos de l'appareil, par le SDK Google AdMob (publicité). Partagées avec Google. Pas de données personnelles collectées par le jeu |
 | Politique de confidentialité | https://hydeob.github.io/Star_app/privacy.html (après activation de GitHub Pages) |
 | Langues | Français, anglais, espagnol, néerlandais, arabe |
 
@@ -33,7 +33,7 @@ Chaque étoile produit des vaisseaux en continu. Touche une étoile puis une cib
 • Zoom et déplacement sur les grandes cartes
 • Jusqu'à 3 étoiles par niveau selon ta vitesse
 • Aide toujours disponible avec le bouton ?
-• Fonctionne hors ligne, sans publicité, sans achat intégré, sans collecte de données
+• Fonctionne hors ligne. Gratuit avec publicités, ou sans publicité grâce à un achat unique
 
 **Mots-clés (iPhone, 100 car. max)** : stratégie,temps réel,étoiles,galaxie,espace,conquête,rts,tactique,planètes,flotte
 
@@ -56,7 +56,7 @@ Every star builds ships continuously. Tap a star then a target to attack, or dra
 • Zoom and pan on large maps
 • Up to 3 stars per level depending on your speed
 • Help always available with the ? button
-• Works offline, no ads, no in-app purchases, no data collection
+• Works offline. Free with ads, or ad-free with a one-time purchase
 
 **Keywords (iPhone, max 100 chars)**: strategy,real-time,stars,galaxy,space,conquest,rts,tactics,planets,fleet
 

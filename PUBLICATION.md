@@ -31,8 +31,10 @@ Après une minute, la page est en ligne : `https://hydeob.github.io/Star_app/pri
 4. Onglet **Actions › Android › Run workflow**. À la fin, télécharge **constella-play-store-aab** (fichier `.aab`).
 5. Dans la Play Console : *Créer une application* (nom Constella, jeu, gratuit), puis remplis :
    - la fiche (textes et images de `store/fiche-store.md`, `store/feature-graphic.png`, `store/icon-512.png`, `store/screenshots/android-*.png`) ;
-   - *Sécurité des données* : « aucune donnée collectée » ;
-   - *Classification du contenu* (questionnaire : pas de violence réaliste, pas d'achats) ;
+   - *Sécurité des données* : « Identifiants de l'appareil (identifiant publicitaire) » collectés et partagés **pour la publicité**, par le SDK Google AdMob ; données chiffrées en transit ;
+   - *Annonces* : « Oui, mon appli contient des annonces » ;
+   - *Classification du contenu* (questionnaire : pas de violence réaliste ; achats numériques : oui) ;
+   - *Public cible* : 13 ans et plus (une appli pour enfants a des règles de pub beaucoup plus strictes) ;
    - *Public cible* ; lien de politique de confidentialité ;
    - dépose le `.aab` dans **Test › Test fermé**, ajoute tes testeurs, puis passe en **Production** après les 14 jours.
 
@@ -48,7 +50,24 @@ Après une minute, la page est en ligne : `https://hydeob.github.io/Star_app/pri
    - `APPSTORE_KEY_P8` : tout le contenu du fichier `.p8`
    - `APPLE_TEAM_ID` : ton Team ID (developer.apple.com › Membership)
 5. Onglet **Actions › iOS › Run workflow**, coche **Envoyer vers TestFlight**. Environ 15 minutes plus tard, la version apparaît dans App Store Connect › TestFlight : tu peux l'installer sur ton iPhone avec l'appli TestFlight.
-6. Dans App Store Connect, remplis la fiche (textes de `store/fiche-store.md`, captures `store/screenshots/iphone-*.png`), *Confidentialité de l'app* : « aucune donnée collectée », classification 4+, choisis le build et clique **Soumettre pour vérification**. Apple répond en général en 1 à 3 jours.
+6. Dans App Store Connect, remplis la fiche (textes de `store/fiche-store.md`, captures `store/screenshots/iphone-*.png`), *Confidentialité de l'app* : « Identifiants › Identifiant de l'appareil » et « Données d'utilisation › Données publicitaires », utilisés pour la publicité tierce et liés au suivi ; classification 4+ ; choisis le build et clique **Soumettre pour vérification**. Apple répond en général en 1 à 3 jours.
+
+## 4. Publicités (AdMob) et achat « sans pub » à 5,99 €
+
+Tant que les vrais identifiants ne sont pas en place, l'appli affiche les **pubs de test de Google**. C'est normal et sans risque.
+
+**AdMob**
+1. Va sur https://admob.google.com avec ton compte Google, accepte les conditions et ajoute tes infos de paiement.
+2. *Applis › Ajouter une appli* : Android, puis une seconde fois iOS (nom Constella). Note les deux **identifiants d'application** (`ca-app-pub-…~…`).
+3. Pour chaque appli, crée deux *blocs d'annonces* : **Interstitiel** et **Avec récompense** (récompense : 20 vaisseaux). Note les identifiants (`ca-app-pub-…/…`).
+4. *Confidentialité et messages › RGPD* : crée et publie le message de consentement (obligatoire en Europe) pour les deux applis. Fais de même pour *Demande de suivi iOS (IDFA)*.
+5. Envoie-moi les 6 identifiants : je les mets dans `app/ads-config.js`, `strings.xml` et `Info.plist`, et je passe `testing` à `false`.
+6. Une fois l'appli publiée, relie-la à sa fiche Play Store / App Store dans AdMob, puis publie le fichier `app-ads.txt` qu'AdMob te donne (je peux le mettre sur la page GitHub Pages).
+
+**Achat « Sans publicité »**
+- Play Console › *Monétiser › Produits › Produits intégrés* › Créer : identifiant **`constella_sans_pub`**, nom « Sans publicité », prix 5,99 €. Il faut d'abord avoir envoyé une version contenant la facturation (n'importe quel `.aab` actuel) et configuré un profil de paiement marchand.
+- App Store Connect › ton appli › *Achats intégrés* › + : type **Non consommable**, identifiant **`constella_sans_pub`**, prix 5,99 €, avec une capture d'écran du réglage. Signe aussi l'accord *Applis payantes* (Business) avec tes coordonnées bancaires.
+- Le bouton **Restaurer** (Réglages) est déjà là : Apple l'exige.
 
 ## Mettre à jour le jeu plus tard
 

@@ -60,3 +60,7 @@ Campagne de niveaux, plus de types de planètes, sons et musique, sauvegarde, pu
 ## Applications mobiles (Android et iPhone)
 
 Le jeu est emballé avec Capacitor (dossiers `android/` et `ios/`). GitHub Actions compile un APK de test et, une fois les clés configurées, le fichier pour le Play Store et l'envoi vers TestFlight. Tout est expliqué pas à pas dans [PUBLICATION.md](PUBLICATION.md). Fiche des stores, icône, bannière et captures : dossier `store/`.
+
+### Publicités et achat « sans pub »
+
+Dans les applis mobiles uniquement : pub plein écran tous les 3 niveaux de campagne (jamais pendant une partie ni pendant l'apprentissage), pub bonus facultative (+20 vaisseaux au départ), consentement RGPD de Google. Achat unique « Sans publicité » à 5,99 € (identifiant `constella_sans_pub`), qui offre aussi le bonus sans pub. Réglages dans `app/ads-config.js` (pubs de test tant que les vrais identifiants AdMob ne sont pas fournis).

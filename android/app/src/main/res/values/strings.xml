@@ -4,4 +4,6 @@
     <string name="title_activity_main">Constella</string>
     <string name="package_name">com.hydeob.constella</string>
     <string name="custom_url_scheme">com.hydeob.constella</string>
+    <!-- AdMob : identifiant d'application (ici celui de TEST de Google, à remplacer par celui de Constella) -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
 </resources>
