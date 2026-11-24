@@ -39,8 +39,13 @@ jobs:
           VERSION_CODE: ${{ github.run_number }}
         working-directory: android
         run: |
-          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/constella.jks"
+          # retire les espaces / retours à la ligne ajoutés par un copier-coller
+          printf '%s' "$KEYSTORE_B64" | tr -d ' \r\n\t' | base64 -d > "$RUNNER_TEMP/constella.jks"
           export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/constella.jks"
+          export ANDROID_KEYSTORE_PASSWORD="$(printf '%s' "$ANDROID_KEYSTORE_PASSWORD" | tr -d ' \r\n\t')"
+          export ANDROID_KEY_PASSWORD="$(printf '%s' "$ANDROID_KEY_PASSWORD" | tr -d ' \r\n\t')"
+          export ANDROID_KEY_ALIAS="$(printf '%s' "$ANDROID_KEY_ALIAS" | tr -d ' \r\n\t')"
+          echo "longueurs : mot de passe ${#ANDROID_KEYSTORE_PASSWORD}, alias ${#ANDROID_KEY_ALIAS}, fichier $(stat -c%s "$ANDROID_KEYSTORE_PATH") octets"
           ./gradlew bundleRelease
         # le fichier .aab est ensuite déposé dans la Play Console
       - uses: actions/upload-artifact@v4
